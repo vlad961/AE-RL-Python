@@ -241,3 +241,9 @@ if __name__ == "__main__":
     save_model(attacker_agent, attacker_model_path)
     save_model(defender_agent, defender_model_path)
     print("Saved trained models.")
+
+#TODO: Check if the code is working as expected
+#TODO: save the models in the correct path
+#TODO: load if the models are saved...
+#TODO: check the logic of the code
+#TODO: Add code from Jupyter notebook to the main.py (Test code and further...)
