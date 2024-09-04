@@ -1,0 +1,35 @@
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 14ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 15ms/step
+
+|Def Loss 0.1188 | Def Reward in ep 096|
+|Att Loss 0.0498 | Att Reward in ep 004|
+|Def Estimated: [10 30 17 32 11]| Att Labels: [11 28 17 33 11]
+Traceback (most recent call last):
+  File "e:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\main.py", line 177, in <module>
+    states = env.reset()
+  File "e:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models\rl_env.py", line 51, in reset
+    DataCls._load_df(self)  # Reload and random index
+  File "e:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\data\data_cls.py", line 189, in _load_df
+    self.df = pd.read_csv(self.formated_train_path, sep=',')  # Read again the csv
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\io\parsers\readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\io\parsers\readers.py", line 626, in _read
+    return parser.read(nrows)
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\io\parsers\readers.py", line 1968, in read
+    df = DataFrame(
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\core\frame.py", line 778, in __init__
+    mgr = dict_to_mgr(data, index, columns, dtype=dtype, copy=copy, typ=manager)
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\core\internals\construction.py", line 503, in dict_to_mgr
+    return arrays_to_mgr(arrays, columns, index, dtype=dtype, typ=typ, consolidate=copy)
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\core\internals\construction.py", line 152, in arrays_to_mgr
+    return create_block_manager_from_column_arrays(
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\core\internals\managers.py", line 2144, in create_block_manager_from_column_arrays
+
+    mgr._consolidate_inplace()
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\core\internals\managers.py", line 1788, in _consolidate_inplace
+    self.blocks = _consolidate(self.blocks)
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\core\internals\managers.py", line 2269, in _consolidate
+    merged_blocks, _ = _merge_blocks(
+  File "E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\pandas\core\internals\managers.py", line 2301, in _merge_blocks
+    new_values = new_values[argsort]
+numpy.core._exceptions._ArrayMemoryError: Unable to allocate 35.6 MiB for an array with shape (37, 125973) and data type float64

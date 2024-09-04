@@ -99,7 +99,7 @@ if __name__ == "__main__":
     #obs_size = env.data_shape[1] - len(env.all_attack_names)
 
     # num_episodes = int(env.data_shape[0]/(iterations_episode)/10)
-    num_episodes = 98  # changed from 100 to 99 since my freeuser-limit is finished on 99
+    num_episodes = 80  # changed from 100 to 99 since my freeuser-limit is finished on 99 --> changed to 80 for local testing
 
     '''
     Definition for the defensor agent.

@@ -1,0 +1,61 @@
+
+|Epoch 000/098| time: 1.31|
+|Def Loss 0.0000 | Def Reward in ep 021|
+|Att Loss 0.0000 | Att Reward in ep 079|
+|Def Estimated: [16 18 23 19 24]| Att Labels: [ 5 29 23 36  7]
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 30ms/step
+2024-09-04 13:51:43.949721: W tensorflow/core/common_runtime/type_inference.cc:339] Type inference failed. This indicates an invalid graph that escaped type checking. Error message: INVALID_ARGUMENT: expected compatible input types, but input 1:
+type_id: TFT_OPTIONAL
+args {
+  type_id: TFT_PRODUCT
+  args {
+    type_id: TFT_TENSOR
+    args {
+      type_id: TFT_BOOL
+    }
+  }
+}
+ is neither a subtype nor a supertype of the combined inputs preceding it:
+type_id: TFT_OPTIONAL
+args {
+  type_id: TFT_PRODUCT
+  args {
+    type_id: TFT_TENSOR
+    args {
+      type_id: TFT_FLOAT
+    }
+  }
+}
+
+        for Tuple type infernce function 0
+        while inferring type of node 'StatefulPartitionedCall/compile_loss/custom_huber_loss/cond/output/_40'
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step
+WARNING:tensorflow:5 out of the last 5 calls to <function TensorFlowTrainer.make_predict_function.<locals>.one_step_on_data_distributed at 0x000002238A8A0430> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 11ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+WARNING:tensorflow:5 out of the last 5 calls to <function TensorFlowTrainer.make_train_function.<locals>.one_step_on_iterator at 0x000002238CC27370> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 11ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+WARNING:tensorflow:6 out of the last 6 calls to <function TensorFlowTrainer.make_train_function.<locals>.one_step_on_iterator at 0x000002238CCC76D0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 11ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 11ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 11ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 11ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 11ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step

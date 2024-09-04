@@ -1,0 +1,29 @@
+PS E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python> & e:/vlad9/Documents/VisualStudioCodeProjects/AE-RL-Python/.venv/Scripts/python.exe e:/vlad9/Documents/VisualStudioCodeProjects/AE-RL-Python/main.py
+2024-09-04 13:51:28.077265: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2024-09-04 13:51:29.398726: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+Current working dir: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python
+Downloaded the dataset
+
+Creating enviroment...
+2024-09-04 13:51:35.149308: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\keras\src\saving\saving_lib.py:713: UserWarning: Skipping variable loading for optimizer 'adam', because it has 10 variables whereas the saved optimizer has 2 variables.
+  saveable.load_own_variables(weights_store.get(inner_path))
+E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\.venv\lib\site-packages\keras\src\saving\saving_lib.py:713: UserWarning: Skipping variable loading for optimizer 'adam', because it has 18 variables whereas the saved optimizer has 2 variables.
+  saveable.load_own_variables(weights_store.get(inner_path))
+-------------------------------------------------------------------------------
+Total epoch: 98 | Iterations in epoch: 100| Minibatch from mem size: 100 | Total Samples: 9800|
+-------------------------------------------------------------------------------
+Dataset shape: (125973, 162)
+-------------------------------------------------------------------------------
+Attacker parameters: Num_actions=40 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=1|
+-------------------------------------------------------------------------------
+Defense parameters: Num_actions=5 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=3|
+-------------------------------------------------------------------------------
+
+|Epoch 000/098| time: 1.31|
+|Def Loss 0.0000 | Def Reward in ep 021|
+|Att Loss 0.0000 | Att Reward in ep 079|
+|Def Estimated: [16 18 23 19 24]| Att Labels: [ 5 29 23 36  7]
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step
