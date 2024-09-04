@@ -1,1 +1,3 @@
+data/datasets/NSL/formated_test_adv.data filter=lfs diff=lfs merge=lfs -text
+data/datasets/NSL/formated_train_adv.data filter=lfs diff=lfs merge=lfs -text
 *.data filter=lfs diff=lfs merge=lfs -text
