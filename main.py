@@ -33,8 +33,8 @@ if __name__ == "__main__":
     kdd_train = os.path.join(data_dir, "KDDTrain.txt")
     kdd_test = os.path.join(data_dir, "KDDTest.txt")
 
-    attacker_model_path = os.path.join(os.getcwd(), "models/attacker_model.h5")
-    defender_model_path = os.path.join(os.getcwd(), "models/defender_model.h5")
+    attacker_model_path = os.path.join(os.getcwd(), "models/attacker_model.keras")
+    defender_model_path = os.path.join(os.getcwd(), "models/defender_model.keras")
 
     download_file(kdd_train_url, kdd_train)
     download_file(kdd_test_url, kdd_test)
