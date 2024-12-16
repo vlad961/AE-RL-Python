@@ -1,9 +1,28 @@
 import numpy as np
 
 class ReplayMemory(object):
-    """Implements basic replay memory"""
+    """
+    Implements basic replay memory for reinforcement learning.
 
+    This class stores experiences (state, action, reward, terminal) and allows sampling of minibatches
+    for training reinforcement learning agents. It helps in breaking the correlation between consecutive
+    experiences by randomly sampling from the memory.
+
+    Attributes:
+        observation_size (int): The size of the observation space.
+        num_observed (int): The number of observed experiences.
+        max_size (int): The maximum size of the replay memory.
+        samples (dict): A dictionary to store observations, actions, rewards, and terminal flags.
+    """
+    
     def __init__(self, observation_size, max_size):
+        """
+        Initializes the replay memory.
+
+        Args:
+            observation_size (int): The size of the observation space.
+            max_size (int): The maximum size of the replay memory.
+        """
         self.observation_size = observation_size
         self.num_observed = 0
         self.max_size = max_size
@@ -16,6 +35,15 @@ class ReplayMemory(object):
         }
 
     def observe(self, state, action, reward, done):
+        """
+        Stores a new experience in the replay memory.
+
+        Args:
+            state (np.ndarray): The observed state.
+            action (int): The action taken.
+            reward (float): The reward received.
+            done (bool): Whether the episode has ended.
+        """
         index = self.num_observed % self.max_size
         self.samples['obs'][index, :] = state
         self.samples['action'][index, :] = action
@@ -25,6 +53,15 @@ class ReplayMemory(object):
         self.num_observed += 1
 
     def sample_minibatch(self, minibatch_size):
+        """
+        Samples a minibatch of experiences from the replay memory.
+
+        Args:
+            minibatch_size (int): The number of experiences to sample.
+
+        Returns:
+            tuple: A tuple containing batches of states, actions, rewards, next states, and terminal flags.
+        """
         max_index = min(self.num_observed, self.max_size) - 1
         sampled_indices = np.random.randint(max_index, size=minibatch_size)
 

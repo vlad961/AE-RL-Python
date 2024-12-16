@@ -94,5 +94,5 @@ class Agent(object):
 
         return loss
 
-    def act(self, state):
+    def act(self, state): # NOTE: In comparison to original code, the policy parameter was deleted since it is already defined in the constructor 
         raise NotImplementedError

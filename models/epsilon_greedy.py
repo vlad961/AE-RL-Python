@@ -3,12 +3,24 @@ import numpy as np
 import tensorflow as tf
 import sys
 
-class Policy:
-    def __init__(self, num_actions, estimator):
-        self.num_actions = num_actions
-        self.estimator = estimator
-
 class EpsilonGreedy(Policy):
+    """
+    Implements the Epsilon-Greedy policy for reinforcement learning.
+
+    The Epsilon-Greedy policy selects a random action (exploration) with probability epsilon and the best action (exploitation)
+    (based on the Q-values predicted by the estimator) with probability 1 - epsilon. The epsilon value
+    decays over time to balance exploration and exploitation.
+
+    Attributes:
+        estimator (object): The Q-value estimator.
+        num_actions (int): The number of possible actions.
+        epsilon (float): The probability of selecting a random action.
+        min_epsilon (float): The minimum value of epsilon after decay.
+        decay_rate (float): The rate at which epsilon decays.
+        epoch_length (int): The number of steps in one epoch.
+        step_counter (int): The counter for the number of steps taken.
+        epsilon_decay (bool): Whether epsilon should decay over time.
+    """
     def __init__(self, estimator, num_actions, epsilon, min_epsilon, decay_rate, epoch_length):
         Policy.__init__(self, num_actions, estimator)
         self.name = "Epsilon Greedy"
@@ -30,6 +42,15 @@ class EpsilonGreedy(Policy):
             self.epsilon_decay = False
 
     def get_actions(self, states):
+        """
+        Selects actions based on the Epsilon-Greedy policy.
+
+        Args:
+            states (np.ndarray): The current states.
+
+        Returns:
+            list: The selected actions.
+        """
         # get next action
         if np.random.rand() <= self.epsilon:
             actions = np.random.randint(0, self.num_actions, states.shape[0])
