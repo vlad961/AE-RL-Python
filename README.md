@@ -46,8 +46,44 @@ I used miniconda but venv will probably also work out.
    conda install matplotlib
    ```
 
+## macOS utilizing GPU
+### Requirements
+- Anaconda/Miniconda
+- Tested on macOS 15.1.1 (24B91), Apple M3 Pro
+#
+1. Create a virtual environment. You can use venv, however I used a miniconda distribution and the following steps.
 
-## Helpful resources to get the project running.
+```sh
+conda create --name ae-rl python=3.9
+```
+
+2. Work with the project environment
+```sh
+conda activate ae-rl #activate the env before working with it
+conda deactivate # deactivate
+```
+
+3. ```sh
+    conda install tensorflow
+    ```
+
+4. ```sh
+    python -m pip install tensorflow-macos
+    ```
+5. ```sh 
+    python -m pip install tensorflow-metal
+    ```
+6. ```sh 
+    conda install pandas
+    ```
+7. ```sh 
+    conda install scikit-learn
+    ```
+8. ```sh 
+    conda install matplotlib
+    ```
+
+## Helpful resources to get the project running (Win 11)
 
  Utilize GPU learning (windows-native):
  1. https://www.tensorflow.org/install/pip#windows-native
