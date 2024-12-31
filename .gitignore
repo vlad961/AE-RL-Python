@@ -166,3 +166,15 @@ cython_debug/
 
 # Ignore .vscode files
 .vscode/
+
+# Ignore files used to verify correct data preprocessing and formatting after my code changes
+data/datasets/formated/verification/formated_test_adv_VRFY.csv
+data/datasets/formated/verification/formated_test_adv_verify.csv
+data/datasets/formated/verification/formated_train_adv_VRFY.csv
+data/datasets/formated/verification/formated_train_adv_verify.csv
+data/datasets/origin-kaggle-com/nsl-kdd/verification/KDDTrain+FormatVerification.txt
+data/datasets/origin-kaggle-com/nsl-kdd/verification/KDDTest+FormatVerification.txt
+logs/*
+
+# Ignore trained models while developing //TODO: remove this line before deploying or create a final model directory
+models/trained-models/*
