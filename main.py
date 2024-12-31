@@ -36,7 +36,7 @@ def main():
 
     kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
     kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
-
+    logging.info(f"Used data files: \n{kdd_train},\n{kdd_test}")
     # Store the start time as a datetime object
     script_start_time = datetime.now()
 

@@ -4,6 +4,7 @@ import os
 from sklearn.utils import shuffle
 
 attack_map = {'normal': 'normal',
+
                 'back': 'DoS',
                 'land': 'DoS',
                 'neptune': 'DoS',
@@ -57,7 +58,7 @@ col_names = ["duration", "protocol_type", "service", "flag", "src_bytes",
                      "diff_srv_rate", "srv_diff_host_rate", "dst_host_count", "dst_host_srv_count",
                      "dst_host_same_srv_rate", "dst_host_diff_srv_rate", "dst_host_same_src_port_rate",
                      "dst_host_srv_diff_host_rate", "dst_host_serror_rate", "dst_host_srv_serror_rate",
-                     "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "labels", "dificulty"]
+                     "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "labels", "difficulty"]
 
 class DataCls:
     def __init__(self, trainset_path, testset_path, formated_trainset_path, 
@@ -163,7 +164,7 @@ class DataCls:
         for att in self.attack_map:
             if att in self.df.columns:
                 # Add only if there exists at least 1
-                if np.sum(self.df[att].values) > 1 and att not in self.attack_names:
+                if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
                     self.attack_names.append(att)
         # self.headers = list(self.df)
 
@@ -196,23 +197,22 @@ class DataCls:
         Returns:
             None
         """
-        # Test if formatted data exists already.
         if os.path.exists(formated_train_path) and os.path.exists(formated_test_path):
             return pd.read_csv(formated_train_path, sep=',')
+        
         # Format the data
-        # Get the parent directory of formated_train_path
         formated_dir = os.path.dirname(formated_train_path)
         if not os.path.exists(formated_dir):
             os.makedirs(formated_dir)
 
         # Formating the training dataset
         df = pd.read_csv(trainset_path, sep = ',', names = col_names, index_col = False)
-        if 'dificulty' in df.columns:
-            df.drop('dificulty', axis=1, inplace=True)  # in case of difficulty
+        if 'difficulty' in df.columns:
+            df.drop('difficulty', axis=1, inplace=True)
 
         test_data = pd.read_csv(testset_path, sep = ',', names = col_names, index_col = False)
-        if 'dificulty' in test_data:
-            test_data.drop('dificulty', axis = 1, inplace = True)
+        if 'difficulty' in test_data:
+            test_data.drop('difficulty', axis = 1, inplace = True)
 
         amount_train_samples = df.shape[0] # Save the amount of training samples
         frames = [df, test_data]
@@ -225,7 +225,7 @@ class DataCls:
         df = pd.concat([df.drop('flag', axis=1), pd.get_dummies(df['flag'])], axis=1)
 
         # NSL-KDD seems to have introduced faulty su_attempted values of '2' which are not documented in the original NSL nor in the improved NSL-KDD work # TODO Lese das Paper nochmal komplett durch und überprüfe ob Aussage tatsächlich stimmt.
-        # Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed it to 0)
+        # Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed them to 0)
         # 1 if ``su root'' command attempted; 0 otherwise
         df['su_attempted'] = df['su_attempted'].replace(2.0, 0.0)
 
@@ -233,13 +233,13 @@ class DataCls:
         df = pd.concat([df.drop('labels', axis=1), pd.get_dummies(df['labels'])], axis=1)
 
         # Normalization of the df
-        # normalized_df=(df-df.mean())/df.std()
+        # Normalization of the continous columns in the df (0-1) # TODO: Check if I get an improvement if I normalize the data with the tensorflow functional API instead. # TODO: What if I use float32 instead of float64?
         for indx, dtype in df.dtypes.items():
             if dtype == 'float64' or dtype == 'int64':
                 if df[indx].max() == 0 and df[indx].min() == 0:
-                    df[indx] = 0.0
+                    df[indx] = 0.0 # dtype = float64 TODO: change to float32 since there is anyway no information in the column
                 else:
-                    df[indx] = (df[indx] - df[indx].min()) / (df[indx].max() - df[indx].min())
+                    df[indx] = (df[indx] - df[indx].min()) / (df[indx].max() - df[indx].min()) # dtype = float64
 
         # Save data
         test_df = df.iloc[amount_train_samples:df.shape[0]]
@@ -295,7 +295,7 @@ class DataCls:
         for att in attack_map:
             if att in df.columns:
                 # Add only if there exists at least 1
-                if np.sum(df[att].values) > 1:
+                if np.sum(df[att].values) >= 1:
                     attack_names.append(att)
         return attack_names
 
@@ -307,5 +307,5 @@ class DataCls:
         for att in self.attack_map:
             if att in self.df.columns:
                 # Add only if there exists at least 1 attack in the column
-                if np.sum(self.df[att].values) > 1 and att not in self.attack_names:
+                if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
                     self.attack_names.append(att)
