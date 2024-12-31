@@ -22,22 +22,25 @@ I used miniconda but venv will probably also work out.
    python.exe -m pip install --upgrade pip
    ```
 
-5. ```sh
-   pip install tensorflow<2.11 # Anything above 2.10 is not supported on the GPU on Windows
+5. TensorFlow versions above 2.10 do not support GPU natively on Windows.
+   ```sh
+   pip install tensorflow<2.11 
    ```
 
 6. ```sh
    pip install numpy<2
    ```
 
-7. ```sh
-   python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))" # If a list of GPU devices is returned the TensorFlow installation was successful.
+7. If a list of GPU devices is returned by the following command, the TensorFlow installation was successful.
+   ```sh
+   python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))" 
    ```
 
 ### Additional libraries
 1. ```sh
    conda install pandas # Used for data processing
    ```
+   
 2. ```sh
    conda install scikit-learn
    ```
