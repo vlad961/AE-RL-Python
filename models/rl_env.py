@@ -1,12 +1,20 @@
 import numpy as np
+import os
 
 from data.data_cls import DataCls
 from models.attack_agent import AttackAgent
 
-
+cwd = os.getcwd()
+data_root_dir = os.path.join(cwd, "data/datasets/")
+data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
+data_formated_dir = os.path.join(data_root_dir, "formated/")
+formated_train_path = os.path.join(data_formated_dir, "formated_train_adv.csv")
+formated_test_path = os.path.join(data_formated_dir, "formated_test_adv.csv")
+kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
+kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 
 class RLenv(DataCls):
-    def __init__(self, dataset_type, attack_agent, trainset_path, testset_path, formated_train_path, formated_test_path, **kwargs):
+    def __init__(self, dataset_type, attack_agent: AttackAgent, trainset_path=kdd_train, testset_path=kdd_test, formated_train_path=formated_train_path, formated_test_path=formated_test_path, **kwargs):
         self.true_labels = None
         self.attack_agent = attack_agent
         DataCls.__init__(self, trainset_path, testset_path, formated_train_path, formated_test_path, dataset_type=dataset_type)
@@ -16,7 +24,6 @@ class RLenv(DataCls):
         self.iterations_episode = kwargs.get('iterations_episode', 10)
         if self.batch_size == 'full':
             self.batch_size = int(self.data_shape[0] / self.iterations_episode)
-
 
 
     def _update_state(self):
@@ -66,9 +73,6 @@ class RLenv(DataCls):
             self.def_true_labels[self.attack_types.index(self.attack_map[self.attack_names[act]])] += 1
 
         # Get new state and new true values
-        # NOTE: the following two uncommented lines were in the original code, however everything was written in one file and the attacker_agent and env variables where defined in __name__ == '__main__' block after this declaration.
-        #attack_actions = attacker_agent.act(self.states)
-        #self.states = env.get_states(attack_actions) ORIGINAL
         attack_actions = self.attack_agent.act(self.states)
         self.states = self.get_states(attack_actions)
 

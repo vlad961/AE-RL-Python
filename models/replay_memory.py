@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 
 class ReplayMemory(object):
@@ -28,7 +29,7 @@ class ReplayMemory(object):
         self.max_size = max_size
 
         # Debugging-Ausgaben
-        print(f"Initializing ReplayMemory with observation_size={self.observation_size} and max_size={self.max_size}")
+        logging.info(f"Initializing ReplayMemory with observation_size={self.observation_size} and max_size={self.max_size}")
 
         if self.max_size <= 0 or self.observation_size <= 0:
             raise ValueError("max_size and observation_size must be positive and greater than zero")

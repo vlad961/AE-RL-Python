@@ -1,15 +1,17 @@
+from models.helpers import download_datasets_if_missing, save_model, logger_setup
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
 from data.data_cls import DataCls
 from datetime import datetime
-import logging
-import tensorflow as tf
+from utils import plot_rewards_and_losses_during_training, plot_attack_distributions, test_trained_agent_quality
 
+
+import logging
 import numpy as np
 import time
 import os
-import requests
+
 
 """
 This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
@@ -17,25 +19,25 @@ This script is the main entry point for the project. It is responsible for downl
 Notes and credits:
 The following anomaly detection RL system is based on the work of Guillermo Caminero, Manuel Lopez-Martin, Belen Carro "Adversarial environment reinforcement learning algorithm for intrusion detection".
 The original project can be found at: https://github.com/gcamfer/Anomaly-ReactionRL
-To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipnb'
+To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipynb' https://github.com/gcamfer/Anomaly-ReactionRL/blob/master/Notebooks/AE_RL_NSL_KDD.ipynb
 """
 
-# This script works on Linux, macOS and MS Windows under the assumption that this "main.py" file lies directly within the root directory of the project.
 cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
 data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
 data_formated_dir = os.path.join(data_root_dir, "formated/")
 formated_train_path = os.path.join(data_formated_dir, "formated_train_adv.csv")
 formated_test_path = os.path.join(data_formated_dir, "formated_test_adv.csv")
+kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
+kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
+trained_models_dir = os.path.join(cwd, "models/trained-models/")
 
 
 def main():
+    logger_setup()
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     logging.info(f"Started script at: {timestamp_begin}")
     logging.info(f"Current working dir: {cwd}")
-
-    kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
-    kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
     logging.info(f"Used data files: \n{kdd_train},\n{kdd_test}")
     # Store the start time as a datetime object
     script_start_time = datetime.now()
@@ -68,7 +70,7 @@ def main():
         att_hidden_layers = 1
         att_hidden_size = 100
 
-        att_learning_rate = 0.2
+        att_learning_rate = 0.00025         #default learning_rate was hardcoded to = 0.00025 on an ADAM optimizer
         obs_size = DataCls.calculate_obs_size(formated_train_path) # Amount of features in the dataset (columns) - attack_types
         
 
@@ -105,7 +107,7 @@ def main():
         def_hidden_size = 100
         def_hidden_layers = 3
 
-        def_learning_rate = 0.2
+        def_learning_rate = 0.00025
 
         defender_agent = DefenderAgent(defender_valid_actions, obs_size, "EpsilonGreedy",
                                         epoch_length=iterations_episode,
@@ -118,7 +120,10 @@ def main():
                                         minibatch_size=minibatch_size,
                                         mem_size=1000,
                                         learning_rate=def_learning_rate,
-                                        ExpRep=ExpRep)
+                                        ExpRep=ExpRep,
+                                        target_model_name='defender_target_model',
+                                        model_name='defender_model'
+                                        )
         # Pretrained defender
         # defender_agent.model_network.model.load_weights("models/type_model.h5")
 
@@ -230,93 +235,35 @@ def main():
 
         # Save the trained models
         timestamp_end = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        attacker_model_path = os.path.join(os.getcwd(), f"models/trained-models/attacker_model-{timestamp_end}.keras")
-        defender_model_path = os.path.join(os.getcwd(), f"models/trained-models/defender_model-{timestamp_end}.keras")
+        attacker_model_path = os.path.join(trained_models_dir, f"{timestamp_end}/attacker_model.keras")
+        defender_model_path = os.path.join(trained_models_dir, f"{timestamp_end}/defender_model.keras")
 
         save_model(attacker_agent, attacker_model_path)
         save_model(defender_agent, defender_model_path)
         logging.info("Saved trained models.")
-        end_time = datetime.now()
-        logging.info(f"End of the script at: {end_time}")
         
-        # Calculate total runtime
         total_runtime = datetime.now() - script_start_time
-
         # Convert total runtime to hours, minutes, and seconds
         total_seconds = int(total_runtime.total_seconds())
         hours, remainder = divmod(total_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         logging.info(f"Total runtime: {hours:02}:{minutes:02}:{seconds:02}")
+        end_time = datetime.now()
+        logging.info(f"End of the script at: {end_time}")
 
+        # Test and visualize results
+        #test_trained_models(attacker_model_path, defender_model_path, env)
+        #plot_training_statistics(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain)
+        plots_path = os.path.join(trained_models_dir, f"{timestamp_end}/plots/")
+        logging.info("Plots saved in: {}".format(plots_path))
+        plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
+        plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
+        test_trained_agent_quality(attacker_agent, defender_model_path, formated_test_path, plots_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)
 
-#TODO: Check if the code is working as  -
-#TODO: Check why there is a discrepancy between the formatted data of origin code and my current impl... --> where have I introduced some error ?
-
-#TODO: check the logic of the code
-#TODO: Add code from Jupyter notebook to the main.py (Test code and further...)
-
-
-##################
-# Helper Methods #
-##################
-
-def download_file(url:str, local_filename:str):
-    """
-    Download a file from a given URL and save it locally.
-
-    Args:
-        url (str): The URL of the file to download.
-        local_filename (str): The local path where the file will be saved.
-
-    Returns:
-        str: The local path where the file was saved.
-    """
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        with open(local_filename, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                f.write(chunk)
-    return local_filename
-
-def save_model(agent, model_path):
-    agent.model_network.model.save(model_path)
-
-def load_model(agent, model_path):
-    agent.model_network.model.load_model(model_path)
-
-def download_datasets_if_missing(kdd_train:str, kdd_test:str):
-    # If the data files for some reason do not exist, download them from the repo this work is based on.
-    if (not os.path.exists(kdd_train)):
-        kdd_train_url = "https://raw.githubusercontent.com/gcamfer/Anomaly-ReactionRL/master/datasets/NSL/KDDTrain%2B.txt"
-        download_file(kdd_train_url, kdd_train)
-        logging.info("Downloaded: {}\nSaved in: {}", kdd_train_url, kdd_train)
-    if (not os.path.exists(kdd_test)):
-        kdd_test_url = "https://raw.githubusercontent.com/gcamfer/Anomaly-ReactionRL/master/datasets/NSL/KDDTest%2B.txt"
-        download_file(kdd_test_url, kdd_test)
-        logging.info("Downloaded: {}\nSaved in: {}", kdd_test_url, kdd_test)
-
-def logger_setup():
-    timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    # Configure logging
-    log_filename = os.path.join(cwd, 'logs/{}.log'.format(timestamp_begin))
-    logging.basicConfig(filename=os.path.join(cwd, log_filename), level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-    
-    # Create a console handler for the logger
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-
-    # Add the console handler to the logger
-    logging.getLogger().addHandler(console_handler)
-
-    # Redirect TensorFlow logs to the logging module
-    tf.get_logger().setLevel('INFO')
-    tf.get_logger().addHandler(logging.StreamHandler())
+# TODO: prettify the logging output + add more logging output (especially of tensorflow itself)
 
 # Run the main function
 if __name__ == "__main__":
-    logger_setup()
     main()

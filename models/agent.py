@@ -1,6 +1,3 @@
-"""
-        Reinforcement learning Agent definition
-"""
 import numpy as np
 from models.q_network import QNetwork
 from models.replay_memory import ReplayMemory
@@ -8,6 +5,9 @@ from models.epsilon_greedy import EpsilonGreedy
 
 
 class Agent(object):
+    """
+        Reinforcement learning Agent definition
+    """
     def __init__(self, actions, obs_size, policy="EpsilonGreedy", **kwargs):
         self.done = None
         self.rewards = None
@@ -33,11 +33,13 @@ class Agent(object):
         self.model_network = QNetwork(self.obs_size, self.num_actions,
                                       kwargs.get('hidden_size', 100),
                                       kwargs.get('hidden_layers', 1),
-                                      kwargs.get('learning_rate', .2))
+                                      kwargs.get('learning_rate', .2),
+                                      kwargs.get('model_name', 'model'))
         self.target_model_network = QNetwork(self.obs_size, self.num_actions,
                                              kwargs.get('hidden_size', 100),
                                              kwargs.get('hidden_layers', 1),
-                                             kwargs.get('learning_rate', .2))
+                                             kwargs.get('learning_rate', .2),
+                                             kwargs.get('target_model_name', 'target_model'))
         self.target_model_network.model = QNetwork.copy_model(self.model_network.model)
 
         if policy == "EpsilonGreedy":
@@ -67,7 +69,7 @@ class Agent(object):
 
         next_actions = []
         # Compute Q targets
-        #        Q_prime = self.model_network.predict(next_states,self.minibatch_size)
+        # Q_prime = self.model_network.predict(next_states,self.minibatch_size)
         Q_prime = self.target_model_network.predict(next_states, self.minibatch_size)
         # TODO: fix performance in this loop
         for row in range(Q_prime.shape[0]):
@@ -80,7 +82,7 @@ class Agent(object):
         # target = reward + gamma * max_a'{Q(next_state,next_action)}
         targets = rewards.reshape(Q[sx, actions].shape) + \
                   self.gamma * Q[sx, next_actions] * \
-                  (1 - done.reshape(Q[sx, actions].shape))
+                  (1 - done.reshape(Q[sx, actions].shape)) # if done (episode has ended), no update
         Q[sx, actions] = targets
 
         loss = self.model_network.model.train_on_batch(states, Q)  # inputs,targets

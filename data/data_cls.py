@@ -154,33 +154,38 @@ class DataCls:
             - Sets self.loaded to True.
             - Updates self.attack_names with the names of the attacks present in the DataFrame.
         """
-        if self.dataset_type == 'train':
-            self.df = pd.read_csv(self.formated_train_path, sep=',')  # Read again the csv
+        if self.df is not None and self.attack_names is not None and len(self.attack_names) > 0:
+            self.loaded = True
+            self.index = np.random.randint(0, self.df.shape[0] - 1, dtype=np.int32)
+            return
         else:
-            self.df = pd.read_csv(self.formated_test_path, sep=',')
-        self.index = np.random.randint(0, self.df.shape[0] - 1, dtype=np.int32)
-        self.loaded = True
-        # Create a list with the existent attacks in the df
-        for att in self.attack_map:
-            if att in self.df.columns:
-                # Add only if there exists at least 1
-                if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
-                    self.attack_names.append(att)
+            if self.dataset_type == 'train':
+                self.df = pd.read_csv(self.formated_train_path, sep=',')  # Read again the csv
+            else:
+                self.df = pd.read_csv(self.formated_test_path, sep=',')
+            self.index = np.random.randint(0, self.df.shape[0] - 1, dtype=np.int32)
+            self.loaded = True
+            # Create a list with the existent attacks in the df
+            for att in self.attack_map:
+                if att in self.df.columns:
+                    # Add only if there exists at least 1
+                    if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
+                        self.attack_names.append(att)
         # self.headers = list(self.df)
 
     @staticmethod
-    def format_data(trainset_path: str, testset_path: str, formated_train_path: str, formated_test_path: str) -> pd.DataFrame:
+    def format_data(dataset_type: str, trainset_path: str, testset_path: str, formated_train_path: str, formated_test_path: str) -> pd.DataFrame:
         """
         Format the data for ready-to-use.
         
         Details:
             Formating the training dataset for ready-2-use data
             Remove the difficulty column because we do not want to consider it, and add the one-hot encoding for the categorical columns
-            Further su_attempted is changed to 0 if it is 2.
+            Further su_attempted values are changed from 2 to 0.
              
-            Note: Upon research my research, in the original KDD dataset there were only 0 and 1 values. 
+            Note: Upon my research, in the original KDD dataset there were only 0 and 1 values for the su_attempted column. 
             The improved NSL-KDD dataset has 0, 1, and 2 values but 2 values were not mentioned in the description.
-            Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed it to 0.
+            Therefore, I assume the authors of AE-RL considered 2 values as mistakes and changed them to 0.
             Reference to original KDD-Data: https://kdd.ics.uci.edu/databases/kddcup99/task.html
             Reference to NSL-KDD originate work was done by Tavallaee et. al. from University of New Brunswick how ever the data doesnt seem to be further maintained.
               https://www.unb.ca/cic/datasets/nsl.html(dead link),
@@ -198,7 +203,10 @@ class DataCls:
             None
         """
         if os.path.exists(formated_train_path) and os.path.exists(formated_test_path):
-            return pd.read_csv(formated_train_path, sep=',')
+            if(dataset_type == 'train'):
+                return pd.read_csv(formated_train_path, sep=',')
+            else:
+                return pd.read_csv(formated_test_path, sep=',')
         
         # Format the data
         formated_dir = os.path.dirname(formated_train_path)
@@ -255,7 +263,7 @@ class DataCls:
         """
         Instance method to format the data using instance attributes.
         """
-        self.df = DataCls.format_data(self.trainset_path, self.testset_path, self.formated_train_path, self.formated_test_path)
+        self.df = DataCls.format_data(self.dataset_type, self.trainset_path, self.testset_path, self.formated_train_path, self.formated_test_path)
         self.loaded = True
 
 
@@ -291,7 +299,7 @@ class DataCls:
             raise FileNotFoundError(f"File {data_path} not found. Please check the path.")
         
         df = pd.read_csv(data_path, sep=',')
-        # Create a list with the existent attacks in the df
+        # Create a list with the existent attacks in the data frame
         for att in attack_map:
             if att in df.columns:
                 # Add only if there exists at least 1

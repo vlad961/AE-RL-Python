@@ -14,15 +14,15 @@ class QNetwork():
     """
 
     def __init__(self, obs_size, num_actions, hidden_size=100,
-                 hidden_layers=1, learning_rate=0.2):
+                 hidden_layers=1, learning_rate=0.2, model_name='model'):
         """
         Initialize the network with the provided shape
         """
         self.obs_size = obs_size
         self.num_actions = num_actions
 
-        # Network arquitecture
-        self.model = tf.keras.Sequential()
+        # Network arquitecture // TODO: add tf.keras.layers.Normalization() to normalize the input
+        self.model = tf.keras.Sequential(name=model_name)
         # Add input layer
         # self.model.add(Dense(hidden_size, input_shape=(obs_size,), # Deactivated this since keras had error: '87: UserWarning: Do not pass an input_shape/input_dim argument to a layer. When using Sequential models, prefer using an Input(shape) object as the first layer in the model instead.'
         #                     activation='relu')) # TODO: recheck if this is the same as Dense in Keras
@@ -31,11 +31,12 @@ class QNetwork():
         for _ in range(hidden_layers):
             self.model.add(tf.keras.layers.Dense(hidden_size, activation='relu')) # TODO: Check if this is the same as Dense in Keras
         # Add output layer
-        self.model.add(tf.keras.layers.Dense(num_actions)) # TODO: Check if this is the same as Dense in Keras # changed from tf.keras.Layer.Dense to tf.keras.layers.Dense
+        self.model.add(tf.keras.layers.Dense(num_actions)) # TODO: Check whether I achieve better results if I add a softmax activation function here.
 
         # optimizer = optimizers.SGD(learning_rate)
         # optimizer = optimizers.Adam(alpha=learning_rate)
-        optimizer = optimizers.Adam(0.00025)
+        #optimizer = optimizers.Adam(0.00025)
+        optimizer = optimizers.Adam(learning_rate)
         # optimizer = optimizers.RMSpropGraves(learning_rate, 0.95, self.momentum, 1e-2)
 
         # Compilation of the model with optimizer and loss
