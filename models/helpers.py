@@ -32,18 +32,20 @@ def download_file(url:str, local_filename:str):
 def save_model(agent: Agent, model_path):
     if not os.path.exists(os.path.dirname(model_path)):
         os.makedirs(os.path.dirname(model_path))
-    # Rename the model
+    # Get the model summary and save it to a file
+    agent.model_network.model.save(model_path)
+    logging.info(f"Model '{agent.model_network.model_name}' saved in: {model_path}")
+    logging.info(f"Model summary:\n{get_model_summary(agent)}")
+
+def get_model_summary(model):
     stream = io.StringIO()
-    agent.model_network.model.summary(print_fn=lambda x: stream.write(x + "\n"))
+    if isinstance(model, Agent):
+        model.model_network.model.summary(print_fn=lambda x: stream.write(x + "\n"))
+    else:
+        model.summary(print_fn=lambda x: stream.write(x + "\n"))
     summary_str = stream.getvalue()
     stream.close()
-    agent.model_network.model.save(model_path)
-    logging.info("Model summary:\n{}".format(summary_str))
-    logging.info("Model saved in: {}".format(model_path))
-
-
-def load_model(agent: Agent, model_path):
-    agent.model_network.model.load_model(model_path)
+    return summary_str
 
 def download_datasets_if_missing(kdd_train:str, kdd_test:str):
     # If the data files for some reason do not exist, download them from the repo this work is based on.
@@ -61,12 +63,11 @@ def logger_setup():
     # Configure logging
     log_filename = os.path.join(cwd, 'logs/{}.log'.format(timestamp_begin))
     logging.basicConfig(filename=os.path.join(cwd, log_filename), level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-    
+                    format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
     # Create a console handler for the logger
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S'))
 
     # Add the console handler to the logger
     logging.getLogger().addHandler(console_handler)
@@ -74,3 +75,6 @@ def logger_setup():
     # Redirect TensorFlow logs to the logging module
     tf.get_logger().setLevel('INFO')
     tf.get_logger().addHandler(console_handler)
+
+    # Disable matplotlib logging
+    logging.getLogger('matplotlib').setLevel(logging.WARN)

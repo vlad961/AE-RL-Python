@@ -50,13 +50,13 @@ def main():
         ExpRep = True
         iterations_episode = 100
         # num_episodes = int(env.data_shape[0]/(iterations_episode)/10)
-        num_episodes = 2
+        num_episodes = 100
 
         logging.info("Creating enviroment...")
         if not os.path.exists(formated_train_path):
             DataCls.format_data(kdd_train, kdd_test, formated_train_path, formated_test_path)
 
-        attack_names = DataCls.get_attack_names(formated_train_path) 
+        attack_names = DataCls.get_attack_names(formated_train_path)
         attack_valid_actions = list(range(len(attack_names))) # NOTE: original code attack_valid_actions = list(range(len(env.attack_names)))
         attack_num_actions = len(attack_valid_actions)
 
@@ -85,7 +85,9 @@ def main():
                                         minibatch_size=minibatch_size,
                                         mem_size=1000,
                                         learning_rate=att_learning_rate,
-                                        ExpRep=ExpRep)
+                                        ExpRep=ExpRep,
+                                        target_model_name='attacker_target_model',
+                                        model_name='attacker_model')
 
 
         env = RLenv('train', attacker_agent, kdd_train, kdd_test, formated_train_path,
@@ -196,11 +198,11 @@ def main():
 
                 # Train network, update loss after at least minibatch_learns
                 if ExpRep and epoch * iterations_episode + i_iteration >= minibatch_size:
-                    def_loss += defender_agent.update_model()
-                    att_loss += attacker_agent.update_model()
+                    def_loss += defender_agent.update_model()[0]
+                    att_loss += attacker_agent.update_model()[0]
                 elif not ExpRep:
-                    def_loss += defender_agent.update_model()
-                    att_loss += attacker_agent.update_model()
+                    def_loss += defender_agent.update_model()[0]
+                    att_loss += attacker_agent.update_model()[0]
 
                 update_end_time = time.time()
 
@@ -255,10 +257,10 @@ def main():
         #test_trained_models(attacker_model_path, defender_model_path, env)
         #plot_training_statistics(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain)
         plots_path = os.path.join(trained_models_dir, f"{timestamp_end}/plots/")
-        logging.info("Plots saved in: {}".format(plots_path))
+        logging.info(f"Plots saved in: {plots_path}")
         plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
-        test_trained_agent_quality(attacker_agent, defender_model_path, formated_test_path, plots_path)
+        test_trained_agent_quality(defender_model_path, plots_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)
 

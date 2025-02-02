@@ -3,6 +3,15 @@ import pandas as pd
 import os
 from sklearn.utils import shuffle
 
+cwd = os.getcwd()
+data_root_dir = os.path.join(cwd, "data/datasets/")
+data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
+data_formated_dir = os.path.join(data_root_dir, "formated/")
+formated_train_path = os.path.join(data_formated_dir, "formated_train_adv.csv")
+formated_test_path = os.path.join(data_formated_dir, "formated_test_adv.csv")
+kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
+kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
+
 attack_map = {'normal': 'normal',
 
                 'back': 'DoS',
@@ -61,16 +70,15 @@ col_names = ["duration", "protocol_type", "service", "flag", "src_bytes",
                      "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "labels", "difficulty"]
 
 class DataCls:
-    def __init__(self, trainset_path, testset_path, formated_trainset_path, 
-                 formated_testset_path, dataset_type="train"):
+    def __init__(self, trainset_path=kdd_train, testset_path=kdd_test, formated_trainset_path=formated_train_path, 
+                 formated_testset_path=formated_test_path, dataset_type="train"):
         """
         Initialize the DataCls object.
-
         Args:
             trainset_path (str): Path to the training dataset.
             testset_path (str): Path to the test dataset.
-            formated_trainset_path (str): Path to the formated training dataset.
-            formated_testset_path (str): Path to the formated test dataset.
+            formated_trainset_path (str): Path to formated training dataset output.
+            formated_testset_path (str): Path to formated test dataset output.
             dataset_type (str): Type of the dataset, either 'train' or 'test'. Default is 'train'.
         """
         self.col_names = col_names

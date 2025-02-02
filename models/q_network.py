@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow.python.keras.losses import Huber
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import optimizers
+from tensorflow.keras.metrics import Precision, Recall
 
 cwd = os.getcwd()
 models_dir = os.path.join(cwd, "models/trained-models/")
@@ -20,6 +21,7 @@ class QNetwork():
         """
         self.obs_size = obs_size
         self.num_actions = num_actions
+        self.model_name = model_name
 
         # Network arquitecture // TODO: add tf.keras.layers.Normalization() to normalize the input
         self.model = tf.keras.Sequential(name=model_name)
@@ -39,8 +41,10 @@ class QNetwork():
         optimizer = optimizers.Adam(learning_rate)
         # optimizer = optimizers.RMSpropGraves(learning_rate, 0.95, self.momentum, 1e-2)
 
+        #f1_score = F1Score() -> use this if you want to use the F1 score as a metric in the model. For my OS configs, this is not available.
         # Compilation of the model with optimizer and loss
-        self.model.compile(loss=Huber(delta=1.0), optimizer=optimizer)
+        self.model.compile(loss=Huber(delta=1.0), optimizer=optimizer,
+                            metrics=["accuracy", Precision(), Recall()])
 
     def predict(self, state, batch_size=1):
         """
