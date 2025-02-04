@@ -59,7 +59,8 @@ class EpsilonGreedy(Policy):
         else:
             # Get Q values
             ######
-            self.Q = self.estimator.predict(states, states.shape[0]) #states_tensor = tf.convert_to_tensor(states, dtype=tf.float32)
+            states_tensor = tf.convert_to_tensor(states, dtype=tf.float32)
+            self.Q = self.estimator.predict(states_tensor, states.shape[0])
             ##### inserted in predict method
             actions = []
             for row in range(self.Q.shape[0]):
