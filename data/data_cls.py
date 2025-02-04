@@ -1,6 +1,8 @@
+import logging
 import numpy as np
 import pandas as pd
 import os
+import tensorflow as tf
 from sklearn.utils import shuffle
 
 cwd = os.getcwd()
@@ -73,7 +75,10 @@ class DataCls:
     def __init__(self, trainset_path=kdd_train, testset_path=kdd_test, formated_trainset_path=formated_train_path, 
                  formated_testset_path=formated_test_path, dataset_type="train"):
         """
-        Initialize the DataCls object.
+        Initialize the DataCls object with the given parameters.
+        Initialize the attack types, attack names, and attack map.
+        Initialize the DataFrame and formats it if not already done, column names, and index.
+        Initializes the present attack_names in the DataFrame.
         Args:
             trainset_path (str): Path to the training dataset.
             testset_path (str): Path to the test dataset.
@@ -111,7 +116,20 @@ class DataCls:
         The dataset must be loaded in RAM
     '''
 
-    def get_batch(self, batch_size=100):
+    def get_batch(self, batch_size=100) -> tuple:
+        """
+        Get a batch of data from the loaded DataFrame.
+
+        This method reads the rows of the DataFrame starting from the current index up to the current index plus the batch size.
+        If the current index plus the batch size exceeds the number of rows in the DataFrame, the method wraps around to the beginning of the DataFrame.
+        The method returns the batch of data and the corresponding labels.
+
+        Args:
+            batch_size (int): The number of rows to read from the DataFrame.
+
+        Returns:
+            tuple: A tuple containing the batch of data and the corresponding labels.
+        """
         if self.loaded is False:
             self.load_formatted_df()
 
@@ -133,14 +151,21 @@ class DataCls:
         return batch, labels
 
     def get_full(self):
+        """
+        This method loads the full DataFrame. All possible attack names from the DataFrame are dropped.
+        The resulting panda DataDrame is converted into a tensor.
+        All labels/attacks that have at least one sample within the original DataFrame are saved, and the result is returned.
+
+        Returns:
+            tuple: A tuple containing a tensor of the DataFrame without any features about all the possible attacks and the corresponding labels
+        """
         if self.loaded is False:
             self.load_formatted_df()
 
         labels = self.df[self.attack_names]
 
         batch = self.df.drop(self.all_attack_names, axis=1)
-
-        return batch, labels
+        return tf.convert_to_tensor(batch, dtype=tf.float32), labels  # batch.to_numpy(dtype=np.float32)
 
     def load_formatted_df(self):
         """
@@ -179,7 +204,6 @@ class DataCls:
                     # Add only if there exists at least 1
                     if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
                         self.attack_names.append(att)
-        # self.headers = list(self.df)
 
     @staticmethod
     def format_data(dataset_type: str, trainset_path: str, testset_path: str, formated_train_path: str, formated_test_path: str) -> pd.DataFrame:
@@ -212,8 +236,10 @@ class DataCls:
         """
         if os.path.exists(formated_train_path) and os.path.exists(formated_test_path):
             if(dataset_type == 'train'):
+                logging.info(f"Reading formated train data from: {formated_train_path}")
                 return pd.read_csv(formated_train_path, sep=',')
             else:
+                logging.info(f"Reading formated test data from: {formated_test_path}")
                 return pd.read_csv(formated_test_path, sep=',')
         
         # Format the data
@@ -264,7 +290,8 @@ class DataCls:
         df = shuffle(df, random_state=np.random.randint(0, 100))
         test_df.to_csv(formated_test_path, sep=',', index=False)
         df.to_csv(formated_train_path, sep=',', index=False)
-
+        logging.info(f"Formated train data saved in: {formated_train_path}")
+        logging.info(f"Formated test data saved in: {formated_test_path}")
         return df
 
     def format_data_instance(self) -> None:
@@ -276,12 +303,12 @@ class DataCls:
 
 
     @staticmethod
-    def calculate_obs_size(data_path):
+    def calculate_obs_size(data_path) -> int:
         """
         Calculate the observation size based on the given data path.
 
         This method calculates the observation size, which is the number of columns in the DataFrame
-        minus the number of attack names.
+        minus the number of all attack names.
 
         Args:
             data_path (str): Path to the already formatted data file. 
@@ -302,6 +329,16 @@ class DataCls:
     
     @staticmethod
     def get_attack_names(data_path) -> list:
+        """
+        Get the list of names of existing attacks in the DataFrame that is loaded from the given data path.
+        An attack is considered to exist if there is at least one instance of it in the DataFrame.
+
+        Args:
+            data_path (str): Path to the already formatted data file.
+
+        Returns:
+            list: List of names of existing attacks in the DataFrame.
+        """
         attack_names = []
         if (not os.path.exists(data_path)):
             raise FileNotFoundError(f"File {data_path} not found. Please check the path.")
@@ -311,7 +348,7 @@ class DataCls:
         for att in attack_map:
             if att in df.columns:
                 # Add only if there exists at least 1
-                if np.sum(df[att].values) >= 1:
+                if np.sum(df[att].values) >= 1 and att not in attack_names:
                     attack_names.append(att)
         return attack_names
 

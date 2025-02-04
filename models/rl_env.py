@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import tensorflow as tf
 
 from data.data_cls import DataCls
 from models.attack_agent import AttackAgent
@@ -41,36 +42,46 @@ class RLenv(DataCls):
         self.true_labels += np.sum(self.labels).values
 
     def reset(self):
+        """
+        Reset the environment to the initial state.
+        Calculates a random index to start the episode and loads the batch of data.
+        Returns:
+            State: The initial state.
+        """
         # Statistics
         self.def_true_labels = np.zeros(len(self.attack_types), dtype=int)
         self.def_estimated_labels = np.zeros(len(self.attack_types), dtype=int)
-        self.att_true_labels = np.zeros(len(self.attack_names), dtype=int)
+        self.att_true_labels = np.zeros(len(self.attack_types), dtype=int) # We set the true labels of attack in the range of the attack types as the defender infers the attack types.
 
-        self.state_numb = 0
-
-        DataCls.load_formatted_df(self)  # Reload and random index
+        DataCls.load_formatted_df(self)  # Reload and set a random index.
         self.states, self.labels = DataCls.get_batch(self, self.batch_size)
-
         self.total_reward = 0
         self.steps_in_episode = 0
-        return self.states.values
+
+        return tf.convert_to_tensor(self.states, dtype=tf.float32) #self.states.to_numpy(dtype=np.float32)
 
     def act(self, defender_actions, attack_actions):
         # Clear previous rewards
         self.att_reward = np.zeros(len(attack_actions))
         self.def_reward = np.zeros(len(defender_actions))
 
-        attack = [self.attack_types.index(self.attack_map[self.attack_names[att]]) for att in attack_actions]
+        attack_names_mapped = [self.attack_names[att] for att in attack_actions]
+        attack_types_mapped = [self.attack_map[attack_name] for attack_name in attack_names_mapped]
+        # Get the indices of the attack types
+        attack = [self.attack_types.index(attack_type) for attack_type in attack_types_mapped]
 
         self.def_reward = (np.asarray(defender_actions) == np.asarray(attack)) * 1
         self.att_reward = (np.asarray(defender_actions) != np.asarray(attack)) * 1
 
         self.def_estimated_labels += np.bincount(defender_actions, minlength=len(self.attack_types))
-        # TODO
-        # list comprehension
-
-        for act in attack_actions:
-            self.def_true_labels[self.attack_types.index(self.attack_map[self.attack_names[act]])] += 1
+        # Update amount of att_true_labels using the indices from attack
+        for idx in attack:
+            self.att_true_labels[idx] += 1
+        
+        # Update def_true_labels using the indices from attack
+        for def_action, att_action in zip(defender_actions, attack):
+            if def_action == att_action:
+                self.def_true_labels[def_action] += 1
 
         # Get new state and new true values
         attack_actions = self.attack_agent.act(self.states)
@@ -85,11 +96,15 @@ class RLenv(DataCls):
 
     def get_states(self, attacker_actions):
         '''
-        Provide the actual states for the selected attacker actions
+        Provide the actual states for the selected attacker actions / chosen attacks by the attacker.
+
+        A random instance is selected from the dataset for each selected attack class.
         Parameters:
-            self:
             attacker_actions: optimum attacks selected by the attacker
                 it can be one of attack_names list and select random of this
+        Side effects:
+            self.states: Actual states for the selected attacks
+            self.labels: Actual labels for the selected attacks
         Returns:
             State: Actual state for the selected attacks
         '''
@@ -104,5 +119,4 @@ class RLenv(DataCls):
         self.labels = minibatch[self.attack_names]
         minibatch.drop(self.all_attack_names, axis=1, inplace=True)
         self.states = minibatch
-
-        return self.states
+        return tf.convert_to_tensor(self.states, dtype=tf.float32) # self.states.to_numpy(dtype=np.float32)

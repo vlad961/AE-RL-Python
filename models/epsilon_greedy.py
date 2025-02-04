@@ -3,6 +3,8 @@ import numpy as np
 import tensorflow as tf
 import sys
 
+from models.q_network import QNetwork
+
 class EpsilonGreedy(Policy):
     """
     Implements the Epsilon-Greedy policy for reinforcement learning.
@@ -21,7 +23,7 @@ class EpsilonGreedy(Policy):
         step_counter (int): The counter for the number of steps taken.
         epsilon_decay (bool): Whether epsilon should decay over time.
     """
-    def __init__(self, estimator, num_actions, epsilon, min_epsilon, decay_rate, epoch_length):
+    def __init__(self, estimator: QNetwork, num_actions, epsilon, min_epsilon, decay_rate, epoch_length):
         Policy.__init__(self, num_actions, estimator)
         self.name = "Epsilon Greedy"
 
@@ -55,11 +57,9 @@ class EpsilonGreedy(Policy):
         if np.random.rand() <= self.epsilon:
             actions = np.random.randint(0, self.num_actions, states.shape[0])
         else:
-            # Convert states to Tensor before prediction##
-            states_tensor = tf.convert_to_tensor(states, dtype=tf.float32)
             # Get Q values
             ######
-            self.Q = self.estimator.predict(states_tensor, states.shape[0])
+            self.Q = self.estimator.predict(states, states.shape[0]) #states_tensor = tf.convert_to_tensor(states, dtype=tf.float32)
             ##### inserted in predict method
             actions = []
             for row in range(self.Q.shape[0]):

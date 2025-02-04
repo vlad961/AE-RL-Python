@@ -1,10 +1,10 @@
-from models.helpers import download_datasets_if_missing, save_model, logger_setup
+from models.helpers import download_datasets_if_missing, move_log_files, plot_attack_distributions, plot_rewards_and_losses_during_training, print_total_runtime, save_model, logger_setup
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
 from data.data_cls import DataCls
 from datetime import datetime
-from utils import plot_rewards_and_losses_during_training, plot_attack_distributions, test_trained_agent_quality
+from test import test_trained_agent_quality
 
 
 import logging
@@ -34,8 +34,8 @@ trained_models_dir = os.path.join(cwd, "models/trained-models/")
 
 
 def main():
-    logger_setup()
-    timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
+    logger_setup(timestamp_begin)
     logging.info(f"Started script at: {timestamp_begin}")
     logging.info(f"Current working dir: {cwd}")
     logging.info(f"Used data files: \n{kdd_train},\n{kdd_test}")
@@ -53,23 +53,20 @@ def main():
         num_episodes = 100
 
         logging.info("Creating enviroment...")
-        if not os.path.exists(formated_train_path):
+        if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
             DataCls.format_data(kdd_train, kdd_test, formated_train_path, formated_test_path)
 
-        attack_names = DataCls.get_attack_names(formated_train_path)
-        attack_valid_actions = list(range(len(attack_names))) # NOTE: original code attack_valid_actions = list(range(len(env.attack_names)))
+        attack_names = DataCls.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
+        attack_valid_actions = list(range(len(attack_names)))
         attack_num_actions = len(attack_valid_actions)
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
         att_epsilon = 1
         att_min_epsilon = 0.82  # min value for exploration
-
         att_gamma = 0.001
         att_decay_rate = 0.99
-
         att_hidden_layers = 1
         att_hidden_size = 100
-
         att_learning_rate = 0.00025         #default learning_rate was hardcoded to = 0.00025 on an ADAM optimizer
         obs_size = DataCls.calculate_obs_size(formated_train_path) # Amount of features in the dataset (columns) - attack_types
         
@@ -90,25 +87,17 @@ def main():
                                         model_name='attacker_model')
 
 
-        env = RLenv('train', attacker_agent, kdd_train, kdd_test, formated_train_path,
-                        formated_test_path, batch_size=batch_size,
-                    iterations_episode=iterations_episode)
+        env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode)
 
-
-        '''
-        Definition for the defensor agent.
-        '''
-        defender_valid_actions = list(range(len(env.attack_types)))  # only detect type of attack
+        # Defender is trained to detect type of attacks 0: normal, 1: Dos, 2: Probe, 3: R2L, 4: U2R
+        defender_valid_actions = list(range(len(env.attack_types))) 
         defender_num_actions = len(defender_valid_actions)
-
         def_epsilon = 1  # exploration
         def_min_epsilon = 0.01  # min value for exploration
         def_gamma = 0.001
         def_decay_rate = 0.99
-
         def_hidden_size = 100
         def_hidden_layers = 3
-
         def_learning_rate = 0.00025
 
         defender_agent = DefenderAgent(defender_valid_actions, obs_size, "EpsilonGreedy",
@@ -126,41 +115,27 @@ def main():
                                         target_model_name='defender_target_model',
                                         model_name='defender_model'
                                         )
-        # Pretrained defender
-        # defender_agent.model_network.model.load_weights("models/type_model.h5")
-
-
         # Statistics
         att_reward_chain = []
         def_reward_chain = []
         att_loss_chain = []
         def_loss_chain = []
-        def_total_reward_chain = []
-        att_total_reward_chain = []
 
         # Print parameters
-        logging.info(f"-------------------------------------------------------------------------------")
-        logging.info("Total epoch: {} | Iterations in epoch: {}"
-                "| Minibatch from mem size: {} | Total Samples: {}|".format(num_episodes,
-                                                                            iterations_episode, minibatch_size,
-                                                                            num_episodes * iterations_episode))
-        logging.info("-------------------------------------------------------------------------------")
-        logging.info("Dataset shape: {}".format(env.data_shape))
-        logging.info("-------------------------------------------------------------------------------")
-        logging.info("Attacker parameters: Num_actions={} | gamma={} |"
-                " epsilon={} | ANN hidden size={} | "
-                "ANN hidden layers={}|".format(attack_num_actions,
-                                                att_gamma, att_epsilon, att_hidden_size,
-                                                att_hidden_layers))
-        logging.info("-------------------------------------------------------------------------------")
-        logging.info("Defense parameters: Num_actions={} | gamma={} | "
-                "epsilon={} | ANN hidden size={} |"
-                " ANN hidden layers={}|".format(defender_num_actions,
-                                                def_gamma, def_epsilon, def_hidden_size,
-                                                def_hidden_layers))
-        logging.info("-------------------------------------------------------------------------------")
-
-        # Main loop
+        logging.info(f"Start Training with the following parameters:\n-------------------------------------------------------------------------------\n"
+                    f"Total epoch: {num_episodes} | Iterations in epoch: {iterations_episode} "
+                    f"| Minibatch from mem size: {minibatch_size} | Total Samples: {num_episodes * iterations_episode} | Data shape: {env.data_shape}\n"
+                    f"-------------------------------------------------------------------------------\n"
+                    f"Attacker: Num_actions={attack_num_actions} | gamma={att_gamma} | "
+                    f"epsilon={att_epsilon} | ANN hidden size={att_hidden_size} | "
+                    f"ANN hidden layers={att_hidden_layers} | Learning rate={att_learning_rate}\n"
+                    f"-------------------------------------------------------------------------------\n"
+                    f"Defender: Num_actions={defender_num_actions} | gamma={def_gamma} | "
+                    f"epsilon={def_epsilon} | ANN hidden size={def_hidden_size} | "
+                    f"ANN hidden layers={def_hidden_layers} | Learning rate={def_learning_rate}\n"
+                    f"-------------------------------------------------------------------------------")
+        
+        # Main loops
         attacks_by_epoch = []
         attack_labels_list = []
         for epoch in range(num_episodes):
@@ -169,11 +144,14 @@ def main():
             def_loss = 0.0
             def_total_reward_by_episode = 0
             att_total_reward_by_episode = 0
-            # Reset enviromet, actualize the data batch with random state/attacks
+            # Reset enviromet, actualize the data batch with random states/attacks.
             states = env.reset()
-
-            # Get actions for actual states following the policy
+            # Get action(s)/attack(s) for randomly chosen state(s)/attack(s) following the policy of the attacker.
+            # The attacker's policy can either predict the best possible action(s)/attack(s) with respect to the randomly chosen state(s)/attack(s)
+            # or explore random action(s)/attack(s) based on the epsilon value (Exploitation vs. Exploration).
             attack_actions = attacker_agent.act(states)
+            # Based on the chosen actions/attacks, the next states are determined.
+            # These states represent the environment after the attacker agent's actions/attacks have been executed.
             states = env.get_states(attack_actions)
 
             done = False
@@ -185,11 +163,11 @@ def main():
                 attacks_list.append(attack_actions[0])
                 # apply actions, get rewards and new state
                 act_time = time.time()
+                # Get action(s)/classification(s) of the defender agent for the chosen state(s)/attack(s).
                 defender_actions = defender_agent.act(states)
                 # Enviroment actuation for this actions
                 next_states, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,
                                                                                             attack_actions)
-                # If the epoch*batch_size*iterations_episode is largest than the df
 
                 attacker_agent.learn(states, attack_actions, next_states, att_reward, done)
                 defender_agent.learn(states, defender_actions, next_states, def_reward, done)
@@ -222,49 +200,33 @@ def main():
             att_loss_chain.append(att_loss)
 
             end_time = time.time()
-            logging.info("\r\n|Epoch {:03d}/{:03d}| time: {:2.2f}|\r\n"
-                    "|Def Loss {:4.4f} | Def Reward in ep {:03d}|\r\n"
-                    "|Att Loss {:4.4f} | Att Reward in ep {:03d}|\r\n"
-                    "|Def Estimated: {}| Att Labels: {}"
-                    .format(epoch, num_episodes, (end_time - epoch_start_time),
-                            def_loss, def_total_reward_by_episode,
-                            att_loss, att_total_reward_by_episode,
-                            env.def_estimated_labels, env.def_true_labels))
-
-            #logging.info("|Def Estimated: {}| Att Labels: {}".format(env.def_estimated_labels,
-            #                                                    env.def_true_labels))
-            attack_labels_list.append(env.def_true_labels)
+            logging.info(f"End of Epoch.\r\n|Epoch {epoch:03d}/{num_episodes:03d}| time: {(end_time - epoch_start_time):2.2f}|\r\n"
+                    f"|Def Loss {def_loss:4.4f} | Def Reward in ep {def_total_reward_by_episode:03d}|\r\n"
+                    f"|Att Loss {att_loss:4.4f} | Att Reward in ep {att_total_reward_by_episode:03d}|\r\n"
+                    f"|Def Estimated: {env.def_estimated_labels}| Att Labels: {env.att_true_labels}|\r\n"
+                    f"|Def Amount of true predicted attacks: {env.def_true_labels}|")
+            attack_labels_list.append(env.att_true_labels)
 
         # Save the trained models
-        timestamp_end = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        attacker_model_path = os.path.join(trained_models_dir, f"{timestamp_end}/attacker_model.keras")
-        defender_model_path = os.path.join(trained_models_dir, f"{timestamp_end}/defender_model.keras")
+        attacker_model_path = os.path.join(trained_models_dir, f"{timestamp_begin}/attacker_model.keras")
+        defender_model_path = os.path.join(trained_models_dir, f"{timestamp_begin}/defender_model.keras")
 
         save_model(attacker_agent, attacker_model_path)
         save_model(defender_agent, defender_model_path)
         logging.info("Saved trained models.")
-        
-        total_runtime = datetime.now() - script_start_time
-        # Convert total runtime to hours, minutes, and seconds
-        total_seconds = int(total_runtime.total_seconds())
-        hours, remainder = divmod(total_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        logging.info(f"Total runtime: {hours:02}:{minutes:02}:{seconds:02}")
-        end_time = datetime.now()
-        logging.info(f"End of the script at: {end_time}")
+        print_total_runtime(script_start_time)
 
         # Test and visualize results
-        #test_trained_models(attacker_model_path, defender_model_path, env)
-        #plot_training_statistics(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain)
-        plots_path = os.path.join(trained_models_dir, f"{timestamp_end}/plots/")
-        logging.info(f"Plots saved in: {plots_path}")
+        plots_path = os.path.join(trained_models_dir, f"{timestamp_begin}/plots/")
+        current_log_path = os.path.join(cwd, f"logs/{timestamp_begin}.log")
+        destination_log_path = os.path.join(trained_models_dir, f"{timestamp_begin}/logs/")
+        logging.info(f"Trying to save summary plots under: {plots_path}")
         plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
         test_trained_agent_quality(defender_model_path, plots_path)
+        move_log_files(current_log_path, destination_log_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)
-
-# TODO: prettify the logging output + add more logging output (especially of tensorflow itself)
 
 # Run the main function
 if __name__ == "__main__":
