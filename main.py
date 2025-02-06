@@ -35,7 +35,7 @@ trained_models_dir = os.path.join(cwd, "models/trained-models/")
 
 def main(attack_type=None, file_name_suffix=""):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
-    output_root_dir = f"{timestamp_begin}-{file_name_suffix}"
+    output_root_dir = f"{timestamp_begin}{file_name_suffix}"
     logger_setup(timestamp_begin, file_name_suffix)
     logging.info(f"Started script at: {timestamp_begin}")
     logging.info(f"Current working dir: {cwd}")
@@ -236,9 +236,8 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    #main(file_name_suffix="mac-all-attacks")
-    #main("normal", file_name_suffix="mac-normal")
-    main("DoS", file_name_suffix="mac-dos")
-    #main("normal", file_name_suffix="mac-normal")
-    #main("DoS", file_name_suffix="mac-dos")
+    main("DoS", file_name_suffix="-WIN-only-DoS")
+    #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
+    #main(file_name_suffix="mac-all-attacks") # Run the main function with all attack types and save the results in a specific folder (mac-all-attacks)
     #main("normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R)
+    #main("normal", file_name_suffix="mac-normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R) and save the results in a specific folder
