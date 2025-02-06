@@ -19,14 +19,14 @@ class RLenv(DataCls):
         self.true_labels = None
         self.attack_agent = attack_agent
 
-        specific_attack = kwargs.get('specific_attack')
+        self.specific_attack_type = kwargs.get('specific_attack_type')
         data = kwargs.get('data')
-        if specific_attack is None and data is None:
+        if self.specific_attack_type is None and data is None:
             DataCls.__init__(self, trainset_path, testset_path, formated_train_path, formated_test_path, dataset_type=dataset_type)
             DataCls.load_formatted_df(self)
         elif data is not None:
             self.df = data.df
-            self.attack_names = data.attack_names
+            self.attack_names = kwargs.get('attack_names')
             self.attack_types = data.attack_types
             self.loaded = True
             self.index = data.index

@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import tensorflow as tf
 from sklearn.utils import shuffle
+from typing import Tuple
 
 cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
@@ -71,6 +72,8 @@ col_names = ["duration", "protocol_type", "service", "flag", "src_bytes",
                      "dst_host_srv_diff_host_rate", "dst_host_serror_rate", "dst_host_srv_serror_rate",
                      "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "labels", "difficulty"]
 
+attack_types = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
+
 class DataCls:
     def __init__(self, trainset_path=kdd_train, testset_path=kdd_test, formated_trainset_path=formated_train_path, 
                  formated_testset_path=formated_test_path, dataset_type="train"):
@@ -97,7 +100,7 @@ class DataCls:
         self.formated_train_path = formated_trainset_path
         self.formated_test_path = formated_testset_path
 
-        self.attack_types = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
+        self.attack_types = attack_types
         self.attack_names = []
         self.attack_map = attack_map
         self.all_attack_names = list(self.attack_map.keys())
@@ -368,6 +371,7 @@ class DataCls:
         Get a specified number of samples for a given attack name.
 
         This method filters the DataFrame for the given attack name and returns the specified number of samples.
+        If the number of samples is 0, the method returns all samples for the given attack type.
 
         Args:
             attack_name (str): The name of the attack.
@@ -384,3 +388,48 @@ class DataCls:
             return attack_df
         else:
             return attack_df.head(num_samples)
+        
+
+    def get_samples_for_attack_type(self, attack_type: str, num_samples: int) -> Tuple[pd.DataFrame, list]:
+        """
+        Get a specified number of samples for a given attack type.
+
+        This method filters the DataFrame for the given attack type and returns the specified number of samples and the attack names.
+        If the number of samples is 0, the method returns all samples for the given attack type.
+
+        Side Effects:
+            - Updates self.attack_names with the names of the attacks present in the DataFrame.
+            - Updates self.df with the filtered DataFrame.
+        Args:
+            attack_type (str): The type of the attack.
+            num_samples (int): The number of samples to return.
+
+        Returns:
+            pd.DataFrame: The DataFrame containing the specified number of samples for the given attack type.
+        """
+        if self.loaded is False:
+            self.load_formatted_df()
+
+        attack_names = [key for key, value in self.attack_map.items() if value == attack_type]
+        
+        attack_df = self.df[self.df[attack_names].any(axis=1)]
+        self.df = attack_df
+        self.update_attack_names_for_given_attacks(attack_names)
+        if num_samples == 0:
+            return attack_df, self.attack_names # self.attack_names = attack_names & self.attack_df = attack_df
+        else:
+            return attack_df.head(num_samples), self.attack_names
+        
+    def update_attack_names_for_given_attacks(self, attack_names):
+        """
+        Update the list self.attack_names for existing attacks in the DataFrame for the given attack names.
+
+        Args:
+            attack_names (list): List of attack names to consider in the DataFrame.
+        """
+        self.attack_names = []
+        for att in attack_names:
+            if att in self.df.columns:
+                # Add only if there exists at least 1 attack in the column
+                if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
+                    self.attack_names.append(att)

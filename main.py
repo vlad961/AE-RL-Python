@@ -2,7 +2,7 @@ from models.helpers import download_datasets_if_missing, move_log_files, plot_at
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
-from data.data_cls import DataCls
+from data.data_cls import DataCls, attack_types
 from datetime import datetime
 from test import test_trained_agent_quality
 
@@ -33,9 +33,10 @@ kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 trained_models_dir = os.path.join(cwd, "models/trained-models/")
 
 
-def main(attack_name=None):
+def main(attack_type=None, file_name_suffix=""):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
-    logger_setup(timestamp_begin)
+    output_root_dir = f"{timestamp_begin}-{file_name_suffix}"
+    logger_setup(timestamp_begin, file_name_suffix)
     logging.info(f"Started script at: {timestamp_begin}")
     logging.info(f"Current working dir: {cwd}")
     logging.info(f"Used data files: \n{kdd_train},\n{kdd_test}")
@@ -56,18 +57,16 @@ def main(attack_name=None):
         if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
             DataCls.format_data(kdd_train, kdd_test, formated_train_path, formated_test_path)
 
-        if(attack_name is not None):
+        if(attack_type is not None):
             # If a specific attack is chosen, the training data is loaded with only this attack type
             data_cls_instance = DataCls(dataset_type='train')
-            normal_samples = data_cls_instance.get_samples_for_attack(attack_name, 0)
-            data_cls_instance.df = normal_samples
-            attack_names = [attack_name]
-            attack_valid_actions = [0]
-            attack_num_actions = 1
+            _, attack_names = data_cls_instance.get_samples_for_attack_type(attack_type, 0)
+            data_cls_instance.attack_names = attack_names
         else:
             attack_names = DataCls.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
-            attack_valid_actions = list(range(len(attack_names)))
-            attack_num_actions = len(attack_valid_actions)
+        
+        attack_valid_actions = list(range(len(attack_names)))
+        attack_num_actions = len(attack_valid_actions)
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
         att_epsilon = 1
@@ -95,13 +94,13 @@ def main(attack_name=None):
                                         target_model_name='attacker_target_model',
                                         model_name='attacker_model')
 
-        if attack_name is not None: # If a specific attack is chosen, the training data is loaded with only this attack type
-            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack=attack_name, data=data_cls_instance)
+        if attack_type is not None: # If a specific attack is chosen, the training data is loaded with only this attack type
+            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack_type=attack_type, data=data_cls_instance, attack_names=attack_names)
         else:
             env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode)
 
         # Defender is trained to detect type of attacks 0: normal, 1: Dos, 2: Probe, 3: R2L, 4: U2R
-        defender_valid_actions = list(range(len(env.attack_types))) 
+        defender_valid_actions = list(range(len(attack_types)))
         defender_num_actions = len(defender_valid_actions)
         def_epsilon = 1  # exploration
         def_min_epsilon = 0.01  # min value for exploration
@@ -133,18 +132,21 @@ def main(attack_name=None):
         def_loss_chain = []
 
         # Print parameters
-        logging.info(f"Start Training with the following parameters:\n-------------------------------------------------------------------------------\n"
+        logging.info(f"Start Training with the following parameters:\n-----------------------------------------------------------------------------------------------------------------------\n"
                     f"Total epoch: {num_episodes} | Iterations in epoch: {iterations_episode} "
                     f"| Minibatch from mem size: {minibatch_size} | Total Samples: {num_episodes * iterations_episode} | Data shape: {env.data_shape}\n"
-                    f"-------------------------------------------------------------------------------\n"
+                    f"-----------------------------------------------------------------------------------------------------------------------\n"
                     f"Attacker: Num_actions={attack_num_actions} | gamma={att_gamma} | "
                     f"epsilon={att_epsilon} | ANN hidden size={att_hidden_size} | "
                     f"ANN hidden layers={att_hidden_layers} | Learning rate={att_learning_rate}\n"
-                    f"-------------------------------------------------------------------------------\n"
+                    f"-----------------------------------------------------------------------------------------------------------------------\n"
                     f"Defender: Num_actions={defender_num_actions} | gamma={def_gamma} | "
                     f"epsilon={def_epsilon} | ANN hidden size={def_hidden_size} | "
                     f"ANN hidden layers={def_hidden_layers} | Learning rate={def_learning_rate}\n"
-                    f"-------------------------------------------------------------------------------")
+                    f"-----------------------------------------------------------------------------------------------------------------------\n"
+                    f"Used Attack types: {attack_type if attack_type is not None else 'Normal, DoS, Probe, R2L, U2R'} | Attack name(s): {attack_names}\n"
+                    f"-----------------------------------------------------------------------------------------------------------------------\n"
+                    )
         
         # Main loops
         attacks_by_epoch = []
@@ -212,8 +214,8 @@ def main(attack_name=None):
             attack_labels_list.append(env.att_true_labels)
 
         # Save the trained models
-        attacker_model_path = os.path.join(trained_models_dir, f"{timestamp_begin}/attacker_model.keras")
-        defender_model_path = os.path.join(trained_models_dir, f"{timestamp_begin}/defender_model.keras")
+        attacker_model_path = os.path.join(trained_models_dir, f"{output_root_dir}/attacker_model.keras")
+        defender_model_path = os.path.join(trained_models_dir, f"{output_root_dir}/defender_model.keras")
 
         save_model(attacker_agent, attacker_model_path)
         save_model(defender_agent, defender_model_path)
@@ -221,9 +223,9 @@ def main(attack_name=None):
         print_total_runtime(script_start_time)
 
         # Test and visualize results
-        plots_path = os.path.join(trained_models_dir, f"{timestamp_begin}/plots/")
-        current_log_path = os.path.join(cwd, f"logs/{timestamp_begin}.log")
-        destination_log_path = os.path.join(trained_models_dir, f"{timestamp_begin}/logs/")
+        plots_path = os.path.join(trained_models_dir, f"{output_root_dir}/plots/")
+        current_log_path = os.path.join(cwd, f"logs/{output_root_dir}.log")
+        destination_log_path = os.path.join(trained_models_dir, f"{output_root_dir}/logs/")
         logging.info(f"Trying to save summary plots under: {plots_path}")
         plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
@@ -234,5 +236,9 @@ def main(attack_name=None):
 
 # Run the main function
 if __name__ == "__main__":
-    #main()
-    main("normal") # Run the main function with a specific attack type
+    #main(file_name_suffix="mac-all-attacks")
+    #main("normal", file_name_suffix="mac-normal")
+    main("DoS", file_name_suffix="mac-dos")
+    #main("normal", file_name_suffix="mac-normal")
+    #main("DoS", file_name_suffix="mac-dos")
+    #main("normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R)

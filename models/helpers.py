@@ -64,9 +64,9 @@ def download_datasets_if_missing(kdd_train:str, kdd_test:str):
         download_file(kdd_test_url, kdd_test)
         logging.info("Downloaded: {}\nSaved in: {}", kdd_test_url, kdd_test)
 
-def logger_setup(timestamp_begin):
+def logger_setup(timestamp_begin, name_suffix="default"):
     # Configure logging
-    log_filename = os.path.join(cwd, f"logs/{timestamp_begin}.log")
+    log_filename = os.path.join(cwd, f"logs/{timestamp_begin}-{name_suffix}.log")
     logging.basicConfig(filename=os.path.join(cwd, log_filename), level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
     # Create a console handler for the logger
@@ -155,14 +155,14 @@ def plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, 
     return plt
 
 def plot_attack_distributions(attacks_by_epoch, attack_names, attack_labels_list, path) -> plt.Figure:
-    bins=np.arange(23)
+    bins=np.arange(len(attack_names))
     # Plot attacks distribution alongside
     plt.figure(2,figsize=[12,12])
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks distribution throughout episodes")
     for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
-    #for indx,e in enumerate([0]):
+    #for indx,e in enumerate([0, 1, 2]):
         plt.subplot(3,3,indx+1)
         plt.hist(attacks_by_epoch[e], bins=bins, width=0.9, align='left')
         plt.xlabel("{} epoch".format(e))
@@ -179,7 +179,7 @@ def plot_attack_distributions(attacks_by_epoch, attack_names, attack_labels_list
     plt.yticks([])
     plt.title("Attacks (mapped) distribution throughout  episodes")
     for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
-    #for indx,e in enumerate([0]):
+    #for indx,e in enumerate([0, 1, 2]):
         plt.subplot(3,3,indx+1)
         plt.bar(range(5), attack_labels_list[e], tick_label = ['Normal','Dos','Probe','R2L','U2R'])
         plt.xlabel("{} epoch".format(e))
@@ -320,5 +320,5 @@ def calculate_general_overview_per_attack_type(attack_types, estimated_labels, e
     }], index=["General"])
 
     outputs_df = pd.concat([outputs_df, general_row])
-    
+
     return outputs_df
