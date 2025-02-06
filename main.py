@@ -33,7 +33,7 @@ kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 trained_models_dir = os.path.join(cwd, "models/trained-models/")
 
 
-def main():
+def main(attack_name=None):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
     logger_setup(timestamp_begin)
     logging.info(f"Started script at: {timestamp_begin}")
@@ -56,9 +56,18 @@ def main():
         if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
             DataCls.format_data(kdd_train, kdd_test, formated_train_path, formated_test_path)
 
-        attack_names = DataCls.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
-        attack_valid_actions = list(range(len(attack_names)))
-        attack_num_actions = len(attack_valid_actions)
+        if(attack_name is not None):
+            # If a specific attack is chosen, the training data is loaded with only this attack type
+            data_cls_instance = DataCls(dataset_type='train')
+            normal_samples = data_cls_instance.get_samples_for_attack(attack_name, 0)
+            data_cls_instance.df = normal_samples
+            attack_names = [attack_name]
+            attack_valid_actions = [0]
+            attack_num_actions = 1
+        else:
+            attack_names = DataCls.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
+            attack_valid_actions = list(range(len(attack_names)))
+            attack_num_actions = len(attack_valid_actions)
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
         att_epsilon = 1
@@ -86,8 +95,10 @@ def main():
                                         target_model_name='attacker_target_model',
                                         model_name='attacker_model')
 
-
-        env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode)
+        if attack_name is not None: # If a specific attack is chosen, the training data is loaded with only this attack type
+            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack=attack_name, data=data_cls_instance)
+        else:
+            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode)
 
         # Defender is trained to detect type of attacks 0: normal, 1: Dos, 2: Probe, 3: R2L, 4: U2R
         defender_valid_actions = list(range(len(env.attack_types))) 
@@ -223,4 +234,5 @@ def main():
 
 # Run the main function
 if __name__ == "__main__":
-    main()
+    #main()
+    main("normal") # Run the main function with a specific attack type

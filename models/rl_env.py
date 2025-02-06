@@ -18,8 +18,24 @@ class RLenv(DataCls):
     def __init__(self, dataset_type, attack_agent: AttackAgent, trainset_path=kdd_train, testset_path=kdd_test, formated_train_path=formated_train_path, formated_test_path=formated_test_path, **kwargs):
         self.true_labels = None
         self.attack_agent = attack_agent
-        DataCls.__init__(self, trainset_path, testset_path, formated_train_path, formated_test_path, dataset_type=dataset_type)
-        DataCls.load_formatted_df(self)
+
+        specific_attack = kwargs.get('specific_attack')
+        data = kwargs.get('data')
+        if specific_attack is None and data is None:
+            DataCls.__init__(self, trainset_path, testset_path, formated_train_path, formated_test_path, dataset_type=dataset_type)
+            DataCls.load_formatted_df(self)
+        elif data is not None:
+            self.df = data.df
+            self.attack_names = data.attack_names
+            self.attack_types = data.attack_types
+            self.loaded = True
+            self.index = data.index
+            self.attack_map = data.attack_map
+            self.all_attack_names = data.all_attack_names
+        else:
+            raise ValueError("If 'specific_attack' is provided, 'data' must also be provided.")
+
+
         self.data_shape = DataCls.get_shape(self)
         self.batch_size = kwargs.get('batch_size', 1)  # experience replay -> batch = 1
         self.iterations_episode = kwargs.get('iterations_episode', 10)

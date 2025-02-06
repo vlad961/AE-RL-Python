@@ -362,3 +362,25 @@ class DataCls:
                 # Add only if there exists at least 1 attack in the column
                 if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
                     self.attack_names.append(att)
+
+    def get_samples_for_attack(self, attack_name: str, num_samples: int) -> pd.DataFrame:
+        """
+        Get a specified number of samples for a given attack name.
+
+        This method filters the DataFrame for the given attack name and returns the specified number of samples.
+
+        Args:
+            attack_name (str): The name of the attack.
+            num_samples (int): The number of samples to return.
+
+        Returns:
+            pd.DataFrame: The DataFrame containing the specified number of samples for the given attack name.
+        """
+        if self.loaded is False:
+            self.load_formatted_df()
+
+        attack_df = self.df[self.df[attack_name] == 1]
+        if num_samples == 0:
+            return attack_df
+        else:
+            return attack_df.head(num_samples)
