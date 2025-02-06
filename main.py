@@ -76,7 +76,7 @@ def main(attack_name=None):
         att_decay_rate = 0.99
         att_hidden_layers = 1
         att_hidden_size = 100
-        att_learning_rate = 0.00025         #default learning_rate was hardcoded to = 0.00025 on an ADAM optimizer
+        att_learning_rate = 0.001         #default learning_rate was hardcoded to = 0.00025 on an ADAM optimizer
         obs_size = DataCls.calculate_obs_size(formated_train_path) # Amount of features in the dataset (columns) - attack_types
         
 
@@ -109,7 +109,7 @@ def main(attack_name=None):
         def_decay_rate = 0.99
         def_hidden_size = 100
         def_hidden_layers = 3
-        def_learning_rate = 0.00025
+        def_learning_rate = 0.001
 
         defender_agent = DefenderAgent(defender_valid_actions, obs_size, "EpsilonGreedy",
                                         epoch_length=iterations_episode,

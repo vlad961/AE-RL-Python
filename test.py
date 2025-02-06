@@ -27,7 +27,8 @@ def test_trained_agent_quality(path_to_model, plots_path):
     states, labels = test_data.get_full() # get test data and true labels.
 
     start_time=time.time()
-    q = model.predict(states)
+    states_tensor = tf.convert_to_tensor(states, dtype=tf.float32)
+    q = model.predict(states_tensor)
     actions = np.argmax(q, axis=1) # get the action with the highest Q-value -> the predicted attack type
 
     true_attack_type_indices=[] # list of true attack types as indices (0-4). 0=normal, 1=dos, 2=probe, 3=r2l, 4=u2r. Length = number of samples
@@ -64,6 +65,6 @@ def test_trained_agent_quality(path_to_model, plots_path):
 
     perf_per_class = calculate_one_vs_all_metrics(true_attack_type_indices, actions)
     logging.info(f"\r\nOne vs All metrics: \r\n{perf_per_class}")
-    loss, acc_model, precision, recall = model.evaluate(states, pd.get_dummies(true_attack_type_indices), verbose=2)
+    loss, acc_model, precision, recall = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
     logging.info(f"Model metrics: \nloss={loss}, accuracy={acc_model}, precision={precision}, recall={recall}")
     logging.info(f"Time needed for testing: {time.time() - start_time}")
