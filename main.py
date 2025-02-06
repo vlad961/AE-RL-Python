@@ -159,10 +159,7 @@ def main():
             attacks_list = []
             # Iteration in one episode
             for i_iteration in range(iterations_episode):
-
                 attacks_list.append(attack_actions[0])
-                # apply actions, get rewards and new state
-                act_time = time.time()
                 # Get action(s)/classification(s) of the defender agent for the chosen state(s)/attack(s).
                 defender_actions = defender_agent.act(states)
                 # Enviroment actuation for this actions
@@ -172,8 +169,6 @@ def main():
                 attacker_agent.learn(states, attack_actions, next_states, att_reward, done)
                 defender_agent.learn(states, defender_actions, next_states, def_reward, done)
 
-                act_end_time = time.time()
-
                 # Train network, update loss after at least minibatch_learns
                 if ExpRep and epoch * iterations_episode + i_iteration >= minibatch_size:
                     def_loss += defender_agent.update_model()[0]
@@ -181,8 +176,6 @@ def main():
                 elif not ExpRep:
                     def_loss += defender_agent.update_model()[0]
                     att_loss += attacker_agent.update_model()[0]
-
-                update_end_time = time.time()
 
                 # Update the state
                 states = next_states

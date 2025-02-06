@@ -58,7 +58,7 @@ class RLenv(DataCls):
         self.total_reward = 0
         self.steps_in_episode = 0
 
-        return tf.convert_to_tensor(self.states, dtype=tf.float32) #self.states.to_numpy(dtype=np.float32)
+        return self.states
 
     def act(self, defender_actions, attack_actions):
         # Clear previous rewards
@@ -119,4 +119,4 @@ class RLenv(DataCls):
         self.labels = minibatch[self.attack_names]
         minibatch.drop(self.all_attack_names, axis=1, inplace=True)
         self.states = minibatch
-        return tf.convert_to_tensor(self.states, dtype=tf.float32) # self.states.to_numpy(dtype=np.float32)
+        return self.states

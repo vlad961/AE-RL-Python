@@ -165,7 +165,7 @@ class DataCls:
         labels = self.df[self.attack_names]
 
         batch = self.df.drop(self.all_attack_names, axis=1)
-        return tf.convert_to_tensor(batch, dtype=tf.float32), labels  # batch.to_numpy(dtype=np.float32)
+        return batch, labels
 
     def load_formatted_df(self):
         """

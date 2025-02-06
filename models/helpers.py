@@ -4,7 +4,7 @@ import numpy as np
 import os
 import pandas as pd
 import requests
-import seaborn as sn
+import seaborn as sns
 import shutil
 import tensorflow as tf
 
@@ -157,13 +157,13 @@ def plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, 
 def plot_attack_distributions(attacks_by_epoch, attack_names, attack_labels_list, path) -> plt.Figure:
     bins=np.arange(23)
     # Plot attacks distribution alongside
-    plt.figure(2,figsize=[12,5])
+    plt.figure(2,figsize=[12,12])
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks distribution throughout episodes")
-    for indx,e in enumerate([0,70,90]):
+    for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
     #for indx,e in enumerate([0]):
-        plt.subplot(1,3,indx+1)
+        plt.subplot(3,3,indx+1)
         plt.hist(attacks_by_epoch[e], bins=bins, width=0.9, align='left')
         plt.xlabel("{} epoch".format(e))
         plt.xticks(bins, attack_names, rotation=90)
@@ -211,7 +211,7 @@ def plot_confusion_matrix(cm, classes,
 
     logging.info(f"\nConfusion Matrix:\n{cm}")
     plt.figure(figsize=(10,7))
-    sn.heatmap(cm, annot=True, fmt='g', xticklabels=classes, yticklabels=classes, cmap='Blues')
+    sns.heatmap(cm, annot=True, fmt='g', xticklabels=classes, yticklabels=classes, cmap='Blues')
     plt.xlabel('Predicted label')
     plt.ylabel('True label')
     plt.savefig(os.path.join(path, 'confusion_matrix.eps'), format='eps', dpi=1000)
@@ -258,7 +258,7 @@ def get_cf_matrix(true_labels, predicted_labels):
     cnf_matrix = confusion_matrix(true_labels, predicted_labels)
     return cnf_matrix
 
-def calculate_unique_f1_scores_per_class(predicted_actions, attack_types, true_labels):
+def calculate_f1_scores_per_class(predicted_actions, attack_types, true_labels):
     predicted_actions_dummies = pd.get_dummies(predicted_actions)
     posible_actions = np.arange(len(attack_types))
     for non_existing_action in posible_actions:
@@ -309,4 +309,16 @@ def calculate_general_overview_per_attack_type(attack_types, estimated_labels, e
         outputs_df.iloc[indx].F1_score = f1_scores[indx]*100
         outputs_df.iloc[indx].Mismatch = abs(mismatch[indx])
 
+    # Add a row for the general F1 score
+    general_f1_score = f1_scores[-1]
+    general_row = pd.DataFrame([{
+        "Estimated": "",
+        "Correct": "",
+        "Total": "",
+        "F1_score": general_f1_score * 100,
+        "Mismatch": ""
+    }], index=["General"])
+
+    outputs_df = pd.concat([outputs_df, general_row])
+    
     return outputs_df

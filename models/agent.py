@@ -85,7 +85,7 @@ class Agent(object):
                   (1 - done.reshape(Q[sx, actions].shape)) # if done (episode has ended), no update
         Q[sx, actions] = targets
 
-        loss = self.model_network.model.train_on_batch(states, Q)  # inputs,targets
+        result = self.model_network.model.train_on_batch(states, Q)  # inputs,targets
 
         # timer to ddqn update
         self.ddqn_update -= 1
@@ -94,7 +94,7 @@ class Agent(object):
             #            self.target_model_network.model = QNetwork.copy_model(self.model_network.model)
             self.target_model_network.model.set_weights(self.model_network.model.get_weights())
 
-        return loss
+        return result
 
     def act(self, state): # NOTE: In comparison to original code, the policy parameter was deleted since it is already defined in the constructor 
         raise NotImplementedError

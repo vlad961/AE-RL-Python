@@ -7,7 +7,7 @@ import tensorflow as tf
 import time
 
 from data.data_cls import DataCls
-from models.helpers import calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_unique_f1_scores_per_class, get_cf_matrix, get_model_summary, plot_confusion_matrix, print_aggregated_performance_measures
+from models.helpers import calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, plot_confusion_matrix, print_aggregated_performance_measures
 
 def test_trained_agent_quality(path_to_model, plots_path):
     logging.info("Start testing the trained model.")
@@ -46,7 +46,7 @@ def test_trained_agent_quality(path_to_model, plots_path):
             total_reward += 1
             predicted_correct_labels[a] += 1
 
-    f1_scores = calculate_unique_f1_scores_per_class(actions, test_data.attack_types, true_attack_type_indices)
+    f1_scores = calculate_f1_scores_per_class(actions, test_data.attack_types, true_attack_type_indices)
     mismatch = predicted_labels - true_labels
     acc = float(100 * total_reward / len(states))
 
