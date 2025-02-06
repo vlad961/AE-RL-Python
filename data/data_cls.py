@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import tensorflow as tf
 from sklearn.utils import shuffle
-from typing import Tuple
+from typing import List, Tuple
 
 cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
@@ -390,33 +390,35 @@ class DataCls:
             return attack_df.head(num_samples)
         
 
-    def get_samples_for_attack_type(self, attack_type: str, num_samples: int) -> Tuple[pd.DataFrame, list]:
+    def get_samples_for_attack_type(self, att_types: List[str], num_samples: int) -> Tuple[pd.DataFrame, list]:
         """
-        Get a specified number of samples for a given attack type.
+        Get a specified number of samples for a given attack types.
 
         This method filters the DataFrame for the given attack type and returns the specified number of samples and the attack names.
-        If the number of samples is 0, the method returns all samples for the given attack type.
+        If the number of samples is 0, the method returns all samples for the given attack types.
 
         Side Effects:
             - Updates self.attack_names with the names of the attacks present in the DataFrame.
             - Updates self.df with the filtered DataFrame.
         Args:
-            attack_type (str): The type of the attack.
+            attack_type (List[str]): The types of the attacks.
             num_samples (int): The number of samples to return.
 
         Returns:
-            pd.DataFrame: The DataFrame containing the specified number of samples for the given attack type.
+            pd.DataFrame: The DataFrame containing the specified number of samples for the given attack types.
         """
         if self.loaded is False:
             self.load_formatted_df()
 
-        attack_names = [key for key, value in self.attack_map.items() if value == attack_type]
-        
+        attack_names = []
+        for att_typ in att_types:
+            attack_names.extend([key for key, value in self.attack_map.items() if value == att_typ])
+            
         attack_df = self.df[self.df[attack_names].any(axis=1)]
         self.df = attack_df
         self.update_attack_names_for_given_attacks(attack_names)
         if num_samples == 0:
-            return attack_df, self.attack_names # self.attack_names = attack_names & self.attack_df = attack_df
+            return attack_df, self.attack_names
         else:
             return attack_df.head(num_samples), self.attack_names
         

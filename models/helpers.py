@@ -66,7 +66,7 @@ def download_datasets_if_missing(kdd_train:str, kdd_test:str):
 
 def logger_setup(timestamp_begin, name_suffix="default"):
     # Configure logging
-    log_filename = os.path.join(cwd, f"logs/{timestamp_begin}-{name_suffix}.log")
+    log_filename = os.path.join(cwd, f"logs/{timestamp_begin}{name_suffix}.log")
     logging.basicConfig(filename=os.path.join(cwd, log_filename), level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
     # Create a console handler for the logger

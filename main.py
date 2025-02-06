@@ -61,7 +61,6 @@ def main(attack_type=None, file_name_suffix=""):
             # If a specific attack is chosen, the training data is loaded with only this attack type
             data_cls_instance = DataCls(dataset_type='train')
             _, attack_names = data_cls_instance.get_samples_for_attack_type(attack_type, 0)
-            data_cls_instance.attack_names = attack_names
         else:
             attack_names = DataCls.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
         
@@ -144,7 +143,7 @@ def main(attack_type=None, file_name_suffix=""):
                     f"epsilon={def_epsilon} | ANN hidden size={def_hidden_size} | "
                     f"ANN hidden layers={def_hidden_layers} | Learning rate={def_learning_rate}\n"
                     f"-----------------------------------------------------------------------------------------------------------------------\n"
-                    f"Used Attack types: {attack_type if attack_type is not None else 'Normal, DoS, Probe, R2L, U2R'} | Attack name(s): {attack_names}\n"
+                    f"Used Attack types: '{attack_type if attack_type is not None else 'all: Normal, DoS, Probe, R2L, U2R'}' | Attack name(s): {attack_names}\n"
                     f"-----------------------------------------------------------------------------------------------------------------------\n"
                     )
         
@@ -236,7 +235,8 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    main("DoS", file_name_suffix="-WIN-only-DoS")
+    #main("U2R", file_name_suffix="-WIN-only-DoS")
+    main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
     #main(file_name_suffix="mac-all-attacks") # Run the main function with all attack types and save the results in a specific folder (mac-all-attacks)
     #main("normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R)
