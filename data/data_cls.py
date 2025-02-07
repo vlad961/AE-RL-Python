@@ -435,3 +435,51 @@ class DataCls:
                 # Add only if there exists at least 1 attack in the column
                 if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
                     self.attack_names.append(att)
+
+    def get_balanced_samples(self) -> pd.DataFrame:
+        """
+        Get equally balanced data for all attack types.
+
+        Note: there are 125973 instances in the NSL-KDD dataset.
+        67343 instances are normal class.
+        The number of instances for the rest of the attack types is as follows:
+        - DoS: 45927
+        - Probe: 11656
+        - R2L: 995
+        - U2R: 52
+        Which sums up to 58630 instances.
+        Therefore this method takes 58630 instances of the normal class and 58630 instances of the rest of the attack types.
+
+        Args:
+            num_samples (int): The number of samples for each attack type.
+
+        Returns:
+            pd.DataFrame: The DataFrame containing the specified number of samples for each attack type.
+        """
+        if self.loaded is False:
+            self.load_formatted_df()
+
+        # Load all data of "normal" class
+        normal_df = self.df[self.df['normal'] == 1]
+
+        # Shuffle and take only the first 58630 of 67343 instances of the normal class to balance the data. 
+        normal_df = normal_df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+        normal_df = normal_df.head(58630)
+
+        # Initialize an empty DataFrame to store the balanced samples
+        balanced_df = normal_df
+
+        # Get samples for the rest of the attack types
+        all_attack_names = ['normal']
+        for att_typ in attack_types:
+            if att_typ == 'normal':
+                continue
+            attack_names = [key for key, value in self.attack_map.items() if value == att_typ]
+            attack_df = self.df[self.df[attack_names].any(axis=1)]
+            balanced_df = pd.concat([balanced_df, attack_df])
+            all_attack_names.extend(attack_names)
+
+        self.df = balanced_df
+        self.df = self.df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame one more time
+        self.update_attack_names_for_given_attacks(all_attack_names)
+        return self.df, self.attack_names
