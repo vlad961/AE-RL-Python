@@ -177,4 +177,4 @@ data/datasets/origin-kaggle-com/nsl-kdd/verification/KDDTest+FormatVerification.
 logs/*
 
 # Ignore trained models while developing //TODO: remove this line before deploying or create a final model directory
-models/trained-models/*
+#models/trained-models/*

@@ -77,7 +77,7 @@ def main(attack_type=None, file_name_suffix=""):
         att_min_epsilon = 0.82  # min value for exploration
         att_gamma = 0.001
         att_decay_rate = 0.99
-        att_hidden_layers = 1
+        att_hidden_layers = 5
         att_hidden_size = 100
         att_learning_rate = 0.001         #default learning_rate was hardcoded to = 0.00025 on an ADAM optimizer
         obs_size = DataCls.calculate_obs_size(formated_train_path) # Amount of features in the dataset (columns) - attack_types
@@ -240,8 +240,10 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
+    main(file_name_suffix="-WIN-attacker-5L-defender-3L-lr-0.001")
     #main("U2R", file_name_suffix="-WIN-only-DoS")
-    main("equally_balanced_data", file_name_suffix="-WIN-equally-balanced-data")
+    #main("equally_balanced_data", file_name_suffix="-WIN-equally-balanced-data")
+    #main(["DoS", "Probe", "R2L", "U2R"], file_name_suffix="-WIN-only-attacks") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
     #main(file_name_suffix="mac-all-attacks") # Run the main function with all attack types and save the results in a specific folder (mac-all-attacks)
