@@ -178,3 +178,4 @@ logs/*
 
 # Ignore trained models while developing //TODO: remove this line before deploying or create a final model directory
 #models/trained-models/*
+!models/trained-models/*/logs/*.log
