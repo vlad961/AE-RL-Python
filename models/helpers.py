@@ -123,8 +123,16 @@ def plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, 
     # Plot training results
 
     # Create x-ticks based on the length of def_reward_chain
-    x_ticks = np.arange(len(def_reward_chain))
-    x_labels = [f'{i+1}' for i in range(len(def_reward_chain))]
+    num_entries = len(def_reward_chain)
+    if num_entries > 50:
+        step = 10
+    elif num_entries >= 20:
+        step = 5
+    else:
+        step = 1
+
+    x_ticks = np.arange(0, num_entries, step)
+    x_labels = [f'{i}' for i in x_ticks]
 
     plt.figure(1)
     plt.subplot(211)

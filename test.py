@@ -2,7 +2,7 @@ import logging
 import numpy as np
 
 import pandas as pd
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 import tensorflow as tf
 import time
 
@@ -67,4 +67,7 @@ def test_trained_agent_quality(path_to_model, plots_path):
     logging.info(f"\r\nOne vs All metrics: \r\n{perf_per_class}")
     loss, acc_model, precision, recall = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
     logging.info(f"Model metrics: \nloss={loss}, accuracy={acc_model}, precision={precision}, recall={recall}")
+    logging.info(f"Optimizer config: {model.optimizer.get_config()}")
     logging.info(f"Time needed for testing: {time.time() - start_time}")
+    report = classification_report(true_attack_type_indices, actions, target_names=test_data.attack_types)
+    logging.info(f"Classification report:\n{report}")
