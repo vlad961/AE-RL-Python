@@ -44,7 +44,8 @@ class QNetwork():
         #f1_score = F1Score() -> use this if you want to use the F1 score as a metric in the model. For my OS configs, this is not available.
         # Compilation of the model with optimizer and loss
         self.model.compile(loss=Huber(delta=1.0), optimizer=optimizer,
-                            metrics=["accuracy", Precision(), Recall()])
+                            metrics=["accuracy", Precision(), Recall(), 
+                                     tf.keras.metrics.AUC(num_thresholds=100, name='auc')])
 
     def predict(self, state, batch_size=1):
         """

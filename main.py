@@ -269,3 +269,5 @@ if __name__ == "__main__":
         # blei gleichverteilten Daten scheine ich leicht bessere Ergebnisse zu erhalten (down sampling von normalen instanzen) //TODO: verifizier schaue in meine Ergebnise auf PC (evtl. 2+3 Durchlauf)
 
         # -> 
+
+# TODO: AUC aus dem Modell extrahieren und in die Log-Datei schreiben oder ein Plot dazu zeichnen.

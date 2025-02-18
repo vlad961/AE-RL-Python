@@ -138,7 +138,7 @@ class DataCls:
 
         # Read the df rows
         indexes = list(range(self.index, self.index + batch_size))
-        if max(indexes) > self.data_shape[0] - 1:
+        if max(indexes) > self.get_shape()[0] - 1:
             dif = max(indexes) - self.data_shape[0]
             indexes[len(indexes) - dif - 1:len(indexes)] = list(range(dif + 1))
             self.index = batch_size - dif
