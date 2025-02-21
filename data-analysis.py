@@ -80,14 +80,72 @@ def visualize_relationships_within_data(data: DataCls):
     #@title Code - View pairplot
     #sns.pairplot(training_df, x_vars=["FARE", "TRIP_MILES", "TRIP_SECONDS"], y_vars=["FARE", "TRIP_MILES", "TRIP_SECONDS"])
 
+def balance_r2l_and_u2r_data():
+    """
+    Balance R2L and U2R data and save the updated DataFrames to new CSV files
+    """
+    test_data = DataCls(dataset_type="test")
+    training_data = DataCls(dataset_type="train")
+    
+    # Balance R2L data
+    # Shuffle and extract 725 samples from warezmaster and 950 samples from guess_passwd
+    guess_passwd = test_data.df[test_data.df["guess_passwd"] == 1]
+    guess_passwd = guess_passwd.sample(frac=1)
+    guess_passwd_data_to_move = guess_passwd[:950]
+    guess_passwd = guess_passwd[950:]
+    
+    warezmaster = test_data.df[test_data.df["warezmaster"] == 1]
+    warezmaster = warezmaster.sample(frac=1)
+    warezmaster_data_to_move = warezmaster[:725]
+    warezmaster = warezmaster[725:]
+
+    # Remove the extracted samples from the test data
+    test_data.df = test_data.df[~test_data.df.index.isin(guess_passwd_data_to_move.index)]
+    test_data.df = test_data.df[~test_data.df.index.isin(warezmaster_data_to_move.index)]
+
+
+    # Balance U2R data
+    httptunnel = test_data.df[test_data.df["httptunnel"] == 1]
+    httptunnel = httptunnel.sample(frac=1)
+    httptunnel_data_to_move = httptunnel[:118]
+    httptunnel = httptunnel[118:]
+
+    rootkit = test_data.df[test_data.df["rootkit"] == 1]
+    rootkit = rootkit.sample(frac=1)
+    rootkit_data_to_move = rootkit[:10]
+    rootkit = rootkit[10:]
+
+    buffer_overflow = training_data.df[training_data.df["buffer_overflow"] == 1]
+    buffer_overflow_data_to_move = buffer_overflow[:]
+
+    # Remove the extracted samples from the test data
+    test_data.df = test_data.df[~test_data.df.index.isin(httptunnel_data_to_move.index)]
+    test_data.df = test_data.df[~test_data.df.index.isin(rootkit_data_to_move.index)]
+    training_data.df = training_data.df[~training_data.df.index.isin(buffer_overflow_data_to_move.index)]
+
+    # Move the extracted samples to the training data
+    test_data.df = pd.concat([test_data.df, buffer_overflow_data_to_move]) # U2R samples
+    training_data.df = pd.concat([training_data.df, httptunnel_data_to_move]) # U2R samples
+    training_data.df = pd.concat([training_data.df, rootkit_data_to_move])
+    training_data.df = pd.concat([training_data.df, guess_passwd_data_to_move])
+    training_data.df = pd.concat([training_data.df, warezmaster_data_to_move])
+    
+    # Save the updated DataFrames to new CSV files
+    test_data.df.to_csv("data/datasets/formated/balanced_test_data.csv", index=False)
+    training_data.df.to_csv("data/datasets/formated/balanced_training_data.csv", index=False)
+    
 
 # TODO: Add Precision-recall curve (for imbalanced data) and ROC curve
 if __name__ == "__main__":
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
     logger_setup(timestamp_begin, "-data-analysis")
-    view_dataset_statistics(test_data)
+    #view_dataset_statistics(test_data)
     #view_dataset_statistics(training_data)
     #visualize_relationships_within_data(training_data.df)
-    visualize_relationships_within_data(test_data)
-    plot_correlation_matrix(test_data.df)
+    #visualize_relationships_within_data(test_data)
+    #plot_correlation_matrix(test_data.df)
     #plot_correlation_matrix(training_data.df)
+    balance_r2l_and_u2r_data()
+
+
+
