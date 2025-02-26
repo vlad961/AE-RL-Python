@@ -172,7 +172,9 @@ def main(attack_type=None, file_name_suffix=""):
             states = env.get_states(attack_actions)
 
             done = False
-
+# // TODO: 1 mehrere Angreifer-Agenten normal & attack
+# // TODO: 2 Transferability (zuerst nsl-kdd, dann CICIDS2017, dann UNSW-NB15)
+# // TODO: 3. Boruta Tool Document results in Thesis.tex
             attacks_list = []
             # Iteration in one episode
             for i_iteration in range(iterations_episode):
@@ -269,5 +271,3 @@ if __name__ == "__main__":
         # blei gleichverteilten Daten scheine ich leicht bessere Ergebnisse zu erhalten (down sampling von normalen instanzen) //TODO: verifizier schaue in meine Ergebnise auf PC (evtl. 2+3 Durchlauf)
 
         # -> 
-
-# TODO: AUC aus dem Modell extrahieren und in die Log-Datei schreiben oder ein Plot dazu zeichnen.
