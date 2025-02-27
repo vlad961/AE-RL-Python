@@ -1,0 +1,5 @@
+The Boruta algorithm was run on ≈ 10% of randomly chosen data.
+
+The following attack distribution was used for the run:
+DoS, normal, Probe, R2L, U2R
+4499, 6794, 1199, 102, 4
