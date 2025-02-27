@@ -10,8 +10,8 @@ cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
 data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
 data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "formated_train_adv.csv")
-formated_test_path = os.path.join(data_formated_dir, "formated_test_adv.csv")
+formated_train_path = os.path.join(data_formated_dir, "balanced_training_data.csv") #  formated_train_adv
+formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") #  formated_test_adv
 kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
 kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 

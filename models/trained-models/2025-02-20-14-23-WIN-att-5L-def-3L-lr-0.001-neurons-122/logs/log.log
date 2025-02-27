@@ -1,0 +1,746 @@
+02/20/2025 14:23:19 - INFO - Started script at: 2025-02-20-14-23
+02/20/2025 14:23:19 - INFO - Current working dir: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python
+02/20/2025 14:23:19 - INFO - Used data files: 
+E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\data/datasets/origin-kaggle-com/nsl-kdd/KDDTrain+.txt,
+E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\data/datasets/origin-kaggle-com/nsl-kdd/KDDTest+.txt
+02/20/2025 14:23:19 - INFO - Creating enviroment...
+02/20/2025 14:23:22 - INFO - Initializing ReplayMemory with observation_size=122 and max_size=1000
+02/20/2025 14:23:23 - DEBUG - Creating converter from 5 to 3
+02/20/2025 14:23:23 - DEBUG - Creating converter from 3 to 5
+02/20/2025 14:23:23 - INFO - Reading formated train data from: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\data/datasets/formated/formated_train_adv.csv
+02/20/2025 14:23:25 - INFO - Initializing ReplayMemory with observation_size=122 and max_size=1000
+02/20/2025 14:23:25 - INFO - Start Training with the following parameters:
+-----------------------------------------------------------------------------------------------------------------------
+Total epoch: 100 | Iterations in epoch: 100 | Minibatch from mem size: 100 | Total Samples: 10000 | Data shape: (125973, 162)
+-----------------------------------------------------------------------------------------------------------------------
+Attacker: Num_actions=23 | gamma=0.001 | epsilon=1 | ANN hidden size=122 | ANN hidden layers=5 | Learning rate=0.001 | Neurons=122
+-----------------------------------------------------------------------------------------------------------------------
+Defender: Num_actions=5 | gamma=0.001 | epsilon=1 | ANN hidden size=122 | ANN hidden layers=3 | Learning rate=0.001 | Neurons=122
+-----------------------------------------------------------------------------------------------------------------------
+Used Attack types: 'all: Normal, DoS, Probe, R2L, U2R' | Attack name(s): ['normal', 'back', 'land', 'neptune', 'pod', 'smurf', 'teardrop', 'ipsweep', 'nmap', 'portsweep', 'satan', 'ftp_write', 'guess_passwd', 'imap', 'multihop', 'phf', 'spy', 'warezclient', 'warezmaster', 'buffer_overflow', 'loadmodule', 'perl', 'rootkit']
+-----------------------------------------------------------------------------------------------------------------------
+
+02/20/2025 14:23:25 - INFO - End of Epoch.
+|Epoch 000/100| time: 0.70|
+|Def Loss 0.0000 | Def Reward in ep 013|
+|Att Loss 0.0000 | Att Reward in ep 087|
+|Def Estimated: [18 29 24 10 19]| Att Labels: [ 3 30 14 37 16]|
+|Def Amount of true predicted attacks: [1 6 3 1 2]|
+02/20/2025 14:23:26 - WARNING - 5 out of the last 5 calls to <function Model.make_predict_function.<locals>.predict_function at 0x0000022F0A8CB8B0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+02/20/2025 14:23:26 - WARNING - 6 out of the last 6 calls to <function Model.make_predict_function.<locals>.predict_function at 0x0000022F0411C280> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+02/20/2025 14:23:44 - INFO - End of Epoch.
+|Epoch 001/100| time: 18.29|
+|Def Loss 0.4151 | Def Reward in ep 041|
+|Att Loss 0.4140 | Att Reward in ep 059|
+|Def Estimated: [15 31 10 27 17]| Att Labels: [ 7 32 12 36 13]|
+|Def Amount of true predicted attacks: [ 1 20  2 14  4]|
+02/20/2025 14:24:02 - INFO - End of Epoch.
+|Epoch 002/100| time: 18.13|
+|Def Loss 0.2013 | Def Reward in ep 076|
+|Att Loss 0.3441 | Att Reward in ep 024|
+|Def Estimated: [ 7 21 16 44 12]| Att Labels: [10 19 17 34 20]|
+|Def Amount of true predicted attacks: [ 5 18 12 32  9]|
+02/20/2025 14:24:20 - INFO - End of Epoch.
+|Epoch 003/100| time: 18.43|
+|Def Loss 0.0978 | Def Reward in ep 088|
+|Att Loss 0.3635 | Att Reward in ep 012|
+|Def Estimated: [15 29 18 30  8]| Att Labels: [14 29 16 30 11]|
+|Def Amount of true predicted attacks: [11 25 16 29  7]|
+02/20/2025 14:24:39 - INFO - End of Epoch.
+|Epoch 004/100| time: 18.27|
+|Def Loss 0.1083 | Def Reward in ep 089|
+|Att Loss 0.3412 | Att Reward in ep 011|
+|Def Estimated: [13 24 12 40 11]| Att Labels: [12 28 10 37 13]|
+|Def Amount of true predicted attacks: [ 8 23 10 37 11]|
+02/20/2025 14:24:57 - INFO - End of Epoch.
+|Epoch 005/100| time: 18.14|
+|Def Loss 0.1244 | Def Reward in ep 090|
+|Att Loss 0.3168 | Att Reward in ep 010|
+|Def Estimated: [12 27 14 36 11]| Att Labels: [13 28 13 32 14]|
+|Def Amount of true predicted attacks: [ 9 26 13 31 11]|
+02/20/2025 14:25:15 - INFO - End of Epoch.
+|Epoch 006/100| time: 18.12|
+|Def Loss 0.1398 | Def Reward in ep 090|
+|Att Loss 0.2977 | Att Reward in ep 010|
+|Def Estimated: [15 27  9 33 16]| Att Labels: [18 27  9 30 16]|
+|Def Amount of true predicted attacks: [14 26  7 29 14]|
+02/20/2025 14:25:33 - INFO - End of Epoch.
+|Epoch 007/100| time: 18.35|
+|Def Loss 0.1278 | Def Reward in ep 092|
+|Att Loss 0.2901 | Att Reward in ep 008|
+|Def Estimated: [12 23 22 28 15]| Att Labels: [18 23 21 24 14]|
+|Def Amount of true predicted attacks: [12 23 21 23 13]|
+02/20/2025 14:25:51 - INFO - End of Epoch.
+|Epoch 008/100| time: 18.14|
+|Def Loss 0.1140 | Def Reward in ep 094|
+|Att Loss 0.2775 | Att Reward in ep 006|
+|Def Estimated: [14 25 21 28 12]| Att Labels: [15 26 21 28 10]|
+|Def Amount of true predicted attacks: [14 24 20 27  9]|
+02/20/2025 14:26:09 - INFO - End of Epoch.
+|Epoch 009/100| time: 17.94|
+|Def Loss 0.1040 | Def Reward in ep 091|
+|Att Loss 0.2501 | Att Reward in ep 009|
+|Def Estimated: [10 24 13 38 15]| Att Labels: [12 24 15 34 15]|
+|Def Amount of true predicted attacks: [ 9 22 13 34 13]|
+02/20/2025 14:26:28 - INFO - End of Epoch.
+|Epoch 010/100| time: 18.27|
+|Def Loss 0.0967 | Def Reward in ep 092|
+|Att Loss 0.2043 | Att Reward in ep 008|
+|Def Estimated: [18 28 17 26 11]| Att Labels: [18 31 12 24 15]|
+|Def Amount of true predicted attacks: [18 27 12 24 11]|
+02/20/2025 14:26:46 - INFO - End of Epoch.
+|Epoch 011/100| time: 18.06|
+|Def Loss 0.0894 | Def Reward in ep 093|
+|Att Loss 0.1094 | Att Reward in ep 007|
+|Def Estimated: [12 28 15 31 14]| Att Labels: [12 28 14 32 14]|
+|Def Amount of true predicted attacks: [10 27 13 30 13]|
+02/20/2025 14:27:04 - INFO - End of Epoch.
+|Epoch 012/100| time: 18.26|
+|Def Loss 0.1022 | Def Reward in ep 087|
+|Att Loss 0.0575 | Att Reward in ep 013|
+|Def Estimated: [17 21 16 30 16]| Att Labels: [19 23 16 32 10]|
+|Def Amount of true predicted attacks: [15 21 14 27 10]|
+02/20/2025 14:27:22 - INFO - End of Epoch.
+|Epoch 013/100| time: 18.42|
+|Def Loss 0.1219 | Def Reward in ep 093|
+|Att Loss 0.0454 | Att Reward in ep 007|
+|Def Estimated: [10 20 22 32 16]| Att Labels: [16 20 21 29 14]|
+|Def Amount of true predicted attacks: [10 20 21 28 14]|
+02/20/2025 14:27:41 - INFO - End of Epoch.
+|Epoch 014/100| time: 18.42|
+|Def Loss 0.1005 | Def Reward in ep 088|
+|Att Loss 0.0415 | Att Reward in ep 012|
+|Def Estimated: [14 24 22 26 14]| Att Labels: [13 22 23 24 18]|
+|Def Amount of true predicted attacks: [11 21 21 21 14]|
+02/20/2025 14:27:59 - INFO - End of Epoch.
+|Epoch 015/100| time: 18.21|
+|Def Loss 0.1063 | Def Reward in ep 090|
+|Att Loss 0.0343 | Att Reward in ep 010|
+|Def Estimated: [ 6 29 18 36 11]| Att Labels: [ 7 27 18 36 12]|
+|Def Amount of true predicted attacks: [ 4 27 15 34 10]|
+02/20/2025 14:28:17 - INFO - End of Epoch.
+|Epoch 016/100| time: 18.10|
+|Def Loss 0.1073 | Def Reward in ep 095|
+|Att Loss 0.0303 | Att Reward in ep 005|
+|Def Estimated: [ 5 24 25 27 19]| Att Labels: [ 6 24 23 28 19]|
+|Def Amount of true predicted attacks: [ 4 24 22 27 18]|
+02/20/2025 14:28:35 - INFO - End of Epoch.
+|Epoch 017/100| time: 18.33|
+|Def Loss 0.0932 | Def Reward in ep 095|
+|Att Loss 0.0295 | Att Reward in ep 005|
+|Def Estimated: [11 28 28 22 11]| Att Labels: [12 29 27 21 11]|
+|Def Amount of true predicted attacks: [10 28 27 20 10]|
+02/20/2025 14:28:54 - INFO - End of Epoch.
+|Epoch 018/100| time: 18.26|
+|Def Loss 0.0883 | Def Reward in ep 099|
+|Att Loss 0.0273 | Att Reward in ep 001|
+|Def Estimated: [10 19 21 38 12]| Att Labels: [11 19 21 37 12]|
+|Def Amount of true predicted attacks: [10 19 21 37 12]|
+02/20/2025 14:29:12 - INFO - End of Epoch.
+|Epoch 019/100| time: 17.96|
+|Def Loss 0.0754 | Def Reward in ep 094|
+|Att Loss 0.0294 | Att Reward in ep 006|
+|Def Estimated: [ 8 26 20 29 17]| Att Labels: [ 8 25 20 29 18]|
+|Def Amount of true predicted attacks: [ 6 25 19 27 17]|
+02/20/2025 14:29:30 - INFO - End of Epoch.
+|Epoch 020/100| time: 18.13|
+|Def Loss 0.0610 | Def Reward in ep 095|
+|Att Loss 0.0288 | Att Reward in ep 005|
+|Def Estimated: [11 22 20 33 14]| Att Labels: [10 22 21 32 15]|
+|Def Amount of true predicted attacks: [ 9 22 20 31 13]|
+02/20/2025 14:29:48 - INFO - End of Epoch.
+|Epoch 021/100| time: 18.10|
+|Def Loss 0.0522 | Def Reward in ep 099|
+|Att Loss 0.0321 | Att Reward in ep 001|
+|Def Estimated: [ 9 33 21 23 14]| Att Labels: [ 9 33 20 24 14]|
+|Def Amount of true predicted attacks: [ 9 33 20 23 14]|
+02/20/2025 14:30:06 - INFO - End of Epoch.
+|Epoch 022/100| time: 18.42|
+|Def Loss 0.0517 | Def Reward in ep 095|
+|Att Loss 0.0316 | Att Reward in ep 005|
+|Def Estimated: [15 22 19 27 17]| Att Labels: [14 22 18 29 17]|
+|Def Amount of true predicted attacks: [13 21 18 27 16]|
+02/20/2025 14:30:24 - INFO - End of Epoch.
+|Epoch 023/100| time: 17.95|
+|Def Loss 0.0525 | Def Reward in ep 097|
+|Att Loss 0.0290 | Att Reward in ep 003|
+|Def Estimated: [ 6 23 26 24 21]| Att Labels: [ 5 23 27 24 21]|
+|Def Amount of true predicted attacks: [ 5 23 26 23 20]|
+02/20/2025 14:30:43 - INFO - End of Epoch.
+|Epoch 024/100| time: 18.69|
+|Def Loss 0.0614 | Def Reward in ep 095|
+|Att Loss 0.0267 | Att Reward in ep 005|
+|Def Estimated: [13 21 22 27 17]| Att Labels: [12 22 22 24 20]|
+|Def Amount of true predicted attacks: [12 21 21 24 17]|
+02/20/2025 14:31:01 - INFO - End of Epoch.
+|Epoch 025/100| time: 18.26|
+|Def Loss 0.0675 | Def Reward in ep 091|
+|Att Loss 0.0183 | Att Reward in ep 009|
+|Def Estimated: [10 25 21 29 15]| Att Labels: [14 25 17 31 13]|
+|Def Amount of true predicted attacks: [10 25 17 27 12]|
+02/20/2025 14:31:19 - INFO - End of Epoch.
+|Epoch 026/100| time: 18.12|
+|Def Loss 0.0555 | Def Reward in ep 100|
+|Att Loss 0.0194 | Att Reward in ep 000|
+|Def Estimated: [14 16 22 30 18]| Att Labels: [14 16 22 30 18]|
+|Def Amount of true predicted attacks: [14 16 22 30 18]|
+02/20/2025 14:31:37 - INFO - End of Epoch.
+|Epoch 027/100| time: 18.08|
+|Def Loss 0.0634 | Def Reward in ep 096|
+|Att Loss 0.0136 | Att Reward in ep 004|
+|Def Estimated: [10 20 25 31 14]| Att Labels: [11 19 23 33 14]|
+|Def Amount of true predicted attacks: [ 9 19 23 31 14]|
+02/20/2025 14:31:56 - INFO - End of Epoch.
+|Epoch 028/100| time: 18.19|
+|Def Loss 0.0619 | Def Reward in ep 097|
+|Att Loss 0.0173 | Att Reward in ep 003|
+|Def Estimated: [13 28 12 35 12]| Att Labels: [13 29 12 32 14]|
+|Def Amount of true predicted attacks: [13 28 12 32 12]|
+02/20/2025 14:32:14 - INFO - End of Epoch.
+|Epoch 029/100| time: 18.21|
+|Def Loss 0.0744 | Def Reward in ep 088|
+|Att Loss 0.0180 | Att Reward in ep 012|
+|Def Estimated: [17 17 21 26 19]| Att Labels: [13 18 22 28 19]|
+|Def Amount of true predicted attacks: [11 17 21 24 15]|
+02/20/2025 14:32:32 - INFO - End of Epoch.
+|Epoch 030/100| time: 18.29|
+|Def Loss 0.0727 | Def Reward in ep 093|
+|Att Loss 0.0259 | Att Reward in ep 007|
+|Def Estimated: [12 29 18 26 15]| Att Labels: [15 27 18 26 14]|
+|Def Amount of true predicted attacks: [12 25 17 25 14]|
+02/20/2025 14:32:50 - INFO - End of Epoch.
+|Epoch 031/100| time: 18.19|
+|Def Loss 0.0763 | Def Reward in ep 097|
+|Att Loss 0.0285 | Att Reward in ep 003|
+|Def Estimated: [11 23 15 36 15]| Att Labels: [12 23 15 36 14]|
+|Def Amount of true predicted attacks: [10 23 15 35 14]|
+02/20/2025 14:33:09 - INFO - End of Epoch.
+|Epoch 032/100| time: 18.41|
+|Def Loss 0.0717 | Def Reward in ep 095|
+|Att Loss 0.0337 | Att Reward in ep 005|
+|Def Estimated: [14 19 22 31 14]| Att Labels: [14 18 22 31 15]|
+|Def Amount of true predicted attacks: [13 18 22 29 13]|
+02/20/2025 14:33:27 - INFO - End of Epoch.
+|Epoch 033/100| time: 18.22|
+|Def Loss 0.0774 | Def Reward in ep 093|
+|Att Loss 0.0312 | Att Reward in ep 007|
+|Def Estimated: [15 14 21 27 23]| Att Labels: [15 14 20 28 23]|
+|Def Amount of true predicted attacks: [14 13 19 26 21]|
+02/20/2025 14:33:46 - INFO - End of Epoch.
+|Epoch 034/100| time: 18.79|
+|Def Loss 0.0924 | Def Reward in ep 096|
+|Att Loss 0.0298 | Att Reward in ep 004|
+|Def Estimated: [17 16 28 29 10]| Att Labels: [17 15 29 27 12]|
+|Def Amount of true predicted attacks: [16 15 28 27 10]|
+02/20/2025 14:34:04 - INFO - End of Epoch.
+|Epoch 035/100| time: 18.26|
+|Def Loss 0.0754 | Def Reward in ep 094|
+|Att Loss 0.0259 | Att Reward in ep 006|
+|Def Estimated: [ 9 32 19 30 10]| Att Labels: [10 31 19 32  8]|
+|Def Amount of true predicted attacks: [ 8 31 19 29  7]|
+02/20/2025 14:34:22 - INFO - End of Epoch.
+|Epoch 036/100| time: 18.32|
+|Def Loss 0.0729 | Def Reward in ep 097|
+|Att Loss 0.0212 | Att Reward in ep 003|
+|Def Estimated: [11 30 20 26 13]| Att Labels: [11 29 21 26 13]|
+|Def Amount of true predicted attacks: [11 29 20 25 12]|
+02/20/2025 14:34:40 - INFO - End of Epoch.
+|Epoch 037/100| time: 17.81|
+|Def Loss 0.0678 | Def Reward in ep 094|
+|Att Loss 0.0244 | Att Reward in ep 006|
+|Def Estimated: [ 9 19 21 27 24]| Att Labels: [11 20 21 26 22]|
+|Def Amount of true predicted attacks: [ 9 18 21 25 21]|
+02/20/2025 14:34:58 - INFO - End of Epoch.
+|Epoch 038/100| time: 18.11|
+|Def Loss 0.0795 | Def Reward in ep 092|
+|Att Loss 0.0256 | Att Reward in ep 008|
+|Def Estimated: [ 9 32 18 24 17]| Att Labels: [11 30 16 24 19]|
+|Def Amount of true predicted attacks: [ 8 30 16 21 17]|
+02/20/2025 14:35:16 - INFO - End of Epoch.
+|Epoch 039/100| time: 18.05|
+|Def Loss 0.0671 | Def Reward in ep 097|
+|Att Loss 0.0192 | Att Reward in ep 003|
+|Def Estimated: [10 18 20 36 16]| Att Labels: [10 18 21 34 17]|
+|Def Amount of true predicted attacks: [ 9 18 20 34 16]|
+02/20/2025 14:35:34 - INFO - End of Epoch.
+|Epoch 040/100| time: 18.16|
+|Def Loss 0.0605 | Def Reward in ep 097|
+|Att Loss 0.0168 | Att Reward in ep 003|
+|Def Estimated: [14 18 23 30 15]| Att Labels: [12 19 24 30 15]|
+|Def Amount of true predicted attacks: [12 18 23 29 15]|
+02/20/2025 14:35:52 - INFO - End of Epoch.
+|Epoch 041/100| time: 17.96|
+|Def Loss 0.0775 | Def Reward in ep 095|
+|Att Loss 0.0198 | Att Reward in ep 005|
+|Def Estimated: [ 6 28 17 38 11]| Att Labels: [ 7 28 16 38 11]|
+|Def Amount of true predicted attacks: [ 5 27 16 37 10]|
+02/20/2025 14:36:11 - INFO - End of Epoch.
+|Epoch 042/100| time: 18.22|
+|Def Loss 0.0661 | Def Reward in ep 096|
+|Att Loss 0.0299 | Att Reward in ep 004|
+|Def Estimated: [10 23 19 27 21]| Att Labels: [ 9 24 20 29 18]|
+|Def Amount of true predicted attacks: [ 9 23 19 27 18]|
+02/20/2025 14:36:29 - INFO - End of Epoch.
+|Epoch 043/100| time: 18.22|
+|Def Loss 0.0541 | Def Reward in ep 095|
+|Att Loss 0.0294 | Att Reward in ep 005|
+|Def Estimated: [11 24 16 30 19]| Att Labels: [10 23 16 34 17]|
+|Def Amount of true predicted attacks: [10 23 15 30 17]|
+02/20/2025 14:36:48 - INFO - End of Epoch.
+|Epoch 044/100| time: 18.79|
+|Def Loss 0.0517 | Def Reward in ep 095|
+|Att Loss 0.0308 | Att Reward in ep 005|
+|Def Estimated: [18 24 15 27 16]| Att Labels: [18 23 17 26 16]|
+|Def Amount of true predicted attacks: [17 23 15 25 15]|
+02/20/2025 14:37:06 - INFO - End of Epoch.
+|Epoch 045/100| time: 18.12|
+|Def Loss 0.0591 | Def Reward in ep 097|
+|Att Loss 0.0289 | Att Reward in ep 003|
+|Def Estimated: [ 9 24 21 34 12]| Att Labels: [ 9 26 20 32 13]|
+|Def Amount of true predicted attacks: [ 9 24 20 32 12]|
+02/20/2025 14:37:24 - INFO - End of Epoch.
+|Epoch 046/100| time: 18.19|
+|Def Loss 0.0506 | Def Reward in ep 093|
+|Att Loss 0.0270 | Att Reward in ep 007|
+|Def Estimated: [10 29 14 34 13]| Att Labels: [ 9 30 16 33 12]|
+|Def Amount of true predicted attacks: [ 8 28 14 32 11]|
+02/20/2025 14:37:42 - INFO - End of Epoch.
+|Epoch 047/100| time: 18.14|
+|Def Loss 0.0484 | Def Reward in ep 096|
+|Att Loss 0.0292 | Att Reward in ep 004|
+|Def Estimated: [ 6 26 17 31 20]| Att Labels: [ 7 26 17 28 22]|
+|Def Amount of true predicted attacks: [ 6 26 16 28 20]|
+02/20/2025 14:38:00 - INFO - End of Epoch.
+|Epoch 048/100| time: 18.30|
+|Def Loss 0.0546 | Def Reward in ep 094|
+|Att Loss 0.0264 | Att Reward in ep 006|
+|Def Estimated: [12 27 23 27 11]| Att Labels: [12 28 23 25 12]|
+|Def Amount of true predicted attacks: [11 26 23 24 10]|
+02/20/2025 14:38:19 - INFO - End of Epoch.
+|Epoch 049/100| time: 18.34|
+|Def Loss 0.0536 | Def Reward in ep 097|
+|Att Loss 0.0254 | Att Reward in ep 003|
+|Def Estimated: [ 8 27 17 31 17]| Att Labels: [ 7 28 17 33 15]|
+|Def Amount of true predicted attacks: [ 7 27 17 31 15]|
+02/20/2025 14:38:37 - INFO - End of Epoch.
+|Epoch 050/100| time: 18.18|
+|Def Loss 0.0437 | Def Reward in ep 095|
+|Att Loss 0.0315 | Att Reward in ep 005|
+|Def Estimated: [13 32 15 24 16]| Att Labels: [13 30 17 25 15]|
+|Def Amount of true predicted attacks: [11 30 15 24 15]|
+02/20/2025 14:38:55 - INFO - End of Epoch.
+|Epoch 051/100| time: 18.21|
+|Def Loss 0.0545 | Def Reward in ep 096|
+|Att Loss 0.0363 | Att Reward in ep 004|
+|Def Estimated: [ 9 34 19 25 13]| Att Labels: [ 8 34 18 27 13]|
+|Def Amount of true predicted attacks: [ 7 33 18 25 13]|
+02/20/2025 14:39:14 - INFO - End of Epoch.
+|Epoch 052/100| time: 18.82|
+|Def Loss 0.0659 | Def Reward in ep 094|
+|Att Loss 0.0366 | Att Reward in ep 006|
+|Def Estimated: [ 5 26 13 41 15]| Att Labels: [ 4 26 13 45 12]|
+|Def Amount of true predicted attacks: [ 4 26 13 40 11]|
+02/20/2025 14:39:32 - INFO - End of Epoch.
+|Epoch 053/100| time: 18.40|
+|Def Loss 0.0400 | Def Reward in ep 096|
+|Att Loss 0.0348 | Att Reward in ep 004|
+|Def Estimated: [ 5 27 21 34 13]| Att Labels: [ 5 26 21 37 11]|
+|Def Amount of true predicted attacks: [ 5 26 20 34 11]|
+02/20/2025 14:39:51 - INFO - End of Epoch.
+|Epoch 054/100| time: 18.61|
+|Def Loss 0.0318 | Def Reward in ep 097|
+|Att Loss 0.0314 | Att Reward in ep 003|
+|Def Estimated: [ 6 43 24 21  6]| Att Labels: [ 5 42 24 23  6]|
+|Def Amount of true predicted attacks: [ 5 42 23 21  6]|
+02/20/2025 14:40:09 - INFO - End of Epoch.
+|Epoch 055/100| time: 18.16|
+|Def Loss 0.0327 | Def Reward in ep 097|
+|Att Loss 0.0335 | Att Reward in ep 003|
+|Def Estimated: [ 4 32 16 34 14]| Att Labels: [ 4 31 17 36 12]|
+|Def Amount of true predicted attacks: [ 4 31 16 34 12]|
+02/20/2025 14:40:28 - INFO - End of Epoch.
+|Epoch 056/100| time: 18.65|
+|Def Loss 0.0290 | Def Reward in ep 097|
+|Att Loss 0.0293 | Att Reward in ep 003|
+|Def Estimated: [13 28 21 26 12]| Att Labels: [12 27 21 28 12]|
+|Def Amount of true predicted attacks: [11 27 21 26 12]|
+02/20/2025 14:40:46 - INFO - End of Epoch.
+|Epoch 057/100| time: 18.29|
+|Def Loss 0.0213 | Def Reward in ep 100|
+|Att Loss 0.0231 | Att Reward in ep 000|
+|Def Estimated: [ 7 34 15 30 14]| Att Labels: [ 7 34 15 30 14]|
+|Def Amount of true predicted attacks: [ 7 34 15 30 14]|
+02/20/2025 14:41:04 - INFO - End of Epoch.
+|Epoch 058/100| time: 18.31|
+|Def Loss 0.0227 | Def Reward in ep 095|
+|Att Loss 0.0243 | Att Reward in ep 005|
+|Def Estimated: [ 8 25 24 28 15]| Att Labels: [ 7 24 24 29 16]|
+|Def Amount of true predicted attacks: [ 7 24 24 27 13]|
+02/20/2025 14:41:22 - INFO - End of Epoch.
+|Epoch 059/100| time: 18.23|
+|Def Loss 0.0236 | Def Reward in ep 096|
+|Att Loss 0.0252 | Att Reward in ep 004|
+|Def Estimated: [ 5 24 13 39 19]| Att Labels: [ 6 22 14 39 19]|
+|Def Amount of true predicted attacks: [ 5 22 13 38 18]|
+02/20/2025 14:41:41 - INFO - End of Epoch.
+|Epoch 060/100| time: 18.03|
+|Def Loss 0.0225 | Def Reward in ep 093|
+|Att Loss 0.0248 | Att Reward in ep 007|
+|Def Estimated: [ 4 26 23 27 20]| Att Labels: [ 4 23 25 28 20]|
+|Def Amount of true predicted attacks: [ 3 23 23 25 19]|
+02/20/2025 14:41:59 - INFO - End of Epoch.
+|Epoch 061/100| time: 18.36|
+|Def Loss 0.0184 | Def Reward in ep 095|
+|Att Loss 0.0238 | Att Reward in ep 005|
+|Def Estimated: [ 7 19 15 35 24]| Att Labels: [ 5 20 16 34 25]|
+|Def Amount of true predicted attacks: [ 5 19 15 34 22]|
+02/20/2025 14:42:17 - INFO - End of Epoch.
+|Epoch 062/100| time: 18.37|
+|Def Loss 0.0162 | Def Reward in ep 098|
+|Att Loss 0.0273 | Att Reward in ep 002|
+|Def Estimated: [ 5 23 22 30 20]| Att Labels: [ 5 21 24 30 20]|
+|Def Amount of true predicted attacks: [ 5 21 22 30 20]|
+02/20/2025 14:42:36 - INFO - End of Epoch.
+|Epoch 063/100| time: 18.44|
+|Def Loss 0.0202 | Def Reward in ep 095|
+|Att Loss 0.0232 | Att Reward in ep 005|
+|Def Estimated: [ 5 19 24 37 15]| Att Labels: [ 4 20 23 35 18]|
+|Def Amount of true predicted attacks: [ 4 19 23 34 15]|
+02/20/2025 14:42:54 - INFO - End of Epoch.
+|Epoch 064/100| time: 18.49|
+|Def Loss 0.0426 | Def Reward in ep 092|
+|Att Loss 0.0246 | Att Reward in ep 008|
+|Def Estimated: [12 20 17 30 21]| Att Labels: [10 20 17 32 21]|
+|Def Amount of true predicted attacks: [ 8 20 17 27 20]|
+02/20/2025 14:43:13 - INFO - End of Epoch.
+|Epoch 065/100| time: 18.99|
+|Def Loss 0.0441 | Def Reward in ep 095|
+|Att Loss 0.0300 | Att Reward in ep 005|
+|Def Estimated: [ 8 24 17 33 18]| Att Labels: [ 8 23 18 32 19]|
+|Def Amount of true predicted attacks: [ 7 23 16 31 18]|
+02/20/2025 14:43:32 - INFO - End of Epoch.
+|Epoch 066/100| time: 18.44|
+|Def Loss 0.0465 | Def Reward in ep 097|
+|Att Loss 0.0237 | Att Reward in ep 003|
+|Def Estimated: [ 8 33 15 28 16]| Att Labels: [ 7 33 16 28 16]|
+|Def Amount of true predicted attacks: [ 7 33 15 27 15]|
+02/20/2025 14:43:50 - INFO - End of Epoch.
+|Epoch 067/100| time: 18.57|
+|Def Loss 0.0469 | Def Reward in ep 097|
+|Att Loss 0.0273 | Att Reward in ep 003|
+|Def Estimated: [ 4 30 25 18 23]| Att Labels: [ 5 29 25 18 23]|
+|Def Amount of true predicted attacks: [ 4 29 25 17 22]|
+02/20/2025 14:44:09 - INFO - End of Epoch.
+|Epoch 068/100| time: 18.51|
+|Def Loss 0.0425 | Def Reward in ep 098|
+|Att Loss 0.0268 | Att Reward in ep 002|
+|Def Estimated: [ 6 22 24 22 26]| Att Labels: [ 5 23 25 22 25]|
+|Def Amount of true predicted attacks: [ 5 22 24 22 25]|
+02/20/2025 14:44:27 - INFO - End of Epoch.
+|Epoch 069/100| time: 18.73|
+|Def Loss 0.0430 | Def Reward in ep 092|
+|Att Loss 0.0276 | Att Reward in ep 008|
+|Def Estimated: [10 23 20 28 19]| Att Labels: [ 9 22 22 30 17]|
+|Def Amount of true predicted attacks: [ 7 22 20 27 16]|
+02/20/2025 14:44:46 - INFO - End of Epoch.
+|Epoch 070/100| time: 18.70|
+|Def Loss 0.0430 | Def Reward in ep 097|
+|Att Loss 0.0283 | Att Reward in ep 003|
+|Def Estimated: [ 6 29 25 22 18]| Att Labels: [ 7 28 25 23 17]|
+|Def Amount of true predicted attacks: [ 6 28 25 21 17]|
+02/20/2025 14:45:05 - INFO - End of Epoch.
+|Epoch 071/100| time: 18.42|
+|Def Loss 0.0421 | Def Reward in ep 099|
+|Att Loss 0.0208 | Att Reward in ep 001|
+|Def Estimated: [ 7 30 19 27 17]| Att Labels: [ 7 30 19 28 16]|
+|Def Amount of true predicted attacks: [ 7 30 19 27 16]|
+02/20/2025 14:45:23 - INFO - End of Epoch.
+|Epoch 072/100| time: 18.67|
+|Def Loss 0.0382 | Def Reward in ep 100|
+|Att Loss 0.0180 | Att Reward in ep 000|
+|Def Estimated: [10 28 22 29 11]| Att Labels: [10 28 22 29 11]|
+|Def Amount of true predicted attacks: [10 28 22 29 11]|
+02/20/2025 14:45:42 - INFO - End of Epoch.
+|Epoch 073/100| time: 18.53|
+|Def Loss 0.0300 | Def Reward in ep 095|
+|Att Loss 0.0152 | Att Reward in ep 005|
+|Def Estimated: [ 5 25 24 29 17]| Att Labels: [ 2 25 25 31 17]|
+|Def Amount of true predicted attacks: [ 2 24 23 29 17]|
+02/20/2025 14:46:01 - INFO - End of Epoch.
+|Epoch 074/100| time: 18.99|
+|Def Loss 0.0319 | Def Reward in ep 092|
+|Att Loss 0.0198 | Att Reward in ep 008|
+|Def Estimated: [ 6 28 22 20 24]| Att Labels: [ 4 27 22 22 25]|
+|Def Amount of true predicted attacks: [ 2 27 20 19 24]|
+02/20/2025 14:46:19 - INFO - End of Epoch.
+|Epoch 075/100| time: 18.73|
+|Def Loss 0.0296 | Def Reward in ep 097|
+|Att Loss 0.0222 | Att Reward in ep 003|
+|Def Estimated: [ 6 29 18 26 21]| Att Labels: [ 7 28 18 27 20]|
+|Def Amount of true predicted attacks: [ 6 28 18 25 20]|
+02/20/2025 14:46:38 - INFO - End of Epoch.
+|Epoch 076/100| time: 18.85|
+|Def Loss 0.0192 | Def Reward in ep 097|
+|Att Loss 0.0215 | Att Reward in ep 003|
+|Def Estimated: [ 4 21 21 36 18]| Att Labels: [ 4 21 19 36 20]|
+|Def Amount of true predicted attacks: [ 4 21 19 35 18]|
+02/20/2025 14:46:57 - INFO - End of Epoch.
+|Epoch 077/100| time: 18.85|
+|Def Loss 0.0131 | Def Reward in ep 094|
+|Att Loss 0.0215 | Att Reward in ep 006|
+|Def Estimated: [ 9 25 14 36 16]| Att Labels: [ 9 24 14 35 18]|
+|Def Amount of true predicted attacks: [ 8 24 14 33 15]|
+02/20/2025 14:47:16 - INFO - End of Epoch.
+|Epoch 078/100| time: 18.98|
+|Def Loss 0.0412 | Def Reward in ep 096|
+|Att Loss 0.0218 | Att Reward in ep 004|
+|Def Estimated: [13 24 14 27 22]| Att Labels: [13 24 13 26 24]|
+|Def Amount of true predicted attacks: [13 23 13 25 22]|
+02/20/2025 14:47:35 - INFO - End of Epoch.
+|Epoch 079/100| time: 18.83|
+|Def Loss 0.0345 | Def Reward in ep 092|
+|Att Loss 0.0228 | Att Reward in ep 008|
+|Def Estimated: [ 8 19 23 25 25]| Att Labels: [ 5 19 24 28 24]|
+|Def Amount of true predicted attacks: [ 5 18 23 24 22]|
+02/20/2025 14:47:54 - INFO - End of Epoch.
+|Epoch 080/100| time: 18.93|
+|Def Loss 0.0274 | Def Reward in ep 098|
+|Att Loss 0.0251 | Att Reward in ep 002|
+|Def Estimated: [ 4 27 24 29 16]| Att Labels: [ 3 27 23 31 16]|
+|Def Amount of true predicted attacks: [ 3 27 23 29 16]|
+02/20/2025 14:48:13 - INFO - End of Epoch.
+|Epoch 081/100| time: 18.93|
+|Def Loss 0.0383 | Def Reward in ep 096|
+|Att Loss 0.0263 | Att Reward in ep 004|
+|Def Estimated: [ 8 19 24 33 16]| Att Labels: [ 8 18 23 35 16]|
+|Def Amount of true predicted attacks: [ 7 18 22 33 16]|
+02/20/2025 14:48:31 - INFO - End of Epoch.
+|Epoch 082/100| time: 18.60|
+|Def Loss 0.0281 | Def Reward in ep 094|
+|Att Loss 0.0330 | Att Reward in ep 006|
+|Def Estimated: [ 3 28 14 36 19]| Att Labels: [ 3 29 14 37 17]|
+|Def Amount of true predicted attacks: [ 2 27 13 35 17]|
+02/20/2025 14:48:50 - INFO - End of Epoch.
+|Epoch 083/100| time: 18.83|
+|Def Loss 0.0354 | Def Reward in ep 098|
+|Att Loss 0.0277 | Att Reward in ep 002|
+|Def Estimated: [ 1 22 24 33 20]| Att Labels: [ 2 22 24 33 19]|
+|Def Amount of true predicted attacks: [ 1 22 24 32 19]|
+02/20/2025 14:49:09 - INFO - End of Epoch.
+|Epoch 084/100| time: 19.23|
+|Def Loss 0.0355 | Def Reward in ep 094|
+|Att Loss 0.0308 | Att Reward in ep 006|
+|Def Estimated: [ 6 21 13 33 27]| Att Labels: [ 6 22 13 38 21]|
+|Def Amount of true predicted attacks: [ 6 21 13 33 21]|
+02/20/2025 14:49:28 - INFO - End of Epoch.
+|Epoch 085/100| time: 18.96|
+|Def Loss 0.0430 | Def Reward in ep 096|
+|Att Loss 0.0329 | Att Reward in ep 004|
+|Def Estimated: [10 22 17 32 19]| Att Labels: [ 9 24 17 32 18]|
+|Def Amount of true predicted attacks: [ 8 22 17 31 18]|
+02/20/2025 14:49:47 - INFO - End of Epoch.
+|Epoch 086/100| time: 18.93|
+|Def Loss 0.0601 | Def Reward in ep 096|
+|Att Loss 0.0375 | Att Reward in ep 004|
+|Def Estimated: [ 6 30 16 33 15]| Att Labels: [ 5 30 17 35 13]|
+|Def Amount of true predicted attacks: [ 5 30 16 32 13]|
+02/20/2025 14:50:06 - INFO - End of Epoch.
+|Epoch 087/100| time: 18.66|
+|Def Loss 0.0518 | Def Reward in ep 095|
+|Att Loss 0.0344 | Att Reward in ep 005|
+|Def Estimated: [ 7 21 22 32 18]| Att Labels: [ 7 21 24 32 16]|
+|Def Amount of true predicted attacks: [ 6 21 22 30 16]|
+02/20/2025 14:50:25 - INFO - End of Epoch.
+|Epoch 088/100| time: 18.85|
+|Def Loss 0.0510 | Def Reward in ep 098|
+|Att Loss 0.0267 | Att Reward in ep 002|
+|Def Estimated: [ 2 36 14 28 20]| Att Labels: [ 3 35 14 29 19]|
+|Def Amount of true predicted attacks: [ 2 35 14 28 19]|
+02/20/2025 14:50:44 - INFO - End of Epoch.
+|Epoch 089/100| time: 18.65|
+|Def Loss 0.0688 | Def Reward in ep 095|
+|Att Loss 0.0238 | Att Reward in ep 005|
+|Def Estimated: [10 24 17 29 20]| Att Labels: [ 9 23 18 32 18]|
+|Def Amount of true predicted attacks: [ 8 23 17 29 18]|
+02/20/2025 14:51:03 - INFO - End of Epoch.
+|Epoch 090/100| time: 19.17|
+|Def Loss 0.0572 | Def Reward in ep 096|
+|Att Loss 0.0219 | Att Reward in ep 004|
+|Def Estimated: [ 8 23 18 37 14]| Att Labels: [10 22 17 37 14]|
+|Def Amount of true predicted attacks: [ 8 22 17 36 13]|
+02/20/2025 14:51:22 - INFO - End of Epoch.
+|Epoch 091/100| time: 18.93|
+|Def Loss 0.0627 | Def Reward in ep 097|
+|Att Loss 0.0290 | Att Reward in ep 003|
+|Def Estimated: [ 7 29 11 36 17]| Att Labels: [ 8 30  9 37 16]|
+|Def Amount of true predicted attacks: [ 7 29  9 36 16]|
+02/20/2025 14:51:40 - INFO - End of Epoch.
+|Epoch 092/100| time: 18.68|
+|Def Loss 0.0732 | Def Reward in ep 092|
+|Att Loss 0.0252 | Att Reward in ep 008|
+|Def Estimated: [ 5 30 17 30 18]| Att Labels: [ 6 30 15 33 16]|
+|Def Amount of true predicted attacks: [ 4 29 15 29 15]|
+02/20/2025 14:51:59 - INFO - End of Epoch.
+|Epoch 093/100| time: 19.03|
+|Def Loss 0.0822 | Def Reward in ep 099|
+|Att Loss 0.0230 | Att Reward in ep 001|
+|Def Estimated: [ 8 38 14 26 14]| Att Labels: [ 8 37 15 26 14]|
+|Def Amount of true predicted attacks: [ 8 37 14 26 14]|
+02/20/2025 14:52:19 - INFO - End of Epoch.
+|Epoch 094/100| time: 19.25|
+|Def Loss 0.0898 | Def Reward in ep 095|
+|Att Loss 0.0266 | Att Reward in ep 005|
+|Def Estimated: [11 24 23 25 17]| Att Labels: [14 24 22 24 16]|
+|Def Amount of true predicted attacks: [11 23 21 24 16]|
+02/20/2025 14:52:37 - INFO - End of Epoch.
+|Epoch 095/100| time: 18.86|
+|Def Loss 0.0724 | Def Reward in ep 097|
+|Att Loss 0.0229 | Att Reward in ep 003|
+|Def Estimated: [ 4 30 19 35 12]| Att Labels: [ 5 30 19 32 14]|
+|Def Amount of true predicted attacks: [ 4 30 19 32 12]|
+02/20/2025 14:52:57 - INFO - End of Epoch.
+|Epoch 096/100| time: 19.02|
+|Def Loss 0.0610 | Def Reward in ep 099|
+|Att Loss 0.0177 | Att Reward in ep 001|
+|Def Estimated: [ 8 25 23 27 17]| Att Labels: [ 9 25 23 27 16]|
+|Def Amount of true predicted attacks: [ 8 25 23 27 16]|
+02/20/2025 14:53:16 - INFO - End of Epoch.
+|Epoch 097/100| time: 19.17|
+|Def Loss 0.0495 | Def Reward in ep 096|
+|Att Loss 0.0215 | Att Reward in ep 004|
+|Def Estimated: [14 25 16 30 15]| Att Labels: [15 24 16 28 17]|
+|Def Amount of true predicted attacks: [13 24 16 28 15]|
+02/20/2025 14:53:35 - INFO - End of Epoch.
+|Epoch 098/100| time: 18.93|
+|Def Loss 0.0581 | Def Reward in ep 095|
+|Att Loss 0.0268 | Att Reward in ep 005|
+|Def Estimated: [ 7 24 12 40 17]| Att Labels: [ 9 22 13 40 16]|
+|Def Amount of true predicted attacks: [ 7 22 12 38 16]|
+02/20/2025 14:53:54 - INFO - End of Epoch.
+|Epoch 099/100| time: 18.94|
+|Def Loss 0.0529 | Def Reward in ep 096|
+|Att Loss 0.0255 | Att Reward in ep 004|
+|Def Estimated: [10 26 10 37 17]| Att Labels: [12 25 11 36 16]|
+|Def Amount of true predicted attacks: [ 9 25 10 36 16]|
+02/20/2025 14:53:54 - INFO - Model 'attacker_model' saved in: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models/trained-models/2025-02-20-14-23-WIN-att-5L-def-3L-lr-0.001-neurons-122/attacker_model.keras
+02/20/2025 14:53:54 - INFO - Model summary:
+Model: "attacker_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense (Dense)               (None, 122)               15006     
+                                                                 
+ dense_1 (Dense)             (None, 122)               15006     
+                                                                 
+ dense_2 (Dense)             (None, 122)               15006     
+                                                                 
+ dense_3 (Dense)             (None, 122)               15006     
+                                                                 
+ dense_4 (Dense)             (None, 122)               15006     
+                                                                 
+ dense_5 (Dense)             (None, 23)                2829      
+                                                                 
+=================================================================
+Total params: 77,859
+Trainable params: 77,859
+Non-trainable params: 0
+_________________________________________________________________
+
+02/20/2025 14:53:54 - INFO - Model 'defender_model' saved in: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models/trained-models/2025-02-20-14-23-WIN-att-5L-def-3L-lr-0.001-neurons-122/defender_model.keras
+02/20/2025 14:53:54 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_12 (Dense)            (None, 122)               15006     
+                                                                 
+ dense_13 (Dense)            (None, 122)               15006     
+                                                                 
+ dense_14 (Dense)            (None, 122)               15006     
+                                                                 
+ dense_15 (Dense)            (None, 5)                 615       
+                                                                 
+=================================================================
+Total params: 45,633
+Trainable params: 45,633
+Non-trainable params: 0
+_________________________________________________________________
+
+02/20/2025 14:53:54 - INFO - Saved trained models.
+02/20/2025 14:53:54 - INFO - Total runtime: 00:30:34
+02/20/2025 14:53:54 - INFO - End of the script at: 2025-02-20 14:53:54.117003
+02/20/2025 14:53:54 - INFO - Trying to save summary plots under: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models/trained-models/2025-02-20-14-23-WIN-att-5L-def-3L-lr-0.001-neurons-122/plots/
+02/20/2025 14:53:54 - WARNING - The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+02/20/2025 14:53:55 - INFO - Plotted rewards and losses during training in: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models/trained-models/2025-02-20-14-23-WIN-att-5L-def-3L-lr-0.001-neurons-122/plots/
+02/20/2025 14:53:57 - INFO - Plotted attack distributions during training in: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models/trained-models/2025-02-20-14-23-WIN-att-5L-def-3L-lr-0.001-neurons-122/plots/
+02/20/2025 14:53:57 - INFO - Start testing the trained model.
+02/20/2025 14:53:57 - INFO - Model 'defender_model' loaded from: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models/trained-models/2025-02-20-14-23-WIN-att-5L-def-3L-lr-0.001-neurons-122/defender_model.keras
+02/20/2025 14:53:57 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_12 (Dense)            (None, 122)               15006     
+                                                                 
+ dense_13 (Dense)            (None, 122)               15006     
+                                                                 
+ dense_14 (Dense)            (None, 122)               15006     
+                                                                 
+ dense_15 (Dense)            (None, 5)                 615       
+                                                                 
+=================================================================
+Total params: 45,633
+Trainable params: 45,633
+Non-trainable params: 0
+_________________________________________________________________
+
+02/20/2025 14:53:57 - INFO - Reading formated test data from: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\data/datasets/formated/formated_test_adv.csv
+02/20/2025 14:53:59 - INFO - Overall overview
+Total reward: 17553 | Number of samples: 22544 | Accuracy = 77.86%
+02/20/2025 14:53:59 - INFO - Overall overview per attack type
+        Estimated Correct Total   F1_score Mismatch
+normal      10603    8715  9711  85.802895      892
+DoS          7393    6522  7458  87.832469       65
+Probe        2145    1473  2421  64.520368      276
+R2L          1932     793  2754  33.845497      822
+U2R           471      50   200   14.90313      271
+General                          77.212624         
+02/20/2025 14:53:59 - INFO - Performance measures on Test data
+02/20/2025 14:53:59 - INFO - Accuracy =  0.7786
+02/20/2025 14:53:59 - INFO - F1 =  0.7721
+02/20/2025 14:53:59 - INFO - Precision_score =  0.7707
+02/20/2025 14:53:59 - INFO - recall_score =  0.7786
+02/20/2025 14:53:59 - INFO - Normalized confusion matrix
+02/20/2025 14:53:59 - INFO - 
+Confusion Matrix:
+[[0.9  0.04 0.05 0.01 0.01]
+ [0.03 0.87 0.01 0.09 0.  ]
+ [0.07 0.14 0.61 0.15 0.04]
+ [0.55 0.06 0.01 0.29 0.09]
+ [0.03 0.01 0.56 0.15 0.25]]
+02/20/2025 14:54:00 - INFO - Plotted confusion matrix in: E:\vlad9\Documents\VisualStudioCodeProjects\AE-RL-Python\models/trained-models/2025-02-20-14-23-WIN-att-5L-def-3L-lr-0.001-neurons-122/plots/
+02/20/2025 14:54:01 - INFO - 
+One vs All metrics: 
+     name  accuracy        f1 precision    recall
+0  normal  0.872072  0.858029  0.821937  0.897436
+1     DoS  0.919846  0.878325  0.882186  0.874497
+2     R2L  0.862491  0.338455  0.410455  0.287945
+3   Probe  0.928141  0.645204  0.686713  0.608426
+4     U2R  0.974672  0.149031  0.106157      0.25
+02/20/2025 14:54:03 - INFO - Model metrics: 
+loss=0.056704871356487274, accuracy=0.7786107063293457, precision=0.6348145604133606, recall=0.8047817349433899
+02/20/2025 14:54:03 - INFO - Optimizer config: {'name': 'Adam', 'learning_rate': 0.001, 'decay': 0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'epsilon': 1e-07, 'amsgrad': False}
+02/20/2025 14:54:03 - INFO - Time needed for testing: 5.58727765083313
+02/20/2025 14:54:03 - INFO - Classification report:
+              precision    recall  f1-score   support
+
+      normal       0.82      0.90      0.86      9711
+         DoS       0.88      0.87      0.88      7458
+       Probe       0.69      0.61      0.65      2421
+         R2L       0.41      0.29      0.34      2754
+         U2R       0.11      0.25      0.15       200
+
+    accuracy                           0.78     22544
+   macro avg       0.58      0.58      0.57     22544
+weighted avg       0.77      0.78      0.77     22544
+
