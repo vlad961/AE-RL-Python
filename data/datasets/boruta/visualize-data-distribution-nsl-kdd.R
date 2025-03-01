@@ -58,11 +58,11 @@ attack_labels <- paste0(names(attack_counts), " (", attack_counts, ")")
 ggplot(attack_distribution, aes(x = attack_category, y = percentage, fill = attack_category)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = scales::label_number(accuracy = 0.0001)(percentage)), vjust = -0.5, size = 5) +  # Prozentwerte über Balken
-  labs(title = "Relative Distribution of Attack types in the NSL-KDD Trainset",
-       x = "Attacktype",
+  labs(title = "Relative Distribution of Attack Types in the NSL-KDD Trainset",
+       x = "Attack Type",
        y = "Relative Frequency") +
   scale_fill_manual(values = c("#4CAF50", "#E74C3C", "#E74C3C", "#E74C3C", "#E74C3C"),
-                    name = "Attacktypes and count",
+                    name = "Attack Types and Count",
                     labels = attack_labels) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
