@@ -31,7 +31,7 @@ class QNetwork():
         self.model.add(tf.keras.Input(shape=(obs_size,)))  # use this input layer to avoid problem
         # Add hidden layers
         for _ in range(hidden_layers):
-            self.model.add(tf.keras.layers.Dense(hidden_size, activation='relu')) # TODO: Check if this is the same as Dense in Keras
+            self.model.add(tf.keras.layers.Dense(hidden_size, activation='relu'))
         # Add output layer
         self.model.add(tf.keras.layers.Dense(num_actions)) # TODO: Check whether I achieve better results if I add a softmax activation function here.
 
@@ -70,5 +70,6 @@ class QNetwork():
     @staticmethod
     def copy_model(model):
         """Returns a copy of a keras model."""
-        model.save(os.path.join(models_dir, 'tmp_model.keras'))  # NOTE: Added '.keras' as this is the currently suggested extension for saving keras models 
-        return tf.keras.models.load_model(os.path.join(models_dir, 'tmp_model.keras'))
+        cloned_model = tf.keras.models.clone_model(model)
+        cloned_model.set_weights(model.get_weights())
+        return cloned_model

@@ -58,22 +58,28 @@ final_sample <- bind_rows(sample_r2l, sample_u2r, sample_dos, sample_normal, sam
 # select only features without labels
 features <- final_sample %>% select(1:122)
 # run Boruta algorithm to determine all relevant features
-boruta_result <- Boruta(final_sample$attack_category ~ ., data = features, doTrace = 1)
+boruta_result <- Boruta(x = features, y = final_sample$attack_category, doTrace = 1)
+# In case tentative features are present, decide automatically.
+boruta_tentative_decided <- TentativeRoughFix(boruta_result)
 
-# analyse results
+# save results
 print(boruta_result)
-pdf("boruta_plots.pdf")
-plot(boruta_result, las = 2)  # Plot feature importance.
+pdf("00_boruta_plots.pdf")
+plot(boruta_result, las = 2, cex.axis = 0.37)  # Plot feature importance.
 plotImpHistory(boruta_result) # Shows the development of Z-Scores over the iterations
 dev.off()  # finish writing into pdf file.
 
 # extract important features
-confirmed_features <- getConfirmedFormula(boruta_result)
-print(confirmed_features)
+confirmed_features_and_tentative <- getSelectedAttributes(boruta_result, withTentative = TRUE)
 
-# In case tentative features are present, decide automatically.
-boruta_result <- TentativeRoughFix(boruta_result)
-print(getConfirmedFormula(boruta_result))
+write.csv(attStats(boruta_result), "01_boruta_results_before_tentative_decision.csv", row.names = TRUE) # result before TentativeRoughFix
+write.csv(attStats(boruta_tentative_decided), "02_boruta_results_after_tentative_decision.csv", row.names = TRUE) # result after TentativeRoughFix
+write.csv(data.frame(Feature = confirmed_features_and_tentative), 
+          "03_boruta_confirmed_and_tentative_features.csv", row.names = FALSE) # confirmed features + tentative Features before Tentative Decision
 
-# save results
-write.csv(attStats(boruta_result), "boruta_results_10percent_balanced_attacks.csv", row.names = TRUE)
+# extract important features after Tentative Decision
+confirmed_features_final <- getSelectedAttributes(boruta_tentative_decided, withTentative = FALSE)
+# final confirmed features after Tentative Decision
+write.csv(data.frame(Feature = confirmed_features_final),
+          "03_boruta_confirmed_features_final.csv", row.names = FALSE)
+

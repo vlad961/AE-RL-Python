@@ -3,10 +3,10 @@ library(dplyr)
 library(readr)
 
 setwd("/Users/vsehtman/PycharmProjects/AE-RL-Pure-Python/data/datasets/boruta")
-random_sample_results <- read_csv("./rand_no_fix_seed/boruta_results_10percent_rand.csv")
+random_sample_results <- read_csv("./rand-vs-strat-new/rand_10_percent/02_boruta_results_after_tentative_decision.csv")
 colnames(random_sample_results)[1] <- "Feature"
 
-stratified_sample_results <- read_csv("./rand_vs_stratified_10_percent/stratified_no_fix_seed/boruta_results.csv")
+stratified_sample_results <- read_csv("./rand-vs-strat-new/strat_10_percent/02_boruta_results_after_tentative_decision.csv")
 colnames(stratified_sample_results)[1] <- "Feature"
 
 # Split features by decision

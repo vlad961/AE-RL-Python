@@ -269,7 +269,7 @@ class DataCls:
         df = pd.concat([df.drop('service', axis=1), pd.get_dummies(df['service'])], axis=1)
         df = pd.concat([df.drop('flag', axis=1), pd.get_dummies(df['flag'])], axis=1)
 
-        # NSL-KDD seems to have introduced faulty su_attempted values of '2' which are not documented in the original NSL nor in the improved NSL-KDD work # TODO Lese das Paper nochmal komplett durch und überprüfe ob Aussage tatsächlich stimmt.
+        # NSL-KDD seems to have introduced faulty su_attempted values of '2' which are not documented in the original NSL nor in the improved NSL-KDD work.
         # Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed them to 0)
         # 1 if ``su root'' command attempted; 0 otherwise
         df['su_attempted'] = df['su_attempted'].replace(2.0, 0.0)

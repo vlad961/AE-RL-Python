@@ -1,5 +1,0 @@
-The Boruta algorithm was run on a stratified sample of ≈ 10% of the data
-
-The follow attack distribution was used for the run:
-DoS, normal, Probe, R2L, U2R
-4624, 6703, 1167, 100, 4

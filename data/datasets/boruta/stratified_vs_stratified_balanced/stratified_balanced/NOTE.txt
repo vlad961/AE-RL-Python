@@ -1,3 +1,0 @@
-All samples of the attack types \'84Remote to Local (R2L)\'93 (995 ) and \'84User to Root (U2R)\'93 (52) were used. \
-In addition, 3885 samples for each of the rest attack types \'84normal\'93, \'84Probe\'93 and \'84Denial of Service (DoS)\'93 were added into one batch. \
-In the end the batch consists of 12702 Samples with their corresponding 122 Features.}
