@@ -12,10 +12,8 @@ import numpy as np
 import time
 import os
 
-
 """
 This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
-
 Notes and credits:
 The following anomaly detection RL system is based on the work of Guillermo Caminero, Manuel Lopez-Martin, Belen Carro "Adversarial environment reinforcement learning algorithm for intrusion detection".
 The original project can be found at: https://github.com/gcamfer/Anomaly-ReactionRL
@@ -282,3 +280,4 @@ if __name__ == "__main__":
         # Befinden sich alle numerischen Werte im bereich von 0-1 ? -> überprüfen ob die Daten korrekt formatiert wurden.
     # TODO: Schreibe Tests um zu überprüfen ob während des Trainings NaN auftauchen für die weights und layer outputs.
         # Überprüfe auch ob mehr als die Hälfte der Ausgaben einer Schicht != 0 sind.
+    # TODO: Plagiatsprüfungs-Tool nutzen um zu überprüfen ob die Arbeit plagiiert wurde.
