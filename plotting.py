@@ -66,7 +66,7 @@ def plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, 
     logging.info(f"Plotted rewards and losses during training in: {path}")
     return plt
 
-def plot_attack_distributions(attacks_by_epoch, attack_names, attack_labels_list, path) -> plt.Figure:
+def plot_attack_distributions(attacks_by_epoch, attack_names, attacks_mapped_to_att_type_list, path) -> plt.Figure:
     bins=np.arange(len(attack_names))
     # Plot attacks distribution alongside
     plt.figure(2,figsize=[12,12])
@@ -92,7 +92,7 @@ def plot_attack_distributions(attacks_by_epoch, attack_names, attack_labels_list
     #for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
     for indx,e in enumerate([0, 1, 2]):
         plt.subplot(3,3,indx+1)
-        plt.bar(range(5), attack_labels_list[e], tick_label = ['Normal','Dos','Probe','R2L','U2R'])
+        plt.bar(range(5), attacks_mapped_to_att_type_list[e], tick_label = ['Normal','Dos','Probe','R2L','U2R'])
         plt.xlabel("{} epoch".format(e))
 
     plt.tight_layout()

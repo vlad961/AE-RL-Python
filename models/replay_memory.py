@@ -16,7 +16,7 @@ class ReplayMemory(object):
         samples (dict): A dictionary to store observations, actions, rewards, and terminal flags.
     """
     
-    def __init__(self, observation_size, max_size):
+    def __init__(self, observation_size, max_size, parent_agent):
         """
         Initializes the replay memory.
 
@@ -27,9 +27,11 @@ class ReplayMemory(object):
         self.observation_size = observation_size
         self.num_observed = 0
         self.max_size = max_size
+        self.parent_agent = parent_agent
 
-        # Debugging-Ausgaben
-        logging.info(f"Initializing ReplayMemory with observation_size={self.observation_size} and max_size={self.max_size}")
+        # Logging
+        agent_type = "Defender" if "Defender" in parent_agent.name else "Attacker"
+        logging.info(f"Initializing {agent_type}'s ReplayMemory with observation_size={self.observation_size} and max_size={self.max_size}")
 
         if self.max_size <= 0 or self.observation_size <= 0:
             raise ValueError("max_size and observation_size must be positive and greater than zero")

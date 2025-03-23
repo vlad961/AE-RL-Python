@@ -1,3 +1,4 @@
+from typing import List
 from models.policy import Policy
 import numpy as np
 import tensorflow as tf
@@ -13,27 +14,20 @@ class EpsilonGreedy(Policy):
     (based on the Q-values predicted by the estimator) with probability 1 - epsilon. The epsilon value
     decays over time to balance exploration and exploitation.
 
-    Attributes:
-        estimator (object): The Q-value estimator.
-        num_actions (int): The number of possible actions.
-        epsilon (float): The probability of selecting a random action.
-        min_epsilon (float): The minimum value of epsilon after decay.
-        decay_rate (float): The rate at which epsilon decays.
-        epoch_length (int): The number of steps in one epoch.
-        step_counter (int): The counter for the number of steps taken.
-        epsilon_decay (bool): Whether epsilon should decay over time.
     """
-    def __init__(self, estimator: QNetwork, num_actions, epsilon, min_epsilon, decay_rate, epoch_length):
-        Policy.__init__(self, num_actions, estimator)
+    def __init__(self, estimator: QNetwork, actions, epsilon: float, min_epsilon: float, decay_rate: float, epoch_length: int, parent_agent):
+        super().__init__(len(actions), estimator)
         self.name = "Epsilon Greedy"
+        self.parent_agent = parent_agent
 
         if (epsilon is None or epsilon < 0 or epsilon > 1):
             print("EpsilonGreedy: Invalid value of epsilon", flush=True)
             sys.exit(0)
         self.epsilon = epsilon
         self.min_epsilon = min_epsilon
-        self.actions = list(range(num_actions))
+        self.actions = actions
         self.step_counter = 0
+        self.num_actions = len(actions)
         self.epoch_length = epoch_length
         self.decay_rate = decay_rate
 
@@ -43,9 +37,12 @@ class EpsilonGreedy(Policy):
         else:
             self.epsilon_decay = False
 
-    def get_actions(self, states):
+    def get_actions(self, states) -> List[int]:
         """
         Selects actions based on the Epsilon-Greedy policy.
+        In epsilon percent of the cases, a random action is selected. 
+        In the remaining cases, the action with the highest Q-value is selected.
+        Epsilon is decayed over time to balance exploration and exploitation.
 
         Args:
             states (np.ndarray): The current states.
@@ -54,8 +51,9 @@ class EpsilonGreedy(Policy):
             list: The selected actions.
         """
         # get next action
-        if np.random.rand() <= self.epsilon:
-            actions = np.random.randint(0, self.num_actions, states.shape[0])
+        dice = np.random.rand() # returns a random float between 0 and 1
+        if dice <= self.epsilon:
+            actions = np.random.choice(list(self.actions), states.shape[0]).tolist() # Choose a random value from self.actions (possible action IDs for the agent)
         else:
             # Get Q values
             ######
@@ -65,12 +63,15 @@ class EpsilonGreedy(Policy):
             actions = []
             for row in range(self.Q.shape[0]):
                 best_actions = np.argwhere(self.Q[row] == np.amax(self.Q[row]))
-                actions.append(best_actions[np.random.choice(len(best_actions))].item())
+                best_action_index = best_actions[np.random.choice(len(best_actions))].item()
+                actions.append(np.array(list(self.actions)[best_action_index]))
 
-        self.step_counter += 1
+        self.step_counter += 1 # //TODO: rework logic, as now multiple actions will be taken by defender in one step, so step_counter will be incremented multiple times --> make decay rate multiple of 4
         # decay epsilon after each epoch
         if self.epsilon_decay:
-            if self.step_counter % self.epoch_length == 0:
+            if self.parent_agent.name == "Defender" and self.step_counter % (self.epoch_length * 4) == 0:
+                self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate ** self.step_counter)
+            elif self.parent_agent.name != "Defender" and self.step_counter % self.epoch_length == 0:
                 self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate ** self.step_counter)
 
-        return actions
+        return actions # FIXME: Return Type für beide Fälle abchecken und sicherstellen, dass es eine Liste ist von int oder np.int 

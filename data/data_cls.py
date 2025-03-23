@@ -2,9 +2,8 @@ import logging
 import numpy as np
 import pandas as pd
 import os
-import tensorflow as tf
 from sklearn.utils import shuffle
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
@@ -15,7 +14,7 @@ formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") #
 kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
 kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 
-attack_map = {'normal': 'normal',
+attack_map: Dict[str, str] = {'normal': 'normal',
 
                 'back': 'DoS',
                 'land': 'DoS',
@@ -61,7 +60,7 @@ attack_map = {'normal': 'normal',
                 'xterm': 'U2R'
 }
 
-col_names = ["duration", "protocol_type", "service", "flag", "src_bytes",
+col_names: List[str] = ["duration", "protocol_type", "service", "flag", "src_bytes",
                      "dst_bytes", "land_f", "wrong_fragment", "urgent", "hot", "num_failed_logins",
                      "logged_in", "num_compromised", "root_shell", "su_attempted", "num_root",
                      "num_file_creations", "num_shells", "num_access_files", "num_outbound_cmds",
@@ -72,11 +71,11 @@ col_names = ["duration", "protocol_type", "service", "flag", "src_bytes",
                      "dst_host_srv_diff_host_rate", "dst_host_serror_rate", "dst_host_srv_serror_rate",
                      "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "labels", "difficulty"]
 
-attack_types = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
+attack_types: List[str] = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
 
 class DataCls:
-    def __init__(self, trainset_path=kdd_train, testset_path=kdd_test, formated_trainset_path=formated_train_path, 
-                 formated_testset_path=formated_test_path, dataset_type="train"):
+    def __init__(self, trainset_path: str = kdd_train, testset_path: str = kdd_test, formated_trainset_path: str = formated_train_path, 
+                 formated_testset_path: str = formated_test_path, dataset_type: str = "train"):
         """
         Initialize the DataCls object with the given parameters.
         Initialize the attack types, attack names, and attack map.
@@ -119,7 +118,7 @@ class DataCls:
         The dataset must be loaded in RAM
     '''
 
-    def get_batch(self, batch_size=100) -> tuple:
+    def get_batch(self, batch_size=100) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Get a batch of data from the loaded DataFrame.
 
@@ -150,6 +149,10 @@ class DataCls:
         labels = batch[self.attack_names]
 
         batch = batch.drop(self.all_attack_names, axis=1)
+
+        # Laufzeitprüfung
+        if not isinstance(batch, pd.DataFrame) or not isinstance(labels, pd.DataFrame):
+            raise TypeError("Expected both batch and labels to be pandas DataFrames.")
 
         return batch, labels
 

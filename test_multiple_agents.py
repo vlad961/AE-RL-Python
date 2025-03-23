@@ -2,13 +2,13 @@ import logging
 import numpy as np
 
 import pandas as pd
-from sklearn.metrics import auc, classification_report, roc_curve
+from sklearn.metrics import classification_report
 import tensorflow as tf
 import time
 
 from data.data_cls import DataCls
 from models.helpers import calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
-from plotting import plot_confusion_matrix, plot_roc_curve
+from plotting import plot_confusion_matrix
 
 def test_trained_agent_quality(path_to_model, plots_path):
     logging.info("Start testing the trained model.")
@@ -66,13 +66,8 @@ def test_trained_agent_quality(path_to_model, plots_path):
 
     perf_per_class = calculate_one_vs_all_metrics(true_attack_type_indices, actions)
     logging.info(f"\r\nOne vs All metrics: \r\n{perf_per_class}")
-    loss, acc_model, precision, recall, auc_value = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
-    logging.info(f"AUC: {auc_value}")
-    # Berechnen der ROC-Kurve und der AUC
-    fpr, tpr, _ = roc_curve(pd.get_dummies(true_attack_type_indices).values.ravel(), q.ravel())
-    roc_auc = auc(fpr, tpr)
-    plot_roc_curve(fpr, tpr, roc_auc, plots_path)
-    logging.info(f"Model metrics: \nloss={loss}, accuracy={acc_model}, precision={precision}, recall={recall}")
+    loss, mse, mae = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
+    logging.info(f"Model metrics: \nloss={loss}, mse={mse}, mae={mae}")
     logging.info(f"Optimizer config: {model.optimizer.get_config()}")
     logging.info(f"Time needed for testing: {time.time() - start_time}")
     report = classification_report(true_attack_type_indices, actions, target_names=test_data.attack_types)

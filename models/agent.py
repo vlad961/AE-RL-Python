@@ -8,14 +8,17 @@ class Agent(object):
     """
         Reinforcement learning Agent definition
     """
-    def __init__(self, actions, obs_size, policy="EpsilonGreedy", **kwargs):
+    def __init__(self, actions, obs_size, parent_agent, policy="EpsilonGreedy", **kwargs):
         self.done = None
         self.rewards = None
         self.next_states = None
         self.states = None
         self.actions = actions
         self.num_actions = len(actions)
+        self.action_to_index = {action: idx for idx, action in enumerate(self.actions)}
         self.obs_size = obs_size
+        self.parent_agent = parent_agent
+        self.name = parent_agent.name
 
         self.epsilon = kwargs.get('epsilon', 1)
         self.min_epsilon = kwargs.get('min_epsilon', .1)
@@ -25,7 +28,7 @@ class Agent(object):
         self.decay_rate = kwargs.get('decay_rate', 0.99)
         self.ExpRep = kwargs.get('ExpRep', True)
         if self.ExpRep:
-            self.memory = ReplayMemory(self.obs_size, kwargs.get('mem_size', 10))
+            self.memory = ReplayMemory(self.obs_size, kwargs.get('mem_size', 10), self)
 
         self.ddqn_time = 100
         self.ddqn_update = self.ddqn_time
@@ -43,9 +46,9 @@ class Agent(object):
         self.target_model_network.model = QNetwork.copy_model(self.model_network.model)
 
         if policy == "EpsilonGreedy":
-            self.policy = EpsilonGreedy(self.model_network, len(actions),
+            self.policy = EpsilonGreedy(self.model_network, actions,
                                          self.epsilon, self.min_epsilon,
-                                         self.decay_rate, self.epoch_length)
+                                         self.decay_rate, self.epoch_length, self)
 
     def learn(self, states, actions, next_states, rewards, done):
         if self.ExpRep:
@@ -58,7 +61,7 @@ class Agent(object):
             self.done = done
 
     def update_model(self):
-        if self.ExpRep:
+        if self.ExpRep: # //TODO: Ändere mal hier die Implementierung für den Defender, damit er ein größeren Stapel nutzt (* 4 -> Da vier Angreifer Agenten vorhanden sind, und pro Schritt auf vier Aktionen der Angreifer reagiert wird.)
             (states, actions, rewards, next_states, done) = self.memory.sample_minibatch(self.minibatch_size)
         else:
             states = self.states
@@ -77,16 +80,24 @@ class Agent(object):
             next_actions.append(best_next_actions[np.random.choice(len(best_next_actions))].item())
         sx = np.arange(len(next_actions))
         # Compute Q(s,a)
+        # Map actions to indices of the Q values
+        mapped_actions = np.array([self.action_to_index[action] for action in actions])
         Q = self.model_network.predict(states, self.minibatch_size)
         # Q-learning update
         # target = reward + gamma * max_a'{Q(next_state,next_action)}
-        targets = rewards.reshape(Q[sx, actions].shape) + \
+        targets = rewards.reshape(Q[sx, mapped_actions].shape) + \
                   self.gamma * Q[sx, next_actions] * \
-                  (1 - done.reshape(Q[sx, actions].shape)) # if done (episode has ended), no update
-        Q[sx, actions] = targets
+                  (1 - done.reshape(Q[sx, mapped_actions].shape)) # if done (episode has ended), no update
+        Q[sx, mapped_actions] = targets
 
         result = self.model_network.model.train_on_batch(states, Q)  # inputs,targets
-
+        mse_before_update = result[1]  # implicit (TensorFlow)
+        mae_before_update = result[2]  # implicit (TensorFlow)
+        # explicit calculation of MSE and MAE after update
+        mse_after_update = np.mean((Q - self.model_network.model.predict(states))**2)
+        mae_after_update = np.mean(np.abs(Q - self.model_network.model.predict(states)))
+        loss = result[0]
+        
         # timer to ddqn update
         self.ddqn_update -= 1
         if self.ddqn_update == 0:
@@ -94,7 +105,7 @@ class Agent(object):
             #            self.target_model_network.model = QNetwork.copy_model(self.model_network.model)
             self.target_model_network.model.set_weights(self.model_network.model.get_weights())
 
-        return result
+        return {"result": result, "loss": loss, "mse_before": mse_before_update, "mae_before": mae_before_update , "mse_after": mse_after_update, "mae_after": mae_after_update}
 
     def act(self, state): # NOTE: In comparison to original code, the policy parameter was deleted since it is already defined in the constructor 
         raise NotImplementedError
