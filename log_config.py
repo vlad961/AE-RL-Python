@@ -1,4 +1,6 @@
+import json
 import logging
+import numpy as np
 import tensorflow as tf
 import os
 import shutil
@@ -62,3 +64,50 @@ def print_end_of_epoch_info(epoch, num_episodes, epoch_start_time, end_time, def
                  f"|Att Loss U2R {att_loss_u2r:4.4f} | Att Reward in ep {att_total_reward_by_episode_u2r:03d}|\r\n"
                  f"|Def Estimated: {env.def_estimated_labels}| Att Labels: {env.att_true_labels}|\r\n"
                  f"|Def Amount of true predicted attacks: {env.def_true_labels}|")
+    
+def save_debug_info(output_dir, **kwargs):
+    """Saves all relevant variables to a JSON file for debugging."""
+    debug_info_path = os.path.join(output_dir, "debug_info.json")
+    
+    def custom_serializer(obj):
+        """Custom serializer to handle non-serializable types."""
+        if isinstance(obj, (np.integer, np.int32, np.int64)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float32, np.float64)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, set):
+            return list(obj)
+        raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+    
+    try:
+        # Ensure the directory exists
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Save the debug information
+        with open(debug_info_path, "w") as f:
+            json.dump(kwargs, f, indent=4, default=custom_serializer)
+        logging.info(f"Debug information saved to {debug_info_path}")
+    except Exception as e:
+        logging.error(f"Failed to save debug information: {e}")
+
+def load_debug_info(debug_info_path):
+    """
+    Loads debug information from a JSON file.
+
+    Args:
+        debug_info_path (str): Path to the debug_info.json file.
+
+    Returns:
+        dict: A dictionary containing all the debug information.
+    """
+    if not os.path.exists(debug_info_path):
+        raise FileNotFoundError(f"Debug info file not found: {debug_info_path}")
+    
+    try:
+        with open(debug_info_path, "r") as f:
+            debug_info = json.load(f)
+        return debug_info
+    except Exception as e:
+        raise ValueError(f"Failed to load debug information: {e}")

@@ -1,6 +1,5 @@
 
-from typing import List
-from log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup
+from log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, save_debug_info
 from models.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, getAttackTypeMaps, print_total_runtime, save_trained_models, store_episode_results, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_models_and_statistics
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
@@ -10,7 +9,6 @@ from datetime import datetime
 from test_multiple_agents import test_trained_agent_quality
 from plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
 import logging
-import numpy as np
 import time
 import os
 
@@ -27,8 +25,8 @@ cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
 data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
 data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "balanced_training_data.csv") # formated_train_adv
-formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") # formated_test_adv
+formated_train_path = os.path.join(data_formated_dir, "balanced_training_data.csv") # formated_train_adv balanced_training_data
+formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") # formated_test_adv balanced_test_data
 kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
 kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 trained_models_dir = os.path.join(cwd, "models/trained-models/")
@@ -36,6 +34,10 @@ trained_models_dir = os.path.join(cwd, "models/trained-models/")
 def main(attack_type=None, file_name_suffix=""):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
     output_root_dir = f"{timestamp_begin}{file_name_suffix}"
+    plots_path = os.path.join(trained_models_dir, f"{output_root_dir}/plots/")
+    current_log_path = os.path.join(cwd, f"logs/{output_root_dir}.log")
+    destination_log_path = os.path.join(trained_models_dir, f"{output_root_dir}/logs/")
+    
     logger_setup(timestamp_begin, file_name_suffix)
     logging.info(f"Started script at: {timestamp_begin}")
     logging.info(f"Current working dir: {cwd}")
@@ -47,7 +49,7 @@ def main(attack_type=None, file_name_suffix=""):
         minibatch_size = 100 # batch of memory ExpRep
         ExpRep = True
         iterations_episode = 100
-        num_episodes = 50 # //FIXME: 100 after validate correct running
+        num_episodes = 60 # //FIXME: 100 after validate correct running
 
         logging.info("Creating enviroment...")
         if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
@@ -262,13 +264,56 @@ def main(attack_type=None, file_name_suffix=""):
             "u2r": agent_u2r,
             "defender": agent_defender,
         }
-        save_trained_models(agents, output_root_dir, trained_models_dir)        
+        save_trained_models(agents, output_root_dir, trained_models_dir)
         print_total_runtime(script_start_time)
 
-        # Test and visualize results
-        plots_path = os.path.join(trained_models_dir, f"{output_root_dir}/plots/")
-        current_log_path = os.path.join(cwd, f"logs/{output_root_dir}.log")
-        destination_log_path = os.path.join(trained_models_dir, f"{output_root_dir}/logs/")
+        #################################
+        # Collect all relevant variables#
+        #################################
+        debug_info = {
+            "rewards": {
+                "defender": def_reward_chain,
+                "aggregated_attacker": att_reward_chain,
+                "dos": att_reward_chain_dos,
+                "probe": att_reward_chain_probe,
+                "r2l": att_reward_chain_r2l,
+                "u2r": att_reward_chain_u2r,
+            },
+            "losses": {
+                "defender": def_loss_chain,
+                "aggregated_attacker": att_loss_chain,
+                "dos": att_loss_chain_dos,
+                "probe": att_loss_chain_probe,
+                "r2l": att_loss_chain_r2l,
+                "u2r": att_loss_chain_u2r,
+            },
+            "attack_indices_per_episode": attack_indices_per_episode,
+            "attack_names_per_episode": attack_names_per_episode,
+            "attacks_mapped_to_att_type_list": attacks_mapped_to_att_type_list,
+            "mse_before_history": mse_before_history,
+            "mae_before_history": mae_before_history,
+            "mse_after_history": mse_after_history,
+            "mae_after_history": mae_after_history,
+            "agents": {
+                "defender": agent_defender.name,
+                "dos": agent_dos.name,
+                "probe": agent_probe.name,
+                "r2l": agent_r2l.name,
+                "u2r": agent_u2r.name,
+            },
+            "attack_id_to_index": create_attack_id_to_index_mapping(attack_map, attack_names),
+            "attack_id_to_type": create_attack_id_to_type_mapping(attack_map),
+            "attack_names": attack_names,
+            "attack_types": attack_types,
+            "plots_path": plots_path,
+            "output_root_dir": output_root_dir,
+            "destination_log_path": destination_log_path,
+        }
+        save_debug_info(destination_log_path, **debug_info)
+
+        #############################
+        # Test and visualize results#
+        #############################
         logging.info(f"Trying to save summary plots under: {plots_path}")
         plot_rewards_and_losses_during_training_multiple_agents(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions_multiple_agents(attack_indices_per_episode, attack_map, env.attack_names, attacks_mapped_to_att_type_list, plots_path)

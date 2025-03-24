@@ -20,8 +20,9 @@ def plot_attack_distribution_for_each_attacker(attacks_by_epoch, attack_names, p
     """
     # Definiere explizit das Layout
     fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(20, 15))
-    epochs_to_plot = [0, 10, 20, 30, 40, 60, 70, 80, 90]
-    #epochs_to_plot = [0, 1, 2]
+    #epochs_to_plot = [0, 10, 20, 30, 40, 60, 70, 80, 90]
+    epochs_to_plot = [0, 5, 10, 15, 20, 30, 40, 50, 59]
+    #epochs_to_plot = [0, 1, 2, 3, 5, 6, 7, 8, 9]
     num_attacks = len(attack_names)
     indices = np.arange(num_attacks)
     bar_width = 0.8 / len(attacks_by_epoch)  # Dynamisch angepasst auf Anzahl der Angreifer
@@ -75,8 +76,9 @@ def plot_mapped_attack_distribution_for_each_attacker(attacks_by_epoch, attack_n
     if attacker_labels is None:
         attacker_labels = [f'Model {i+1}' for i in range(num_attackers)]
 
-    epochs_to_plot = [0, 10, 20, 30, 40, 60, 70, 80, 90]
-    #epochs_to_plot = [0, 1, 2]
+    #epochs_to_plot = [0, 10, 20, 30, 40, 60, 70, 80, 90]
+    epochs_to_plot = [0, 5, 10, 15, 20, 30, 40, 50, 59]
+    #epochs_to_plot = [0, 1, 2, 3, 5, 6, 7, 8, 9]
     bar_width = 0.8 / num_attackers  # To avoid overlap
 
     plt.figure(figsize=(18, 18))
@@ -352,8 +354,8 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks distribution throughout episodes")
-    #for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
-    for indx,e in enumerate([0, 1, 2]):
+    for indx,e in enumerate([0, 5, 10, 15, 20, 30, 40, 50, 59]):
+    #for indx,e in enumerate([0, 1, 2, 3, 5, 6, 7, 8, 9]):
         flattened_epoch = [int(action[0]) for actions in attacks_by_epoch[e] for action in actions]
         
         # Map attack ids to indices in attack_names
@@ -387,8 +389,8 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks (mapped) distribution throughout  episodes")
-    for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
-    #for indx,e in enumerate([0, 1, 2])
+    for indx,e in enumerate([0, 5, 10, 15, 20, 30, 40, 50, 59]):
+    #for indx,e in enumerate([0, 1, 2, 3, 5, 6, 7, 8, 9]):
         plt.subplot(3,3,indx+1)
         #plt.bar(range(5), attacks_mapped_to_att_type_list[e], tick_label = ['Normal','Dos','Probe','R2L','U2R'])
         bars = plt.bar(range(5), attacks_mapped_to_att_type_list[e], tick_label=['Normal', 'Dos', 'Probe', 'R2L', 'U2R'], color='skyblue', edgecolor='black')
