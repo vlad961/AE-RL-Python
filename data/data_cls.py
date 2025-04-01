@@ -268,9 +268,9 @@ class DataCls:
 
         # Dataframe processing
         # One hot encoding for categorical columns
-        df = pd.concat([df.drop('protocol_type', axis=1), pd.get_dummies(df['protocol_type'])], axis=1)
-        df = pd.concat([df.drop('service', axis=1), pd.get_dummies(df['service'])], axis=1)
-        df = pd.concat([df.drop('flag', axis=1), pd.get_dummies(df['flag'])], axis=1)
+        df = pd.concat([df.drop('protocol_type', axis=1), pd.get_dummies(df['protocol_type'])], axis=1, dtype='int32')
+        df = pd.concat([df.drop('service', axis=1), pd.get_dummies(df['service'])], axis=1, dtype='int32')
+        df = pd.concat([df.drop('flag', axis=1), pd.get_dummies(df['flag'])], axis=1, dtype='int32')
 
         # NSL-KDD seems to have introduced faulty su_attempted values of '2' which are not documented in the original NSL nor in the improved NSL-KDD work.
         # Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed them to 0)
@@ -278,22 +278,28 @@ class DataCls:
         df['su_attempted'] = df['su_attempted'].replace(2.0, 0.0)
 
         # One hot encoding for labels
-        df = pd.concat([df.drop('labels', axis=1), pd.get_dummies(df['labels'])], axis=1)
+        df = pd.concat([df.drop('labels', axis=1), pd.get_dummies(df['labels'])], axis=1, dtype='int32')
 
         # Normalization of the df
         # Normalization of the continous columns in the df (0-1) # TODO: Check if I get an improvement if I normalize the data with the tensorflow functional API instead. # TODO: What if I use float32 instead of float64?
         for indx, dtype in df.dtypes.items():
             if dtype == 'float64' or dtype == 'int64':
+                # Convert int64 to int32 and float64 to float32 to save memory (also tensorflow preferes float32 instead of float64)
+                if dtype == 'int64':
+                    df[indx] = df[indx].astype('int32')
+                elif dtype == 'float64':
+                    df[indx] = df[indx].astype('float32')
+
                 if df[indx].max() == 0 and df[indx].min() == 0:
                     df[indx] = 0.0 # dtype = float64 TODO: change to float32 since there is anyway no information in the column
+                    df[indx] = df[indx].astype('float32')
                 else:
                     df[indx] = (df[indx] - df[indx].min()) / (df[indx].max() - df[indx].min()) # dtype = float64
+                    df[indx] = df[indx].astype('float32')
 
         # Save data
         test_df = df.iloc[amount_train_samples:df.shape[0]]
-        test_df = shuffle(test_df, random_state=np.random.randint(0, 100))
         df = df[:amount_train_samples]
-        df = shuffle(df, random_state=np.random.randint(0, 100))
         test_df.to_csv(formated_test_path, sep=',', index=False)
         df.to_csv(formated_train_path, sep=',', index=False)
         logging.info(f"Formated train data saved in: {formated_train_path}")
