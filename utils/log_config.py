@@ -9,6 +9,9 @@ import tensorflow as tf
 cwd = os.getcwd()
 
 def logger_setup(timestamp_begin, name_suffix="default"):
+    # Ensure the logs directory exists
+    logs_dir = os.path.join(cwd, "logs")
+    os.makedirs(logs_dir, exist_ok=True)
     # Configure logging
     log_filename = os.path.join(cwd, f"logs/{timestamp_begin}{name_suffix}.log")
     logging.basicConfig(filename=os.path.join(cwd, log_filename), level=logging.DEBUG,

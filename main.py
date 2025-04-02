@@ -1,4 +1,4 @@
-from models.helpers import download_datasets_if_missing, move_log_files, plot_attack_distributions, plot_rewards_and_losses_during_training, print_total_runtime, save_model, logger_setup
+from utils.helpers import download_datasets_if_missing, move_log_files, plot_attack_distributions, plot_rewards_and_losses_during_training, print_total_runtime, save_model, logger_setup
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent

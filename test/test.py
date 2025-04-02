@@ -1,14 +1,15 @@
 import logging
 import numpy as np
-
+import os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pandas as pd
 from sklearn.metrics import auc, classification_report, roc_curve
 import tensorflow as tf
 import time
 
 from data.data_cls import DataCls
-from models.helpers import calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
-from plotting import plot_confusion_matrix, plot_roc_curve
+from utils.helpers import calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
+from utils.plotting import plot_confusion_matrix, plot_roc_curve
 
 def test_trained_agent_quality(path_to_model, plots_path):
     logging.info("Start testing the trained model.")

@@ -1,16 +1,17 @@
 
-from log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, save_debug_info
-from models.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, getAttackTypeMaps, print_total_runtime, save_trained_models, store_episode_results, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_models_and_statistics
+from utils.log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, save_debug_info
+from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, getAttackTypeMaps, print_total_runtime, save_trained_models, store_episode_results, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_models_and_statistics
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
 from data.data_cls import DataCls, attack_types, attack_map
 from datetime import datetime
-from test_multiple_agents import test_trained_agent_quality
-from plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
+from test.test_multiple_agents import test_trained_agent_quality
+from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
 import logging
 import time
-import os
+import os, sys
+import tensorflow as tf
 
 """
 This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
@@ -25,11 +26,21 @@ cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
 data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
 data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "balanced_training_data.csv") # formated_train_adv balanced_training_data
-formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") # formated_test_adv balanced_test_data
+formated_train_path = os.path.join(data_formated_dir, "formated_training_data.csv") # formated_train_adv balanced_training_data
+formated_test_path = os.path.join(data_formated_dir, "formated_test_data.csv") # formated_test_adv balanced_test_data
 kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
 kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 trained_models_dir = os.path.join(cwd, "models/trained-models/")
+
+# TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
+try:
+  physical_devices = tf.config.list_physical_devices('GPU')
+  tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except tf.errors.InvalidArgumentError:
+  print("Invalid device or cannot modify virtual devices once initialized.")
+  print("Exiting the script early...")
+  sys.exit(0)  # Exit with code 0 (success)
+
 
 def main(attack_type=None, file_name_suffix=""):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -39,17 +50,15 @@ def main(attack_type=None, file_name_suffix=""):
     destination_log_path = os.path.join(trained_models_dir, f"{output_root_dir}/logs/")
     
     logger_setup(timestamp_begin, file_name_suffix)
-    logging.info(f"Started script at: {timestamp_begin}")
-    logging.info(f"Current working dir: {cwd}")
-    logging.info(f"Used data files: \n{kdd_train},\n{kdd_test}")
+    logging.info(f"Started script at: {timestamp_begin}\nCurrent working dir: {cwd}\nUsed data files: \n{kdd_train},\n{kdd_test}")
     script_start_time = datetime.now()
 
     try:
         batch_size = 1 # Train batch
         minibatch_size = 100 # batch of memory ExpRep
-        ExpRep = True
+        exp_replay = True
         iterations_episode = 100
-        num_episodes = 60 # //FIXME: 100 after validate correct running
+        num_episodes = 10 # //FIXME: 100 after validate correct running
 
         logging.info("Creating enviroment...")
         if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
@@ -82,7 +91,7 @@ def main(attack_type=None, file_name_suffix=""):
                                         minibatch_size=minibatch_size,
                                         mem_size=1000,
                                         learning_rate=att_learning_rate,
-                                        ExpRep=ExpRep,
+                                        ExpRep=exp_replay,
                                         target_model_name='attacker_target_model_dos',
                                         model_name='attacker_model_dos')
         
@@ -97,7 +106,7 @@ def main(attack_type=None, file_name_suffix=""):
                                 minibatch_size=minibatch_size,
                                 mem_size=1000,
                                 learning_rate=att_learning_rate,
-                                ExpRep=ExpRep,
+                                ExpRep=exp_replay,
                                 target_model_name='attacker_target_model_probe',
                                 model_name='attacker_model_probe')
         
@@ -112,7 +121,7 @@ def main(attack_type=None, file_name_suffix=""):
                 minibatch_size=minibatch_size,
                 mem_size=1000,
                 learning_rate=att_learning_rate,
-                ExpRep=ExpRep,
+                ExpRep=exp_replay,
                 target_model_name='attacker_target_model_r2l',
                 model_name='attacker_model_probe_r2l')
         
@@ -127,7 +136,7 @@ def main(attack_type=None, file_name_suffix=""):
                         minibatch_size=minibatch_size,
                         mem_size=1000,
                         learning_rate=att_learning_rate,
-                        ExpRep=ExpRep,
+                        ExpRep=exp_replay,
                         target_model_name='attacker_target_model_u2r',
                         model_name='attacker_model_probe_u2r')
         
@@ -154,10 +163,10 @@ def main(attack_type=None, file_name_suffix=""):
                                         gamma=def_gamma,
                                         hidden_size=def_hidden_size,
                                         hidden_layers=def_hidden_layers,
-                                        minibatch_size=400, # //TODO: auf 400 setzen, da 4 agenten?
+                                        minibatch_size=200, # //TODO: auf 400 setzen, da 4 agenten?
                                         mem_size=4000,
                                         learning_rate=def_learning_rate,
-                                        ExpRep=ExpRep,
+                                        ExpRep=exp_replay,
                                         target_model_name='defender_target_model',
                                         model_name='defender_model'
                                         )
@@ -223,7 +232,7 @@ def main(attack_type=None, file_name_suffix=""):
                 store_experience([agent_defender], states, defender_actions, next_states, def_reward, done)
 
                 # Train network, update loss after at least minibatch_size learns (observations)
-                if ExpRep and episode * iterations_episode + iteration >= minibatch_size:
+                if exp_replay and episode * iterations_episode + iteration >= minibatch_size:
                     def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss = update_models_and_statistics(
                             agent_defender, attackers, def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss, def_metrics_chain, 
                             att_metrics_chain, epoch_mse_before, epoch_mae_before, epoch_mse_after, epoch_mae_after)
@@ -374,7 +383,6 @@ if __name__ == "__main__":
         #
 
         # blei gleichverteilten Daten scheine ich leicht bessere Ergebnisse zu erhalten (down sampling von normalen instanzen) //TODO: verifizier schaue in meine Ergebnise auf PC (evtl. 2+3 Durchlauf)
-
         # -> 
 
     # TODO: Add False Positive Rate for each class. (FP / (FP + TN)) -> FP = False Positives, TN = True Negatives

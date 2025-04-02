@@ -9,8 +9,8 @@ cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
 data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
 data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "balanced_training_data.csv") #  formated_train_adv
-formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") #  formated_test_adv
+formated_train_path = os.path.join(data_formated_dir, "formated_training_data.csv") #  formated_train_adv
+formated_test_path = os.path.join(data_formated_dir, "formated_test_data.csv") #  formated_test_adv
 kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
 kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 
@@ -268,9 +268,9 @@ class DataCls:
 
         # Dataframe processing
         # One hot encoding for categorical columns
-        df = pd.concat([df.drop('protocol_type', axis=1), pd.get_dummies(df['protocol_type'])], axis=1, dtype='int32')
-        df = pd.concat([df.drop('service', axis=1), pd.get_dummies(df['service'])], axis=1, dtype='int32')
-        df = pd.concat([df.drop('flag', axis=1), pd.get_dummies(df['flag'])], axis=1, dtype='int32')
+        df = pd.concat([df.drop('protocol_type', axis=1), pd.get_dummies(df['protocol_type'])], axis=1)
+        df = pd.concat([df.drop('service', axis=1), pd.get_dummies(df['service'])], axis=1)
+        df = pd.concat([df.drop('flag', axis=1), pd.get_dummies(df['flag'])], axis=1)
 
         # NSL-KDD seems to have introduced faulty su_attempted values of '2' which are not documented in the original NSL nor in the improved NSL-KDD work.
         # Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed them to 0)
@@ -278,24 +278,25 @@ class DataCls:
         df['su_attempted'] = df['su_attempted'].replace(2.0, 0.0)
 
         # One hot encoding for labels
-        df = pd.concat([df.drop('labels', axis=1), pd.get_dummies(df['labels'])], axis=1, dtype='int32')
+        df = pd.concat([df.drop('labels', axis=1), pd.get_dummies(df['labels'])], axis=1)
 
         # Normalization of the df
+        bool_cols = df.select_dtypes(include='bool').columns
+        df[bool_cols] = df[bool_cols].astype('float32')
         # Normalization of the continous columns in the df (0-1) # TODO: Check if I get an improvement if I normalize the data with the tensorflow functional API instead. # TODO: What if I use float32 instead of float64?
-        for indx, dtype in df.dtypes.items():
-            if dtype == 'float64' or dtype == 'int64':
-                # Convert int64 to int32 and float64 to float32 to save memory (also tensorflow preferes float32 instead of float64)
-                if dtype == 'int64':
-                    df[indx] = df[indx].astype('int32')
-                elif dtype == 'float64':
-                    df[indx] = df[indx].astype('float32')
+        for col in df.columns:
+            if df[col].dtype == 'bool':
+                df[col] = df[col].astype('float32')
+            elif df[col].dtype == 'float64':
+                df[col] = df[col].astype('float32')
+            elif df[col].dtype == 'int64':
+                df[col] = df[col].astype('int32')
 
-                if df[indx].max() == 0 and df[indx].min() == 0:
-                    df[indx] = 0.0 # dtype = float64 TODO: change to float32 since there is anyway no information in the column
-                    df[indx] = df[indx].astype('float32')
-                else:
-                    df[indx] = (df[indx] - df[indx].min()) / (df[indx].max() - df[indx].min()) # dtype = float64
-                    df[indx] = df[indx].astype('float32')
+            if pd.api.types.is_numeric_dtype(df[col]):
+                if df[col].max() == 0 and df[col].min() == 0:
+                    df[col] = np.zeros_like(df[col], dtype=np.float32)
+                elif df[col].max() != df[col].min():  # Avoid division by zero
+                    df[col] = ((df[col] - df[col].min()) / (df[col].max() - df[col].min())).astype('float32')
 
         # Save data
         test_df = df.iloc[amount_train_samples:df.shape[0]]

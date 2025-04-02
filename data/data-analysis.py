@@ -6,7 +6,7 @@ import pandas as pd
 import seaborn as sns
 
 from data.data_cls import DataCls
-from models.helpers import logger_setup
+from utils.helpers import logger_setup
 
 test_data  = DataCls(dataset_type="test")
 training_data = DataCls(dataset_type="train")

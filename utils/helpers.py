@@ -473,10 +473,11 @@ def store_episode_results(attack_indices_list, attack_names_list, env: RLenv, ep
     attack_indices_per_episode.append(attack_indices_list)
     attack_names_per_episode.append(attack_names_list)
     attacks_mapped_to_att_type_list.append(env.att_true_labels)
-    mse_before_history.append(np.mean(epoch_mse_before))
-    mae_before_history.append(np.mean(epoch_mae_before))
-    mse_after_history.append(np.mean(epoch_mse_after))
-    mae_after_history.append(np.mean(epoch_mae_after))
+    if epoch_mae_after:
+        mse_before_history.append(np.mean(epoch_mse_before))
+        mae_before_history.append(np.mean(epoch_mae_before))
+        mse_after_history.append(np.mean(epoch_mse_after))
+        mae_after_history.append(np.mean(epoch_mae_after))
 
     def_reward_chain.append(def_total_reward_by_episode)
     att_reward_chain.append(att_total_reward_by_episode)

@@ -69,6 +69,9 @@ class QNetwork():
     @staticmethod
     def copy_model(model):
         """Returns a copy of a keras model."""
-        cloned_model = tf.keras.models.clone_model(model)
+
+        """        cloned_model = tf.keras.models.clone_model(model)
         cloned_model.set_weights(model.get_weights())
-        return cloned_model
+        return cloned_model"""
+        model.save('tmp_model.keras')  # Added '.keras' extension here
+        return tf.keras.models.load_model('tmp_model.keras')  # Added '.keras' extension here to avoid ValueError: Invalid filepath extension for saving. + custom_objects={'CustomHuberLoss': huber_loss}

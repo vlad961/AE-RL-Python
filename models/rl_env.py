@@ -11,8 +11,8 @@ cwd = os.getcwd()
 data_root_dir = os.path.join(cwd, "data/datasets/")
 data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
 data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "balanced_training_data.csv") # formated_train_adv.csv
-formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") # formated_test_adv.csv
+formated_train_path = os.path.join(data_formated_dir, "formated_training_data.csv") # formated_train_adv.csv
+formated_test_path = os.path.join(data_formated_dir, "formated_test_data.csv") # formated_test_adv.csv
 kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
 kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
 
@@ -122,14 +122,21 @@ class RLenv(DataCls):
         '''
         first = True
         for attack in attacker_actions:
+            attack_name = self.all_attack_names[attack]
+            filtered_df: pd.DataFrame | None = self.df[self.df[attack_name] == 1]
+
+            if filtered_df.empty:
+                raise ValueError(f"No samples found for attack '{attack_name}'. Ensure the dataset contains rows for this attack.")
+            
+            # Limit the size of the filtered DataFrame if it's too large
+            if len(filtered_df) > 10000:  # Example threshold
+                filtered_df = filtered_df.sample(10000)
+
             if first:
-                attack_name = self.all_attack_names[attack]
-                #minibatch = (self.df[self.df[self.attack_names[attack_name]] == 1].sample(1))
-                minibatch = (self.df[self.df[attack_name] == 1].sample(1))
+                minibatch = filtered_df.sample(1)
                 first = False
             else:
-                #minibatch = minibatch.append(self.df[self.df[self.attack_names[attack]] == 1].sample(1))
-                minibatch = minibatch.append(self.df[self.df[attack_name] == 1].sample(1))
+                minibatch = minibatch.append(filtered_df.sample(1))
 
         labels = minibatch[self.attack_names]
         minibatch.drop(self.all_attack_names, axis=1, inplace=True)

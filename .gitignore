@@ -182,3 +182,14 @@ logs/*
 data/datasets/boruta/.RData
 .gitignore
 data/datasets/boruta/.Rhistory
+data/datasets/formated/test_data_boruta_confirmed_both.csv
+data/datasets/formated/test_data_boruta_only_balanced_confirmed.csv
+data/datasets/formated/test_data_boruta_only_stratified_confirmed.csv
+data/datasets/formated/test_data_boruta_stratified_and_strat_balanced_confirmed.csv
+data/datasets/formated/test_data_rm_highly_correlated_features.csv
+
+data/datasets/formated/training_data_boruta_confirmed_both.csv
+data/datasets/formated/training_data_boruta_only_balanced_confirmed.csv
+data/datasets/formated/training_data_boruta_only_stratified_confirmed.csv
+data/datasets/formated/training_data_boruta_stratified_and_strat_balanced_confirmed.csv
+data/datasets/formated/training_data_rm_highly_correlated_features.csv
