@@ -5,6 +5,7 @@ import tensorflow as tf
 import sys
 
 from models.q_network import QNetwork
+from utils.config import GLOBAL_RNG
 
 class EpsilonGreedy(Policy):
     """
@@ -51,27 +52,30 @@ class EpsilonGreedy(Policy):
             list: The selected actions.
         """
         # get next action
-        dice = np.random.rand() # returns a random float between 0 and 1
+        dice = GLOBAL_RNG.random() # returns a random float between 0 and 1
         if dice <= self.epsilon:
-            actions = np.random.choice(list(self.actions), states.shape[0]).tolist() # Choose a random value from self.actions (possible action IDs for the agent)
+            actions: List[int] = GLOBAL_RNG.choice(list(self.actions), states.shape[0]).tolist() # Choose a random value from self.actions (possible action IDs for the agent)
         else:
             # Get Q values
             ######
             states_tensor = tf.convert_to_tensor(states, dtype=tf.float32)
-            self.Q = self.estimator.predict(states_tensor, states.shape[0])
+            self.Q = self.estimator.predict(states_tensor, states_tensor.shape[0])  #states.shape[0]
             ##### inserted in predict method
-            actions = []
+            actions: List[int] = []
             for row in range(self.Q.shape[0]):
-                best_actions = np.argwhere(self.Q[row] == np.amax(self.Q[row]))
-                best_action_index = best_actions[np.random.choice(len(best_actions))].item()
-                actions.append(np.array(list(self.actions)[best_action_index]))
+                best_actions = np.argwhere(self.Q[row] == np.amax(self.Q[row])).astype(np.int16)
+                best_action_index = best_actions[GLOBAL_RNG.choice(len(best_actions))].item()
+                actions.append(list(self.actions)[best_action_index])
 
-        self.step_counter += 1 # //TODO: rework logic, as now multiple actions will be taken by defender in one step, so step_counter will be incremented multiple times --> make decay rate multiple of 4
-        # decay epsilon after each epoch
+        self.step_counter += 1
+        # decay epsilon after each episode
         if self.epsilon_decay:
-            if self.parent_agent.name == "Defender" and self.step_counter % (self.epoch_length * 4) == 0:
-                self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate ** self.step_counter)
-            elif self.parent_agent.name != "Defender" and self.step_counter % self.epoch_length == 0:
-                self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate ** self.step_counter)
+            decay_interval = self.epoch_length * 4 if self.parent_agent.name == "Defender" else self.epoch_length
+            if self.parent_agent.name == "Defender":
+                decay_step = self.step_counter // 4 # Reduce the step_counter by 4 for the defender, as it takes 4 actions in one step. Otherwise, the epsilon would decay too fast for the defender.
+            else:
+                decay_step = self.step_counter # Attacker takes only one action in one step, so decay_step is equal to step_counter
+            if self.step_counter % decay_interval == 0:
+                self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate ** decay_step)
 
-        return actions # FIXME: Return Type für beide Fälle abchecken und sicherstellen, dass es eine Liste ist von int oder np.int 
+        return actions

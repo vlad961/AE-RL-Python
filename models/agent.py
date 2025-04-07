@@ -2,7 +2,7 @@ import numpy as np
 from models.q_network import QNetwork
 from models.replay_memory import ReplayMemory
 from models.epsilon_greedy import EpsilonGreedy
-
+from utils.config import GLOBAL_RNG
 
 class Agent(object):
     """
@@ -18,7 +18,7 @@ class Agent(object):
         self.action_to_index = {action: idx for idx, action in enumerate(self.actions)}
         self.obs_size = obs_size
         self.parent_agent = parent_agent
-        self.name = parent_agent.name
+        self.name = self.parent_agent.name
 
         self.epsilon = kwargs.get('epsilon', 1)
         self.min_epsilon = kwargs.get('min_epsilon', .1)
@@ -26,19 +26,19 @@ class Agent(object):
         self.minibatch_size = kwargs.get('minibatch_size', 2)
         self.epoch_length = kwargs.get('epoch_length', 100)
         self.decay_rate = kwargs.get('decay_rate', 0.99)
-        self.ExpRep = kwargs.get('ExpRep', True)
-        if self.ExpRep:
+        self.experience_replay = kwargs.get('ExpRep', True)
+        if self.experience_replay:
             self.memory = ReplayMemory(self.obs_size, kwargs.get('mem_size', 10), self)
 
         self.ddqn_time = 100
         self.ddqn_update = self.ddqn_time
 
-        self.model_network = QNetwork(self.obs_size, self.num_actions,
+        self.model_network: QNetwork = QNetwork(self.obs_size, self.num_actions,
                                       kwargs.get('hidden_size', 100),
                                       kwargs.get('hidden_layers', 1),
                                       kwargs.get('learning_rate', .2),
                                       kwargs.get('model_name', 'model'))
-        self.target_model_network = QNetwork(self.obs_size, self.num_actions,
+        self.target_model_network: QNetwork = QNetwork(self.obs_size, self.num_actions,
                                              kwargs.get('hidden_size', 100),
                                              kwargs.get('hidden_layers', 1),
                                              kwargs.get('learning_rate', .2),
@@ -51,7 +51,11 @@ class Agent(object):
                                          self.decay_rate, self.epoch_length, self)
 
     def learn(self, states, actions, next_states, rewards, done):
-        if self.ExpRep:
+        """
+        Store the experience(states) in the replay memory if experience replay is enabled.
+        Otherwise, store the experience in the agent's attributes.
+        """
+        if self.experience_replay:
             self.memory.observe(states, actions, rewards, done)
         else:
             self.states = states
@@ -61,23 +65,22 @@ class Agent(object):
             self.done = done
 
     def update_model(self):
-        if self.ExpRep: # //TODO: Ändere mal hier die Implementierung für den Defender, damit er ein größeren Stapel nutzt (* 4 -> Da vier Angreifer Agenten vorhanden sind, und pro Schritt auf vier Aktionen der Angreifer reagiert wird.)
-            (states, actions, rewards, next_states, done) = self.memory.sample_minibatch(self.minibatch_size)
+        if self.experience_replay:
+            (states, actions, rewards, next_states, done, indices) = self.memory.sample_minibatch(self.minibatch_size)
         else:
-            states = self.states
-            rewards = self.rewards
-            next_states = self.next_states
-            actions = self.actions
-            done = self.done
+            states = self.states.to_numpy(dtype=np.float32)
+            rewards = self.rewards.to_numpy(dtype=np.float32)
+            next_states = self.next_states.to_numpy(dtype=np.float32)
+            actions = self.actions.to_numpy(dtype=np.int32)
+            done = self.done.to_numpy(dtype=np.bool_)
 
         next_actions = []
         # Compute Q targets
-        # Q_prime = self.model_network.predict(next_states,self.minibatch_size)
         Q_prime = self.target_model_network.predict(next_states, self.minibatch_size)
         # TODO: fix performance in this loop
         for row in range(Q_prime.shape[0]):
             best_next_actions = np.argwhere(Q_prime[row] == np.amax(Q_prime[row]))
-            next_actions.append(best_next_actions[np.random.choice(len(best_next_actions))].item())
+            next_actions.append(best_next_actions[GLOBAL_RNG.choice(len(best_next_actions))].item())
         sx = np.arange(len(next_actions))
         # Compute Q(s,a)
         # Map actions to indices of the Q values
@@ -105,7 +108,8 @@ class Agent(object):
             #            self.target_model_network.model = QNetwork.copy_model(self.model_network.model)
             self.target_model_network.model.set_weights(self.model_network.model.get_weights())
 
-        return {"result": result, "loss": loss, "mse_before": mse_before_update, "mae_before": mae_before_update , "mse_after": mse_after_update, "mae_after": mae_after_update}
+        return {"result": result, "loss": loss, "mse_before": mse_before_update, "mae_before": mae_before_update , "mse_after": mse_after_update, 
+                "mae_after": mae_after_update, "sample_indices": indices}
 
     def act(self, state): # NOTE: In comparison to original code, the policy parameter was deleted since it is already defined in the constructor 
         raise NotImplementedError

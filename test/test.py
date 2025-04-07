@@ -7,7 +7,7 @@ from sklearn.metrics import auc, classification_report, roc_curve
 import tensorflow as tf
 import time
 
-from data.data_cls import DataCls
+from data.data_manager import DataManager
 from utils.helpers import calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
 from utils.plotting import plot_confusion_matrix, plot_roc_curve
 
@@ -18,7 +18,7 @@ def test_trained_agent_quality(path_to_model, plots_path):
     logging.info(f"Model summary:\n{get_model_summary(model)}")
 
     # Define environment, game, make sure the batch_size is the same in train
-    test_data = DataCls(dataset_type='test')
+    test_data = DataManager(dataset_type='test')
 
     total_reward = 0
     true_labels = np.zeros(len(test_data.attack_types),dtype=int)

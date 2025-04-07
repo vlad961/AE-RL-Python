@@ -4,6 +4,9 @@ from tensorflow.python.keras.losses import Huber
 from tensorflow.python.keras.layers import Dense, InputLayer
 from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.optimizer_v2.adam import Adam
+from utils.config import TEMPORARY_MODEL_PATH
+# FIXME: --> change to tf.keras.* check whether the code still works, maybe performance improves. Remove the import of the old keras library.
+
 
 cwd = os.getcwd()
 models_dir = os.path.join(cwd, "models/trained-models/")
@@ -24,10 +27,8 @@ class QNetwork():
         self.model_name = model_name
 
         # Network arquitecture // TODO: add tf.keras.layers.Normalization() to normalize the input
-        self.model = Sequential(name=model_name)
+        self.model: Sequential = Sequential(name=model_name)
         # Add input layer
-        # self.model.add(Dense(hidden_size, input_shape=(obs_size,), # Deactivated this since keras had error: '87: UserWarning: Do not pass an input_shape/input_dim argument to a layer. When using Sequential models, prefer using an Input(shape) object as the first layer in the model instead.'
-        #                     activation='relu')) # TODO: recheck if this is the same as Dense in Keras
         self.model.add(InputLayer(input_shape=(obs_size,)))  # use this input layer to avoid problem
         # Add hidden layers
         for _ in range(hidden_layers):
@@ -35,13 +36,8 @@ class QNetwork():
         # Add output layer
         self.model.add(Dense(num_actions)) # TODO: Check whether I achieve better results if I add a softmax activation function here.
 
-        # optimizer = optimizers.SGD(learning_rate)
-        # optimizer = optimizers.Adam(alpha=learning_rate)
-        #optimizer = optimizers.Adam(0.00025)
         optimizer = Adam(learning_rate=learning_rate)
-        # optimizer = optimizers.RMSpropGraves(learning_rate, 0.95, self.momentum, 1e-2)
 
-        #f1_score = F1Score() -> use this if you want to use the F1 score as a metric in the model. For my OS configs, this is not available.
         # Compilation of the model with optimizer and loss
         self.model.compile(loss=Huber(delta=1.0), optimizer=optimizer,
                             metrics=["mse", "mae"])
@@ -67,11 +63,11 @@ class QNetwork():
         return loss
 
     @staticmethod
-    def copy_model(model):
+    def copy_model(model: Sequential) -> Sequential:
         """Returns a copy of a keras model."""
 
         """        cloned_model = tf.keras.models.clone_model(model)
         cloned_model.set_weights(model.get_weights())
         return cloned_model"""
-        model.save('tmp_model.keras')  # Added '.keras' extension here
-        return tf.keras.models.load_model('tmp_model.keras')  # Added '.keras' extension here to avoid ValueError: Invalid filepath extension for saving. + custom_objects={'CustomHuberLoss': huber_loss}
+        model.save(TEMPORARY_MODEL_PATH)
+        return tf.keras.models.load_model(TEMPORARY_MODEL_PATH)

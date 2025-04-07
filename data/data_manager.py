@@ -2,19 +2,10 @@ import logging
 import numpy as np
 import pandas as pd
 import os
-from sklearn.utils import shuffle
 from typing import Dict, List, Tuple
+from utils.config import GLOBAL_RNG
 
-cwd = os.getcwd()
-data_root_dir = os.path.join(cwd, "data/datasets/")
-data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
-data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "formated_training_data.csv") #  formated_train_adv
-formated_test_path = os.path.join(data_formated_dir, "formated_test_data.csv") #  formated_test_adv
-kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
-kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
-
-attack_map: Dict[str, str] = {'normal': 'normal',
+nsl_kdd_attack_map: Dict[str, str] = {'normal': 'normal',
 
                 'back': 'DoS',
                 'land': 'DoS',
@@ -60,7 +51,7 @@ attack_map: Dict[str, str] = {'normal': 'normal',
                 'xterm': 'U2R'
 }
 
-col_names: List[str] = ["duration", "protocol_type", "service", "flag", "src_bytes",
+nsl_kdd_col_names: List[str] = ["duration", "protocol_type", "service", "flag", "src_bytes",
                      "dst_bytes", "land_f", "wrong_fragment", "urgent", "hot", "num_failed_logins",
                      "logged_in", "num_compromised", "root_shell", "su_attempted", "num_root",
                      "num_file_creations", "num_shells", "num_access_files", "num_outbound_cmds",
@@ -73,50 +64,38 @@ col_names: List[str] = ["duration", "protocol_type", "service", "flag", "src_byt
 
 attack_types: List[str] = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
 
-class DataCls:
-    def __init__(self, trainset_path: str = kdd_train, testset_path: str = kdd_test, formated_trainset_path: str = formated_train_path, 
-                 formated_testset_path: str = formated_test_path, dataset_type: str = "train"):
-        """
-        Initialize the DataCls object with the given parameters.
-        Initialize the attack types, attack names, and attack map.
-        Initialize the DataFrame and formats it if not already done, column names, and index.
-        Initializes the present attack_names in the DataFrame.
-        Args:
-            trainset_path (str): Path to the training dataset.
-            testset_path (str): Path to the test dataset.
-            formated_trainset_path (str): Path to formated training dataset output.
-            formated_testset_path (str): Path to formated test dataset output.
-            dataset_type (str): Type of the dataset, either 'train' or 'test'. Default is 'train'.
-        """
-        self.col_names = col_names
-        self.index = 0
-        # Data formated path and test path.
-        self.loaded = False
-        self.dataset_type = dataset_type
-        self.trainset_path = trainset_path
-        self.testset_path = testset_path
+class DataManager:
+    def __init__(self, trainset_path: str, testset_path: str, formated_trainset_path: str,
+                 formated_testset_path: str, dataset_type: str = "train", dataset_name: str = "nsl-kdd", normalization: str = 'linear'):
+        if dataset_name == "nsl-kdd":
+            self.col_names = nsl_kdd_col_names
+            self.index: int = 0
+            # Data formated path and test path.
+            self.loaded = False
+            self.dataset_type = dataset_type
+            self.trainset_path = trainset_path
+            self.testset_path = testset_path
 
-        self.formated_train_path = formated_trainset_path
-        self.formated_test_path = formated_testset_path
+            self.formated_train_path = formated_trainset_path
+            self.formated_test_path = formated_testset_path
 
-        self.attack_types = attack_types
-        self.attack_names = []
-        self.attack_map = attack_map
-        self.all_attack_names = list(self.attack_map.keys())
-        self.format_data_instance()
-        self.update_attack_names()
-
-    def get_shape(self):
-        if self.loaded is False:
-            self.load_formatted_df()
-
-        self.data_shape = self.df.shape
-        # stata + labels
-        return self.data_shape
-
-    ''' Get n-rows from loaded data
-        The dataset must be loaded in RAM
-    '''
+            self.attack_types = attack_types
+            
+            self.attack_map = nsl_kdd_attack_map
+            self.all_attack_names = list(self.attack_map.keys())
+            self.df: pd.DataFrame = None
+            if self.dataset_type == 'test':
+                _, self.df = self.format_nsl_kdd_data_instance(normalization)
+            else:
+                self.df, _ = self.format_nsl_kdd_data_instance(normalization)
+            self.attack_names = DataManager.update_attack_names(self.attack_map, self.df)
+            # Initialize a reusable random generator
+            self.loaded = True
+            self.shape = self.df.shape
+            self.obs_size = self.shape[1] - len(list(nsl_kdd_attack_map.keys())) # Number of columns/features - number of all possible attack names
+        else:
+            # TODO: Implement other datasets
+            raise ValueError("Currently only nsl-kdd dataset is supported.")
 
     def get_batch(self, batch_size=100) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
@@ -137,8 +116,8 @@ class DataCls:
 
         # Read the df rows
         indexes = list(range(self.index, self.index + batch_size))
-        if max(indexes) > self.get_shape()[0] - 1:
-            dif = max(indexes) - self.data_shape[0]
+        if max(indexes) > self.shape[0] - 1:
+            dif = max(indexes) - self.shape[0]
             indexes[len(indexes) - dif - 1:len(indexes)] = list(range(dif + 1))
             self.index = batch_size - dif
             batch = self.df.iloc[indexes]
@@ -181,12 +160,6 @@ class DataCls:
         ('train' or 'test'), initializes the DataFrame, and updates the list of existing
         attacks in the DataFrame.
 
-        Args:
-            None
-
-        Returns:
-            None
-
         Side Effects:
             - Sets self.df to the loaded DataFrame.
             - Sets self.index to a random integer within the range of the DataFrame's row count.
@@ -195,37 +168,62 @@ class DataCls:
         """
         if self.df is not None and self.attack_names is not None and len(self.attack_names) > 0:
             self.loaded = True
-            self.index = np.random.randint(0, self.df.shape[0] - 1, dtype=np.int32)
-            return
+            self.index = GLOBAL_RNG.integers(0, self.shape[0] - 1, dtype=np.int32)
         else:
             if self.dataset_type == 'train':
                 self.df = pd.read_csv(self.formated_train_path, sep=',')  # Read again the csv
             else:
                 self.df = pd.read_csv(self.formated_test_path, sep=',')
-            self.index = np.random.randint(0, self.df.shape[0] - 1, dtype=np.int32)
+            self.index = GLOBAL_RNG.integers(0, self.shape[0] - 1, dtype=np.int32)
             self.loaded = True
-            # Create a list with the existent attacks in the df
-            for att in self.attack_map:
-                if att in self.df.columns:
-                    # Add only if there exists at least 1
-                    if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
-                        self.attack_names.append(att)
+            self.attack_names = DataManager.update_attack_names(self.attack_map, self.df)
 
     @staticmethod
-    def format_data(dataset_type: str, trainset_path: str, testset_path: str, formated_train_path: str, formated_test_path: str) -> pd.DataFrame:
+    def load_formatted_nsl_kdd_if_exists(formated_train_path: str, formated_test_path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
-        Format the data for ready-to-use.
+        Load the formatted NSL-KDD dataset if it exists already.
+
+        Args:
+            formated_train_path (str): Path to the formatted training dataset.
+            formated_test_path (str): Path to the formatted test dataset.
+
+        Returns:
+            Tuple[pd.DataFrame, pd.DataFrame]: Formatted training and test datasets.
+        """
+        if os.path.exists(formated_train_path) and os.path.exists(formated_test_path):
+            logging.info(f"Reading formated train data from: {formated_train_path}")
+            train_data = pd.read_csv(formated_train_path, sep=',', dtype=np.float32)
+            logging.info(f"Reading formated test data from: {formated_test_path}")
+            test_data =  pd.read_csv(formated_test_path, sep=',', dtype=np.float32)
+            for col in train_data.select_dtypes(include=[np.number]).columns:
+                train_data[col] = train_data[col].astype(np.float32)
+
+            for col in test_data.select_dtypes(include=[np.number]).columns:
+                test_data[col] = test_data[col].astype(np.float32)
+
+            return train_data, test_data
+        else:
+            logging.info(f"Formated 'train' data not found in: {formated_train_path}")
+            logging.info(f"Formated 'test' data not found in: {formated_test_path}")
+            return None, None
+
+
+    @staticmethod
+    def get_formated_nsl_kdd_data(trainset_path: str, testset_path: str, formated_train_path: str, formated_test_path: str, normalization: str = 'linear') -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Return the formatted NSL-KDD dataset if it exists already, otherwise format the original dataset and return the ready for training dataset.
+        Format the NSL-KDD dataset to be ready for training.
         
         Details:
-            Formating the training dataset for ready-2-use data
-            Remove the difficulty column because we do not want to consider it, and add the one-hot encoding for the categorical columns
-            Further su_attempted values are changed from 2 to 0.
+            - Remove the difficulty column because we do not want to consider it.
+            - Add one-hot encoding for all categorical columns.
+            - Further su_attempted values are changed from 2 to 0.
              
             Note: Upon my research, in the original KDD dataset there were only 0 and 1 values for the su_attempted column. 
             The improved NSL-KDD dataset has 0, 1, and 2 values but 2 values were not mentioned in the description.
             Therefore, I assume the authors of AE-RL considered 2 values as mistakes and changed them to 0.
             Reference to original KDD-Data: https://kdd.ics.uci.edu/databases/kddcup99/task.html
-            Reference to NSL-KDD originate work was done by Tavallaee et. al. from University of New Brunswick how ever the data doesnt seem to be further maintained.
+            Reference to NSL-KDD originate work was done by Tavallaee et. al. from University of New Brunswick. The data doesnt seem to be further maintained.
               https://www.unb.ca/cic/datasets/nsl.html(dead link),
             Alternative links to the NSL-KDD dataset:
              https://www.kaggle.com/datasets/hassan06/nslkdd (This project is based on this dataset)
@@ -235,93 +233,80 @@ class DataCls:
             testset_path (str): Path to the test dataset.
             formated_train_path (str): Path to the formatted training dataset.
             formated_test_path (str): Path to the formatted test dataset.
-            col_names (list): List of column names for the dataset.
 
         Returns:
-            None
+            Tuple [pd.DataFrame, pd.DataFrame]: Formatted training and test datasets.
         """
-        if os.path.exists(formated_train_path) and os.path.exists(formated_test_path):
-            if(dataset_type == 'train'):
-                logging.info(f"Reading formated train data from: {formated_train_path}")
-                return pd.read_csv(formated_train_path, sep=',')
-            else:
-                logging.info(f"Reading formated test data from: {formated_test_path}")
-                return pd.read_csv(formated_test_path, sep=',')
-        
-        # Format the data
-        formated_dir = os.path.dirname(formated_train_path)
-        if not os.path.exists(formated_dir):
-            os.makedirs(formated_dir)
+        # Load formated data if it exists already
+        train, test = DataManager.load_formatted_nsl_kdd_if_exists(formated_train_path, formated_test_path)
+        if train is not None and test is not None:
+            return train, test
+
+        # Create Folder if it does not exist
+        DataManager.create_formated_data_dir_if_not_exists(formated_train_path)
 
         # Formating the training dataset
-        df = pd.read_csv(trainset_path, sep = ',', names = col_names, index_col = False)
-        if 'difficulty' in df.columns:
-            df.drop('difficulty', axis=1, inplace=True)
-
-        test_data = pd.read_csv(testset_path, sep = ',', names = col_names, index_col = False)
+        train_data = pd.read_csv(trainset_path, sep = ',', names = nsl_kdd_col_names, index_col = False)
+        test_data = pd.read_csv(testset_path, sep = ',', names = nsl_kdd_col_names, index_col = False)
+        if 'difficulty' in train_data.columns:
+            train_data = train_data.drop('difficulty', axis=1)
         if 'difficulty' in test_data:
-            test_data.drop('difficulty', axis = 1, inplace = True)
+            test_data = test_data.drop('difficulty', axis = 1)
 
-        amount_train_samples = df.shape[0] # Save the amount of training samples
-        frames = [df, test_data]
-        df = pd.concat(frames) # Concatenate the train and test dataframes
+        amount_train_samples = train_data.shape[0] # Save the amount of training samples
+        frames = [train_data, test_data]
+        full_data = pd.concat(frames) # Concatenate the train and test dataframes
 
-        # Dataframe processing
         # One hot encoding for categorical columns
-        df = pd.concat([df.drop('protocol_type', axis=1), pd.get_dummies(df['protocol_type'])], axis=1)
-        df = pd.concat([df.drop('service', axis=1), pd.get_dummies(df['service'])], axis=1)
-        df = pd.concat([df.drop('flag', axis=1), pd.get_dummies(df['flag'])], axis=1)
+        full_data = pd.concat([full_data.drop('protocol_type', axis=1), pd.get_dummies(full_data['protocol_type'])], axis=1)
+        full_data = pd.concat([full_data.drop('service', axis=1), pd.get_dummies(full_data['service'])], axis=1)
+        full_data = pd.concat([full_data.drop('flag', axis=1), pd.get_dummies(full_data['flag'])], axis=1)
 
         # NSL-KDD seems to have introduced faulty su_attempted values of '2' which are not documented in the original NSL nor in the improved NSL-KDD work.
-        # Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed them to 0)
-        # 1 if ``su root'' command attempted; 0 otherwise
-        df['su_attempted'] = df['su_attempted'].replace(2.0, 0.0)
+        # Therefore, I assume the authors of AE-RL considered 2 as mistakes and changed them to 0). 1 if ``su root'' command attempted; 0 otherwise
+        full_data['su_attempted'] = full_data['su_attempted'].replace(2.0, 0.0)
 
         # One hot encoding for labels
-        df = pd.concat([df.drop('labels', axis=1), pd.get_dummies(df['labels'])], axis=1)
+        full_data = pd.concat([full_data.drop('labels', axis=1), pd.get_dummies(full_data['labels'])], axis=1)
 
         # Normalization of the df
-        bool_cols = df.select_dtypes(include='bool').columns
-        df[bool_cols] = df[bool_cols].astype('float32')
-        # Normalization of the continous columns in the df (0-1) # TODO: Check if I get an improvement if I normalize the data with the tensorflow functional API instead. # TODO: What if I use float32 instead of float64?
-        for col in df.columns:
-            if df[col].dtype == 'bool':
-                df[col] = df[col].astype('float32')
-            elif df[col].dtype == 'float64':
-                df[col] = df[col].astype('float32')
-            elif df[col].dtype == 'int64':
-                df[col] = df[col].astype('int32')
-
-            if pd.api.types.is_numeric_dtype(df[col]):
-                if df[col].max() == 0 and df[col].min() == 0:
-                    df[col] = np.zeros_like(df[col], dtype=np.float32)
-                elif df[col].max() != df[col].min():  # Avoid division by zero
-                    df[col] = ((df[col] - df[col].min()) / (df[col].max() - df[col].min())).astype('float32')
+        bool_cols = full_data.select_dtypes(include='bool').columns
+        full_data[bool_cols] = full_data[bool_cols].astype('float32')
+        # Normalization of the continous columns in the df (0-1) //TODO: Check if I get an improvement if I use log normalization instead of linear normalization!!!
+        full_data = DataManager.normalize_numerical_columns(full_data, normalization=normalization)
+        logging.info(f"DataManager<Datatypes>:{full_data.dtypes.value_counts()}")
+        assert all(np.issubdtype(dt, np.number) for dt in full_data.dtypes), "Non-numerical columns contained. Please make sure the data is normalized correctly!"
+        assert all(full_data.dtypes == np.float32), "Not all columns are float32!"
 
         # Save data
-        test_df = df.iloc[amount_train_samples:df.shape[0]]
-        df = df[:amount_train_samples]
-        test_df.to_csv(formated_test_path, sep=',', index=False)
-        df.to_csv(formated_train_path, sep=',', index=False)
+        formatted_test_df = full_data.iloc[amount_train_samples:full_data.shape[0]]
+        formatted_train_df = full_data[:amount_train_samples]
+        formatted_test_df.to_csv(formated_test_path, sep=',', index=False)
+        formatted_train_df.to_csv(formated_train_path, sep=',', index=False)
         logging.info(f"Formated train data saved in: {formated_train_path}")
         logging.info(f"Formated test data saved in: {formated_test_path}")
-        return df
+        return formatted_train_df, formatted_test_df
 
-    def format_data_instance(self) -> None:
+    def format_nsl_kdd_data_instance(self, normalization: str = 'linear') -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
-        Instance method to format the data using instance attributes.
-        """
-        self.df = DataCls.format_data(self.dataset_type, self.trainset_path, self.testset_path, self.formated_train_path, self.formated_test_path)
-        self.loaded = True
+        Format the NSL-KDD dataset to be ready for training.
 
+        This method loads the NSL-KDD dataset, formats it by removing unnecessary columns, and applies one-hot encoding to categorical columns.
+        It also normalizes (linear) the continuous columns and saves the formatted dataset to the specified paths.
+
+        Returns:
+            The method returns the formatted training and test datasets.
+        """
+        train_data, test_data = DataManager.get_formated_nsl_kdd_data(self.trainset_path, self.testset_path, self.formated_train_path, self.formated_test_path, normalization=normalization)
+        return train_data, test_data
 
     @staticmethod
-    def calculate_obs_size(data_path) -> int:
+    def get_obs_size_nsl_kdd(data_path) -> int:
         """
-        Calculate the observation size based on the given data path.
+        Calculate the observation size of the nsl-kdd dataset on the given data path.
 
         This method calculates the observation size, which is the number of columns in the DataFrame
-        minus the number of all attack names.
+        minus the number of all occuring attack names.
 
         Args:
             data_path (str): Path to the already formatted data file. 
@@ -334,10 +319,9 @@ class DataCls:
         """
         if (not os.path.exists(data_path)):
             raise FileNotFoundError(f"File {data_path} not found. Please check the path.")
-            return -1
         
         df = pd.read_csv(data_path, sep=',')
-        obs_size = df.shape[1] - len(list(attack_map.keys()))
+        obs_size = df.shape[1] - len(list(nsl_kdd_attack_map.keys()))
         return obs_size
     
     @staticmethod
@@ -358,23 +342,26 @@ class DataCls:
         
         df = pd.read_csv(data_path, sep=',')
         # Create a list with the existent attacks in the data frame
-        for att in attack_map:
+        for att in nsl_kdd_attack_map:
             if att in df.columns:
                 # Add only if there exists at least 1
                 if np.sum(df[att].values) >= 1 and att not in attack_names:
                     attack_names.append(att)
         return attack_names
 
-    def update_attack_names(self):
+    @staticmethod
+    def update_attack_names(attack_map, df: pd.DataFrame) -> list[str]:
         """
         Update the list of existing attacks in the DataFrame.
         """
-        self.attack_names = []
-        for att in self.attack_map:
-            if att in self.df.columns:
+        attack_names = []
+        for att in attack_map:
+            if att in df.columns:
                 # Add only if there exists at least 1 attack in the column
-                if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
-                    self.attack_names.append(att)
+                if np.sum(df[att].values) >= 1 and att not in attack_names:
+                    attack_names.append(att)
+                
+        return attack_names
 
     def get_samples_for_attack(self, attack_name: str, num_samples: int) -> pd.DataFrame:
         """
@@ -446,6 +433,30 @@ class DataCls:
                 if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
                     self.attack_names.append(att)
 
+
+    
+###########
+# Helpers #
+###########
+
+    @staticmethod
+    def create_formated_data_dir_if_not_exists(path: str) -> None:
+        """
+        Create the formatted data directory if it does not exist.
+
+        Args:
+            path (str): Path to the directory to be created.
+
+        Returns:
+            None
+        """
+        formated_data_dir = os.path.dirname(path)
+        if not os.path.exists(formated_data_dir):
+            os.makedirs(formated_data_dir)
+            logging.info(f"Created directory: {formated_data_dir}")
+        else:
+            logging.info(f"Directory already exists: {formated_data_dir}")
+
     def get_balanced_samples(self) -> pd.DataFrame:
         """
         Get equally balanced data for all attack types.
@@ -493,3 +504,20 @@ class DataCls:
         self.df = self.df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame one more time
         self.update_attack_names_for_given_attacks(all_attack_names)
         return self.df, self.attack_names
+    
+    @staticmethod
+    def normalize_numerical_columns(full_data: pd.DataFrame, normalization: str = 'linear') -> pd.DataFrame:
+        for col in full_data.select_dtypes(include=[np.number]).columns:
+            col_max, col_min = full_data[col].max(), full_data[col].min()
+
+            if col_max == 0 and col_min == 0:
+                full_data[col] = 0.0  # Column contains only 0 values.
+            elif col_max != col_min:  # Avoid division by zero
+                if normalization == 'linear':
+                    full_data[col] = (full_data[col] - col_min) / (col_max - col_min)
+                elif normalization == 'log':
+                    full_data[col] = np.log(full_data[col].clip(lower=1e-10))  # Avoid log(0)
+
+            full_data[col] = full_data[col].astype(np.float32) # Make sure all columns are float32!
+
+        return full_data

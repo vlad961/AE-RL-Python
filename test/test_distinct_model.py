@@ -1,15 +1,16 @@
-import os
+import os,sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utils.config import CWD
 from utils.log_config import load_debug_info, logger_setup
 from utils.helpers import create_attack_id_to_index_mapping, transform_attacks_by_epoch
-from plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
+from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
 from test_multiple_agents import test_trained_agent_quality
 from datetime import datetime
-from data.data_cls import attack_map
+from data.data_manager import nsl_kdd_attack_map
 
-cwd = os.getcwd()
-defender_model_path = os.path.join(cwd, "models/trained-models/2025-03-24-10-22-WIN-multiple-attackers-att-5L-def-3L-lr-0.001/defender_model.keras")
-plots_path = os.path.join(cwd, "models/trained-models/2025-03-24-10-22-WIN-multiple-attackers-att-5L-def-3L-lr-0.001/plots/")
-destination_log_path = os.path.join(cwd, "models/trained-models/2025-03-24-10-22-WIN-multiple-attackers-att-5L-def-3L-lr-0.001/logs/")
+defender_model_path = os.path.join(CWD, "models/trained-models/2025-04-07-12-44-WIN-multiple-attackers-balanced-data-att-5L-def-3L-lr-0.001/defender_model.keras")
+plots_path = os.path.join(CWD, "models/trained-models/2025-04-07-12-44-WIN-multiple-attackers-balanced-data-att-5L-def-3L-lr-0.001/plots/")
+destination_log_path = os.path.join(CWD, "models/trained-models/2025-04-07-12-44-WIN-multiple-attackers-balanced-data-att-5L-def-3L-lr-0.001/logs/")
 
 if __name__ == "__main__":
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -58,7 +59,7 @@ if __name__ == "__main__":
 
     plot_trend_lines_multiple_agents(rewards, losses, ["Defender", "Attacker: DoS", "Attacker: Probe", "Attacker: R2L", "Attacker: U2R"], plots_path)
 
-    attack_id_to_index = create_attack_id_to_index_mapping(attack_map, attack_names)
+    attack_id_to_index = create_attack_id_to_index_mapping(nsl_kdd_attack_map, attack_names)
     num_attacks = len(attack_names)
     transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
     plot_attack_distribution_for_each_attacker(transformed_attacks, attack_names, plots_path, ['Attacker DoS', 'Attacker Probe', 'Attacker R2L', 'Attacker U2R'])
@@ -73,6 +74,3 @@ if __name__ == "__main__":
 
 
     test_trained_agent_quality(defender_model_path, plots_path)
-
-
-

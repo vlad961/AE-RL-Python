@@ -1,10 +1,11 @@
-
+import numpy as np
+from utils.config import CWD, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
 from utils.log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, save_debug_info
-from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, getAttackTypeMaps, print_total_runtime, save_trained_models, store_episode_results, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_models_and_statistics
+from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, get_attack_type_maps, print_total_runtime, save_trained_models, store_episode_results, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_models_and_statistics
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
-from data.data_cls import DataCls, attack_types, attack_map
+from data.data_manager import DataManager, attack_types, nsl_kdd_attack_map
 from datetime import datetime
 from test.test_multiple_agents import test_trained_agent_quality
 from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
@@ -22,20 +23,10 @@ The original project can be found at: https://github.com/gcamfer/Anomaly-Reactio
 To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipynb' https://github.com/gcamfer/Anomaly-ReactionRL/blob/master/Notebooks/AE_RL_NSL_KDD.ipynb
 """
 
-cwd = os.getcwd()
-data_root_dir = os.path.join(cwd, "data/datasets/")
-data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
-data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "formated_training_data.csv") # formated_train_adv balanced_training_data
-formated_test_path = os.path.join(data_formated_dir, "formated_test_data.csv") # formated_test_adv balanced_test_data
-kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
-kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
-trained_models_dir = os.path.join(cwd, "models/trained-models/")
-
 # TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
 try:
   physical_devices = tf.config.list_physical_devices('GPU')
-  tf.config.experimental.set_memory_growth(physical_devices[0], True)
+  tf.config.experimental.set_memory_growth(physical_devices[0], False) # TODO: set to True for memory growth
 except tf.errors.InvalidArgumentError:
   print("Invalid device or cannot modify virtual devices once initialized.")
   print("Exiting the script early...")
@@ -45,104 +36,35 @@ except tf.errors.InvalidArgumentError:
 def main(attack_type=None, file_name_suffix=""):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
     output_root_dir = f"{timestamp_begin}{file_name_suffix}"
-    plots_path = os.path.join(trained_models_dir, f"{output_root_dir}/plots/")
-    current_log_path = os.path.join(cwd, f"logs/{output_root_dir}.log")
-    destination_log_path = os.path.join(trained_models_dir, f"{output_root_dir}/logs/")
+    plots_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/plots/")
+    current_log_path = os.path.join(CWD, f"logs/{output_root_dir}.log")
+    destination_log_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/logs/")
     
     logger_setup(timestamp_begin, file_name_suffix)
-    logging.info(f"Started script at: {timestamp_begin}\nCurrent working dir: {cwd}\nUsed data files: \n{kdd_train},\n{kdd_test}")
+    logging.info(f"Started script at: {timestamp_begin}\nCurrent working dir: {CWD}\nUsed data files: \n{ORIGINAL_KDD_TRAIN},\n{ORIGINAL_KDD_TEST}")
     script_start_time = datetime.now()
 
     try:
         batch_size = 1 # Train batch
         minibatch_size = 100 # batch of memory ExpRep
-        exp_replay = True
+        experience_replay = True
         iterations_episode = 100
         num_episodes = 10 # //FIXME: 100 after validate correct running
+ 
+        logging.info("Setting up Attacker and Defender Agents...")
 
-        logging.info("Creating enviroment...")
-        if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
-            DataCls.format_data("train", kdd_train, kdd_test, formated_train_path, formated_test_path)
-
-        attack_names = DataCls.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
-        attack_valid_actions = list(range(len(attack_names)))
-        attack_num_actions = len(attack_valid_actions)
-
-        attack_valid_actions_dos, attack_valid_actions_probe, attack_valid_actions_r2l, attack_valid_actions_u2r = getAttackTypeMaps(attack_map, attack_names)
+        train_data = DataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, normalization='linear')
+        attack_valid_actions = list(range(len(train_data.attack_names)))
+        attack_valid_actions_dos, attack_valid_actions_probe, attack_valid_actions_r2l, attack_valid_actions_u2r = get_attack_type_maps(nsl_kdd_attack_map, train_data.attack_names)
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
         att_epsilon = 1
         att_min_epsilon = 0.82  # min value for exploration
         att_gamma = 0.001
         att_decay_rate = 0.99
-        att_hidden_layers = 5
         att_hidden_size = 100
+        att_hidden_layers = 5
         att_learning_rate = 0.001
-        obs_size = DataCls.calculate_obs_size(formated_train_path) # Amount of features in the dataset (columns) - attack_types
-
-        agent_dos = AttackAgent(attack_valid_actions_dos, obs_size, "DoS", "EpsilonGreedy",
-                                        epoch_length=iterations_episode,
-                                        epsilon=att_epsilon,
-                                        min_epsilon=att_min_epsilon,
-                                        decay_rate=att_decay_rate,
-                                        gamma=att_gamma,
-                                        hidden_size=att_hidden_size,
-                                        hidden_layers=att_hidden_layers,
-                                        minibatch_size=minibatch_size,
-                                        mem_size=1000,
-                                        learning_rate=att_learning_rate,
-                                        ExpRep=exp_replay,
-                                        target_model_name='attacker_target_model_dos',
-                                        model_name='attacker_model_dos')
-        
-        agent_probe = AttackAgent(attack_valid_actions_probe, obs_size, "Probe", "EpsilonGreedy",
-                                epoch_length=iterations_episode,
-                                epsilon=att_epsilon,
-                                min_epsilon=att_min_epsilon,
-                                decay_rate=att_decay_rate,
-                                gamma=att_gamma,
-                                hidden_size=att_hidden_size,
-                                hidden_layers=att_hidden_layers,
-                                minibatch_size=minibatch_size,
-                                mem_size=1000,
-                                learning_rate=att_learning_rate,
-                                ExpRep=exp_replay,
-                                target_model_name='attacker_target_model_probe',
-                                model_name='attacker_model_probe')
-        
-        agent_r2l = AttackAgent(attack_valid_actions_r2l, obs_size, "R2L", "EpsilonGreedy",
-                epoch_length=iterations_episode,
-                epsilon=att_epsilon,
-                min_epsilon=att_min_epsilon,
-                decay_rate=att_decay_rate,
-                gamma=att_gamma,
-                hidden_size=att_hidden_size,
-                hidden_layers=att_hidden_layers,
-                minibatch_size=minibatch_size,
-                mem_size=1000,
-                learning_rate=att_learning_rate,
-                ExpRep=exp_replay,
-                target_model_name='attacker_target_model_r2l',
-                model_name='attacker_model_probe_r2l')
-        
-        agent_u2r = AttackAgent(attack_valid_actions_u2r, obs_size, "U2R", "EpsilonGreedy",
-                        epoch_length=iterations_episode,
-                        epsilon=att_epsilon,
-                        min_epsilon=att_min_epsilon,
-                        decay_rate=att_decay_rate,
-                        gamma=att_gamma,
-                        hidden_size=att_hidden_size,
-                        hidden_layers=att_hidden_layers,
-                        minibatch_size=minibatch_size,
-                        mem_size=1000,
-                        learning_rate=att_learning_rate,
-                        ExpRep=exp_replay,
-                        target_model_name='attacker_target_model_u2r',
-                        model_name='attacker_model_probe_u2r')
-        
-        attackers = [agent_dos, agent_probe, agent_r2l, agent_u2r]
-
-        env = RLenv('train', attackers, batch_size=batch_size, iterations_episode=iterations_episode)
 
         # Defender is trained to detect type of attacks 0: normal, 1: Dos, 2: Probe, 3: R2L, 4: U2R
         defender_valid_actions = list(range(len(attack_types)))
@@ -155,7 +77,77 @@ def main(attack_type=None, file_name_suffix=""):
         def_hidden_layers = 3
         def_learning_rate = 0.001
 
-        agent_defender = DefenderAgent(defender_valid_actions, obs_size, "EpsilonGreedy",
+        training_params = {"num_episodes": num_episodes, "iterations_episode": iterations_episode, "minibatch_size": minibatch_size,
+                           "total_samples": num_episodes * iterations_episode, "data_shape": train_data.shape}
+        attacker_params = {"num_actions": len(attack_valid_actions),"gamma": att_gamma, "epsilon": att_epsilon, "hidden_size": att_hidden_size,
+                           "hidden_layers": att_hidden_layers, "learning_rate": att_learning_rate }
+        defender_params = {"num_actions": defender_num_actions, "gamma": def_gamma, "epsilon": def_epsilon, "hidden_size": def_hidden_size,
+                           "hidden_layers": def_hidden_layers,"learning_rate": def_learning_rate}
+
+        # Create the attacker and defender agents
+        agent_dos = AttackAgent(attack_valid_actions_dos, train_data.obs_size, "DoS", "EpsilonGreedy",
+                                        epoch_length=iterations_episode,
+                                        epsilon=att_epsilon,
+                                        min_epsilon=att_min_epsilon,
+                                        decay_rate=att_decay_rate,
+                                        gamma=att_gamma,
+                                        hidden_size=att_hidden_size,
+                                        hidden_layers=att_hidden_layers,
+                                        minibatch_size=minibatch_size,
+                                        mem_size=1000,
+                                        learning_rate=att_learning_rate,
+                                        ExpRep=experience_replay,
+                                        target_model_name='attacker_target_model_dos',
+                                        model_name='attacker_model_dos')
+        
+        agent_probe = AttackAgent(attack_valid_actions_probe, train_data.obs_size, "Probe", "EpsilonGreedy",
+                                epoch_length=iterations_episode,
+                                epsilon=att_epsilon,
+                                min_epsilon=att_min_epsilon,
+                                decay_rate=att_decay_rate,
+                                gamma=att_gamma,
+                                hidden_size=att_hidden_size,
+                                hidden_layers=att_hidden_layers,
+                                minibatch_size=minibatch_size,
+                                mem_size=1000,
+                                learning_rate=att_learning_rate,
+                                ExpRep=experience_replay,
+                                target_model_name='attacker_target_model_probe',
+                                model_name='attacker_model_probe')
+        
+        agent_r2l = AttackAgent(attack_valid_actions_r2l, train_data.obs_size, "R2L", "EpsilonGreedy",
+                epoch_length=iterations_episode,
+                epsilon=att_epsilon,
+                min_epsilon=att_min_epsilon,
+                decay_rate=att_decay_rate,
+                gamma=att_gamma,
+                hidden_size=att_hidden_size,
+                hidden_layers=att_hidden_layers,
+                minibatch_size=minibatch_size,
+                mem_size=1000,
+                learning_rate=att_learning_rate,
+                ExpRep=experience_replay,
+                target_model_name='attacker_target_model_r2l',
+                model_name='attacker_model_probe_r2l')
+        
+        agent_u2r = AttackAgent(attack_valid_actions_u2r, train_data.obs_size, "U2R", "EpsilonGreedy",
+                        epoch_length=iterations_episode,
+                        epsilon=att_epsilon,
+                        min_epsilon=att_min_epsilon,
+                        decay_rate=att_decay_rate,
+                        gamma=att_gamma,
+                        hidden_size=att_hidden_size,
+                        hidden_layers=att_hidden_layers,
+                        minibatch_size=minibatch_size,
+                        mem_size=1000,
+                        learning_rate=att_learning_rate,
+                        ExpRep=experience_replay,
+                        target_model_name='attacker_target_model_u2r',
+                        model_name='attacker_model_probe_u2r')
+        
+        attackers = [agent_dos, agent_probe, agent_r2l, agent_u2r]
+
+        agent_defender = DefenderAgent(defender_valid_actions, train_data.obs_size, "EpsilonGreedy",
                                         epoch_length=iterations_episode,
                                         epsilon=def_epsilon,
                                         min_epsilon=def_min_epsilon,
@@ -166,16 +158,17 @@ def main(attack_type=None, file_name_suffix=""):
                                         minibatch_size=200, # //TODO: auf 400 setzen, da 4 agenten?
                                         mem_size=4000,
                                         learning_rate=def_learning_rate,
-                                        ExpRep=exp_replay,
+                                        ExpRep=experience_replay,
                                         target_model_name='defender_target_model',
                                         model_name='defender_model'
                                         )
-        
+
+        # Create the environment
+        logging.info("Creating environment...")
+        env = RLenv(train_data, attackers, agent_defender, batch_size=batch_size, iterations_episode=iterations_episode)
+
         # Print training parameters
-        log_training_parameters(num_episodes, iterations_episode, minibatch_size, env, attack_num_actions,
-                                att_gamma, att_epsilon, att_hidden_size, att_hidden_layers, att_learning_rate,
-                                defender_num_actions, def_gamma, def_epsilon, def_hidden_size, def_hidden_layers,
-                                def_learning_rate, attack_type, attack_names)
+        log_training_parameters(training_params, attacker_params, defender_params, attack_type, train_data.attack_names)
         # Statistics
         att_reward_chain, att_reward_chain_dos, att_reward_chain_probe, att_reward_chain_r2l, att_reward_chain_u2r = [], [], [], [], []
         att_loss_chain, att_loss_chain_dos, att_loss_chain_probe, att_loss_chain_r2l, att_loss_chain_u2r = [], [], [], [], []
@@ -188,11 +181,13 @@ def main(attack_type=None, file_name_suffix=""):
         # Main loops
         attack_indices_per_episode, attack_names_per_episode = [], []
         attacks_mapped_to_att_type_list = []
+        sample_indices_per_episode = []
 
         for episode in range(num_episodes):
             epoch_start_time = time.time()
             epoch_mse_before, epoch_mae_before = [], []
             epoch_mse_after, epoch_mae_after = [], []
+
             # Attack and defense losses
             att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r = 0.0, 0.0, 0.0, 0.0
             def_loss, agg_att_loss = 0.0, 0.0
@@ -202,6 +197,7 @@ def main(attack_type=None, file_name_suffix=""):
             
             attack_indices_list = []
             attack_names_list = []
+            sample_indices_list = []
             done = False
             
             # Reset the environment and initialize a new batch of random states and corresponding attack labels.
@@ -231,11 +227,12 @@ def main(attack_type=None, file_name_suffix=""):
                 store_experience(attackers, states, attack_actions, next_states, att_reward, done)
                 store_experience([agent_defender], states, defender_actions, next_states, def_reward, done)
 
-                # Train network, update loss after at least minibatch_size learns (observations)
-                if exp_replay and episode * iterations_episode + iteration >= minibatch_size:
+                # Train network, update loss after at least minibatch_size (observations)
+                if experience_replay and episode * iterations_episode + iteration >= minibatch_size:
+                    
                     def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss = update_models_and_statistics(
                             agent_defender, attackers, def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss, def_metrics_chain, 
-                            att_metrics_chain, epoch_mse_before, epoch_mae_before, epoch_mse_after, epoch_mae_after)
+                            att_metrics_chain, epoch_mse_before, epoch_mae_before, epoch_mse_after, epoch_mae_after, sample_indices_list)
 
                 # Update the environment for the next iteration
                 states = next_states
@@ -244,7 +241,7 @@ def main(attack_type=None, file_name_suffix=""):
                 labels_names = next_labels_names
 
                 # Update episode statistics
-                (def_total_reward_by_episode, att_total_reward_by_episode, att_total_reward_by_episode_dos, att_total_reward_by_episode_probe, 
+                (def_total_reward_by_episode, att_total_reward_by_episode, att_total_reward_by_episode_dos, att_total_reward_by_episode_probe,
                     att_total_reward_by_episode_r2l, att_total_reward_by_episode_u2r) = update_episode_statistics(def_reward, att_reward, 
                             def_total_reward_by_episode, att_total_reward_by_episode, att_total_reward_by_episode_dos, att_total_reward_by_episode_probe,
                             att_total_reward_by_episode_r2l, att_total_reward_by_episode_u2r)
@@ -259,21 +256,22 @@ def main(attack_type=None, file_name_suffix=""):
                                 mae_before_history, mse_after_history, mae_after_history, def_reward_chain,
                                 att_reward_chain, att_reward_chain_dos, att_reward_chain_probe, att_reward_chain_r2l,
                                 att_reward_chain_u2r, def_loss_chain, att_loss_chain, att_loss_chain_dos,
-                                att_loss_chain_probe, att_loss_chain_r2l, att_loss_chain_u2r)
+                                att_loss_chain_probe, att_loss_chain_r2l, att_loss_chain_u2r, sample_indices_per_episode, sample_indices_list)
 
             end_time = time.time()
             # Update user view
-            print_end_of_epoch_info(episode, num_episodes, epoch_start_time, end_time, def_loss, def_total_reward_by_episode, att_loss_dos, att_total_reward_by_episode_dos, att_loss_probe, att_total_reward_by_episode_probe, att_loss_r2l, att_total_reward_by_episode_r2l, att_loss_u2r, att_total_reward_by_episode_u2r, env)
+            episode_info = {"episode": episode, "num_episodes": num_episodes, "epoch_start_time": epoch_start_time, "end_time": end_time}
+            metrics = {"def_loss": def_loss, "def_total_reward_by_episode": def_total_reward_by_episode,
+                       "att_loss_dos": att_loss_dos, "att_total_reward_by_episode_dos": att_total_reward_by_episode_dos,
+                       "att_loss_probe": att_loss_probe, "att_total_reward_by_episode_probe": att_total_reward_by_episode_probe,
+                       "att_loss_r2l": att_loss_r2l, "att_total_reward_by_episode_r2l": att_total_reward_by_episode_r2l,
+                       "att_loss_u2r": att_loss_u2r, "att_total_reward_by_episode_u2r": att_total_reward_by_episode_u2r}
+
+            print_end_of_epoch_info(episode_info, metrics, env)
 
         # Save the trained models
-        agents = {
-            "dos": agent_dos,
-            "probe": agent_probe,
-            "r2l": agent_r2l,
-            "u2r": agent_u2r,
-            "defender": agent_defender,
-        }
-        save_trained_models(agents, output_root_dir, trained_models_dir)
+        agents = {"dos": agent_dos, "probe": agent_probe, "r2l": agent_r2l,"u2r": agent_u2r, "defender": agent_defender}
+        save_trained_models(agents, output_root_dir, TRAINED_MODELS_DIR)
         print_total_runtime(script_start_time)
 
         #################################
@@ -310,9 +308,10 @@ def main(attack_type=None, file_name_suffix=""):
                 "r2l": agent_r2l.name,
                 "u2r": agent_u2r.name,
             },
-            "attack_id_to_index": create_attack_id_to_index_mapping(attack_map, attack_names),
-            "attack_id_to_type": create_attack_id_to_type_mapping(attack_map),
-            "attack_names": attack_names,
+            "sample_indices_per_episode": sample_indices_per_episode,
+            "attack_id_to_index": create_attack_id_to_index_mapping(nsl_kdd_attack_map, train_data.attack_names),
+            "attack_id_to_type": create_attack_id_to_type_mapping(nsl_kdd_attack_map),
+            "attack_names": train_data.attack_names,
             "attack_types": attack_types,
             "plots_path": plots_path,
             "output_root_dir": output_root_dir,
@@ -325,17 +324,17 @@ def main(attack_type=None, file_name_suffix=""):
         #############################
         logging.info(f"Trying to save summary plots under: {plots_path}")
         plot_rewards_and_losses_during_training_multiple_agents(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
-        plot_attack_distributions_multiple_agents(attack_indices_per_episode, attack_map, env.attack_names, attacks_mapped_to_att_type_list, plots_path)
+        plot_attack_distributions_multiple_agents(attack_indices_per_episode, nsl_kdd_attack_map, train_data.attack_names, attacks_mapped_to_att_type_list, plots_path)
         rewards = [def_reward_chain, att_reward_chain_dos, att_reward_chain_probe, att_reward_chain_r2l, att_reward_chain_u2r]
         losses = [def_loss_chain, att_loss_chain_dos, att_loss_chain_probe, att_loss_chain_r2l, att_loss_chain_u2r]
         plot_trend_lines_multiple_agents(rewards, losses, [agent_defender.name, agent_dos.name, agent_probe.name, agent_r2l.name, agent_u2r.name], plots_path)
 
-        attack_id_to_index = create_attack_id_to_index_mapping(attack_map, attack_names)
-        num_attacks = len(attack_names)
+        attack_id_to_index = create_attack_id_to_index_mapping(nsl_kdd_attack_map, train_data.attack_names)
+        num_attacks = len(train_data.attack_names)
         transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
-        plot_attack_distribution_for_each_attacker(transformed_attacks, attack_names, plots_path, ['Attacker DoS', 'Attacker Probe', 'Attacker R2L', 'Attacker U2R'])
+        plot_attack_distribution_for_each_attacker(transformed_attacks, train_data.attack_names, plots_path, ['Attacker DoS', 'Attacker Probe', 'Attacker R2L', 'Attacker U2R'])
         
-        attack_id_to_type = create_attack_id_to_type_mapping(attack_map)
+        attack_id_to_type = create_attack_id_to_type_mapping(nsl_kdd_attack_map)
         # Daten transformieren
         transformed_attacks_by_type = transform_attacks_by_type(attack_indices_per_episode, attack_id_to_type, attack_types)
 
@@ -344,7 +343,7 @@ def main(attack_type=None, file_name_suffix=""):
         # Nutze die Funktion nach Abschluss deines Trainings:
         plot_training_error(mse_before_history, mae_before_history, mse_after_history, mae_after_history, save_path=plots_path)
         
-        defender_model_path = os.path.join(trained_models_dir, f"{output_root_dir}/defender_model.keras")
+        defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
         test_trained_agent_quality(defender_model_path, plots_path)
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:

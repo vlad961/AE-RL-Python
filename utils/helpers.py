@@ -17,13 +17,13 @@ from models.rl_env import RLenv
 # Helper Methods #
 ##################
 
-def getAttackTypeMaps(attack_map: dict[str,str], attack_names: list[str]):
+def get_attack_type_maps(attack_map: dict[str,str], attack_names: list[str]):
     """
-    Get single attack maps for all four attack types: DoS, Probe, R2L, U2R.
+    Get distinct attack maps for all four attack types: DoS, Probe, R2L, U2R.
     Given the full attack_map and the attack_names that are present in the used dataset, return the attack maps for each attack type.
     Each attack map is a dictionary where the key is the index of the attack in the full attack_map and the value is the attack name.
 
-    In each attack map, index 0 is reserved for the normal class.
+    In each attack map, index 0 is reserved for the normal class, as each attacker is expected to be able to behave normally.
 
     Args:
         attack_map (dict[str,str]): The full attack map.
@@ -91,11 +91,11 @@ def download_datasets_if_missing(kdd_train:str, kdd_test:str):
     if (not os.path.exists(kdd_train)):
         kdd_train_url = "https://raw.githubusercontent.com/gcamfer/Anomaly-ReactionRL/master/datasets/NSL/KDDTrain%2B.txt"
         download_file(kdd_train_url, kdd_train)
-        logging.info("Downloaded: {}\nSaved in: {}", kdd_train_url, kdd_train)
+        logging.info(f"Downloaded: {kdd_train_url}\nSaved in: {kdd_train}")
     if (not os.path.exists(kdd_test)):
         kdd_test_url = "https://raw.githubusercontent.com/gcamfer/Anomaly-ReactionRL/master/datasets/NSL/KDDTest%2B.txt"
         download_file(kdd_test_url, kdd_test)
-        logging.info("Downloaded: {}\nSaved in: {}", kdd_test_url, kdd_test)
+        logging.info(f"Downloaded: {kdd_test_url}\nSaved in: {kdd_test}")
 
 def print_total_runtime(script_start_time):
     total_runtime = datetime.now() - script_start_time
@@ -333,51 +333,18 @@ def store_experience(agents: List[Agent], states: List[pd.DataFrame], actions: L
         rewards (list): Rewards received by each agent.
         done (bool): Whether the episode is done.
     """
-    for agent, state, action, next_state, reward in zip(agents, states, actions, next_states, rewards):
-        agent.learn(state, action, next_state, reward, done)
-
-def train_agents(agent_defender: DefenderAgent, attackers: List[AttackAgent], epoch, i_iteration, iterations_episode, minibatch_size, def_loss, agg_att_loss):
-    """
-    Trains the defender and attacker agents and updates the loss metrics.
-
-    Args:
-        agent_defender: The defender agent.
-        attackers (list): List of attacker agents (DoS, Probe, R2L, U2R).
-        epoch (int): Current epoch number.
-        i_iteration (int): Current iteration number within the episode.
-        iterations_episode (int): Total number of iterations per episode.
-        minibatch_size (int): Minimum batch size required for training.
-        def_loss (float): Current cumulative loss for the defender.
-        agg_att_loss (float): Current cumulative loss for all attackers.
-
-    Returns:
-        tuple: Updated defender loss, attacker losses, and metrics.
-    """
-    if epoch * iterations_episode + i_iteration >= minibatch_size:
-        # Train defender
-        def_metrics = agent_defender.update_model()
-        def_loss += def_metrics["loss"]
-
-        # Train attackers
-        att_metrics_dos = attackers[0].update_model()
-        att_metrics_probe = attackers[1].update_model()
-        att_metrics_r2l = attackers[2].update_model()
-        att_metrics_u2r = attackers[3].update_model()
-
-        # Update attacker losses
-        att_loss_dos = att_metrics_dos["loss"]
-        att_loss_probe = att_metrics_probe["loss"]
-        att_loss_r2l = att_metrics_r2l["loss"]
-        att_loss_u2r = att_metrics_u2r["loss"]
-        agg_att_loss += att_loss_dos + att_loss_probe + att_loss_r2l + att_loss_u2r
-
-        return def_loss, agg_att_loss, def_metrics, [att_metrics_dos, att_metrics_probe, att_metrics_r2l, att_metrics_u2r]
-    return def_loss, agg_att_loss, None, None
+    if(agents[0].name == "Defender"):
+        for state, action, next_state, reward in zip(states, actions, next_states, rewards):
+            defender = agents[0]
+            defender.learn(state, action, next_state, reward, done)
+    else:
+        for agent, state, action, next_state, reward in zip(agents, states, actions, next_states, rewards):
+            agent.learn(state, action, next_state, reward, done)
 
 def update_models_and_statistics(agent_defender: DefenderAgent, attackers: List[AttackAgent], def_loss, att_loss_dos, att_loss_probe, 
                                  att_loss_r2l, att_loss_u2r, agg_att_loss, def_metrics_chain: List[dict[str, any]], 
                                  att_metrics_chain: List[dict[str,any]], epoch_mse_before: list, epoch_mae_before: list, 
-                                 epoch_mse_after: list, epoch_mae_after: list):
+                                 epoch_mse_after: list, epoch_mae_after: list, sample_indices_list: list):
     """
     Updates the models of the defender and attackers and updates the loss and statistics.
 
@@ -418,6 +385,10 @@ def update_models_and_statistics(agent_defender: DefenderAgent, attackers: List[
     epoch_mae_before.append(def_metrics["mae_before"])
     epoch_mse_after.append(def_metrics["mse_after"])
     epoch_mae_after.append(def_metrics["mae_after"])
+
+    # Used samples
+    sample_indices = def_metrics["sample_indices"]
+    sample_indices_list.append(sample_indices)
 
     return def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss
 
@@ -460,7 +431,7 @@ def store_episode_results(attack_indices_list, attack_names_list, env: RLenv, ep
                           mae_before_history: list, mse_after_history: list, mae_after_history: list, def_reward_chain: list,
                           att_reward_chain: list, att_reward_chain_dos: list, att_reward_chain_probe: list, att_reward_chain_r2l: list,
                           att_reward_chain_u2r: list, def_loss_chain: list, att_loss_chain: list, att_loss_chain_dos: list,
-                          att_loss_chain_probe: list, att_loss_chain_r2l: list, att_loss_chain_u2r: list):
+                          att_loss_chain_probe: list, att_loss_chain_r2l: list, att_loss_chain_u2r: list, sample_indices_per_episode:list, sample_indices: list):
     """
     Stores the results of the current episode.
 
@@ -492,6 +463,8 @@ def store_episode_results(attack_indices_list, attack_names_list, env: RLenv, ep
     att_loss_chain_probe.append(att_loss_probe)
     att_loss_chain_r2l.append(att_loss_r2l)
     att_loss_chain_u2r.append(att_loss_u2r)
+
+    sample_indices_per_episode.append(sample_indices)
 
 def save_trained_models(agents, output_root_dir, trained_models_dir):
     """

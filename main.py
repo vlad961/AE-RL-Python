@@ -2,7 +2,7 @@ from utils.helpers import download_datasets_if_missing, move_log_files, plot_att
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
-from data.data_cls import DataCls, attack_types
+from data.data_manager import DataManager, attack_types
 from datetime import datetime
 from test import test_trained_agent_quality
 
@@ -53,19 +53,19 @@ def main(attack_type=None, file_name_suffix=""):
 
         logging.info("Creating enviroment...")
         if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
-            DataCls.format_data(kdd_train, kdd_test, formated_train_path, formated_test_path)
+            DataManager.get_formated_nsl_kdd_data(kdd_train, kdd_test, formated_train_path, formated_test_path, 'linear')
 
         if(attack_type is not None):
             if attack_type == "equally_balanced_data":
                 # Retrieve equally balanced training data (Same amount of Attack and Normal instances).
-                data_cls_instance = DataCls(dataset_type='train')
+                data_cls_instance = DataManager(dataset_type='train')
                 _, attack_names = data_cls_instance.get_balanced_samples()
             else:
                 # Retrieve training data for given attack types and existing attack instances.
-                data_cls_instance = DataCls(dataset_type='train')
+                data_cls_instance = DataManager(dataset_type='train')
                 _, attack_names = data_cls_instance.get_samples_for_attack_type(attack_type, 0)
         else:
-            attack_names = DataCls.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
+            attack_names = DataManager.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
         
         attack_valid_actions = list(range(len(attack_names)))
         attack_num_actions = len(attack_valid_actions)
@@ -78,7 +78,7 @@ def main(attack_type=None, file_name_suffix=""):
         att_hidden_layers = 5
         att_hidden_size = 100
         att_learning_rate = 0.001         #default learning_rate was hardcoded to = 0.00025 on an ADAM optimizer
-        obs_size = DataCls.calculate_obs_size(formated_train_path) # Amount of features in the dataset (columns) - attack_types
+        obs_size = DataManager.get_obs_size_nsl_kdd(formated_train_path) # Amount of features in the dataset (columns) - attack_types
         
 
         attacker_agent = AttackAgent(attack_valid_actions, obs_size, "EpsilonGreedy",

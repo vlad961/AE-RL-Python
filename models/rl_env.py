@@ -1,32 +1,25 @@
 from typing import Dict, List, Optional, Tuple
+from models.defender_agent import DefenderAgent
 import numpy as np
-import os
 import pandas as pd
-import tensorflow as tf
 
-from data.data_cls import DataCls, attack_types
+from data.data_manager import DataManager, attack_types
 from models.attack_agent import AttackAgent
 
-cwd = os.getcwd()
-data_root_dir = os.path.join(cwd, "data/datasets/")
-data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
-data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "formated_training_data.csv") # formated_train_adv.csv
-formated_test_path = os.path.join(data_formated_dir, "formated_test_data.csv") # formated_test_adv.csv
-kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
-kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
-
-class RLenv(DataCls):
-    def __init__(self, dataset_type: str, attack_agent: List[AttackAgent], trainset_path: str = kdd_train, testset_path: str = kdd_test, formated_train_path: str = formated_train_path, formated_test_path: str = formated_test_path, **kwargs):
+class RLenv():
+    def __init__(self, data_manager: DataManager, attack_agent: List[AttackAgent], defender_agent: DefenderAgent, **kwargs):
         self.true_labels = None
         self.attack_agent: List[AttackAgent] = attack_agent
-
+        self.defender = defender_agent
+        self.data_manager = data_manager
+        
+        # Train on specific attack type
         self.specific_attack_type = kwargs.get('specific_attack_type')
         data = kwargs.get('data')
-        if self.specific_attack_type is None and data is None:
-            DataCls.__init__(self, trainset_path, testset_path, formated_train_path, formated_test_path, dataset_type=dataset_type)
-            DataCls.load_formatted_df(self)
-        elif data is not None:
+        #if self.specific_attack_type is None and data is None:
+            #DataManager.__init__(self, trainset_path, testset_path, formated_train_path, formated_test_path, dataset_type=dataset_type)
+            #DataManager.load_formatted_df(self)
+        if data is not None:
             self.df: Optional[pd.DataFrame] = data.df
             self.attack_names = kwargs.get('attack_names')
             self.attack_types = data.attack_types
@@ -35,14 +28,29 @@ class RLenv(DataCls):
             self.attack_map: Dict[str, str] = data.attack_map
             self.all_attack_names = data.all_attack_names
         else:
-            raise ValueError("If 'specific_attack' is provided, 'data' must also be provided.")
+            self.attack_names = data_manager.attack_names
+            self.attack_types = data_manager.attack_types
+            self.loaded = data_manager.loaded
+            self.index = data_manager.index
+            self.attack_map: Dict[str, str] = data_manager.attack_map
+            self.all_attack_names = data_manager.all_attack_names
+            self.df: Optional[pd.DataFrame] = data_manager.df
 
 
-        self.data_shape = DataCls.get_shape(self)
+        self.data_shape = data_manager.shape
         self.batch_size = kwargs.get('batch_size', 1)  # experience replay -> batch = 1
         self.iterations_episode = kwargs.get('iterations_episode', 10)
         if self.batch_size == 'full':
             self.batch_size = int(self.data_shape[0] / self.iterations_episode)
+
+        # track the indices of the samples for a deeper analysis TODO: implement me
+        self.tracked_indices = [] 
+        self.used_indices = set()
+        self.dataset_size = self.df.shape[0]
+
+    def reset_used_indices(self):
+        self.used_indices.clear()
+
 
     def reset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
@@ -54,12 +62,12 @@ class RLenv(DataCls):
             Label: The label of the initial state.
         """
         # Statistics
-        self.def_true_labels = np.zeros(len(self.attack_types), dtype=int)
-        self.def_estimated_labels = np.zeros(len(self.attack_types), dtype=int)
-        self.att_true_labels = np.zeros(len(self.attack_types), dtype=int) # We set the true labels of attack in the range of the attack types as the defender infers the attack types.
+        self.def_true_labels: np.ndarray[int] = np.zeros(len(self.attack_types), dtype=int)
+        self.def_estimated_labels: np.ndarray[int] = np.zeros(len(self.attack_types), dtype=int)
+        self.att_true_labels: np.ndarray[int] = np.zeros(len(self.attack_types), dtype=int) # We set the true labels of attack in the range of the attack types as the defender infers the attack types.
 
-        DataCls.load_formatted_df(self)  # Reload and set a random index.
-        self.states, self.labels = DataCls.get_batch(self, self.batch_size)
+        self.data_manager.load_formatted_df() # Reload and set a random index.
+        self.states, self.labels = self.data_manager.get_batch(self.batch_size)
         self.total_reward = 0
         self.steps_in_episode = 0
 
@@ -101,7 +109,7 @@ class RLenv(DataCls):
 
         # Done allways false in this continuous task
         #self.done = np.zeros(len(attack_actions), dtype=bool)
-        self.done = np.zeros(1, dtype=bool)
+        self.done: np.array[bool] = np.zeros(1, dtype=bool) # FIXME: 4 booleans needed ?
 
         return next_states, next_labels, next_labels_names, def_reward, att_reward, next_attack_actions, self.done
 
@@ -129,8 +137,8 @@ class RLenv(DataCls):
                 raise ValueError(f"No samples found for attack '{attack_name}'. Ensure the dataset contains rows for this attack.")
             
             # Limit the size of the filtered DataFrame if it's too large
-            if len(filtered_df) > 10000:  # Example threshold
-                filtered_df = filtered_df.sample(10000)
+            #if len(filtered_df) > 100000:  # Example threshold
+            #    filtered_df = filtered_df.sample(10000)
 
             if first:
                 minibatch = filtered_df.sample(1)
@@ -144,7 +152,7 @@ class RLenv(DataCls):
         
         return states, labels, attack_name
     
-    def calculate_rewards(self, defender_actions_flat, attack) -> Tuple[np.array, List]:
+    def calculate_rewards(self, defender_actions_flat: np.ndarray, attack: np.ndarray) -> Tuple[np.array, List]:
         """
         Calculates the rewards for the defender and attackers.
 
@@ -155,12 +163,13 @@ class RLenv(DataCls):
         Returns:
             tuple: Defender reward (np.array) and attacker rewards (list).
         """
-        def_reward = (defender_actions_flat == attack) * 1 # //TODO: What type am I ? --> update method signature
-        att_reward_dos = 1 if attack[0] != defender_actions_flat[0] else 0
-        att_reward_probe = 1 if attack[1] != defender_actions_flat[1] else 0
-        att_reward_r2l = 1 if attack[2] != defender_actions_flat[2] else 0
-        att_reward_u2r = 1 if attack[3] != defender_actions_flat[3] else 0
+        def_reward = (defender_actions_flat == attack).astype(np.int32) # 1 if defender action is correct, else 0
+        att_reward_dos = np.array(1 if attack[0] != defender_actions_flat[0] else 0, dtype=np.int32)
+        att_reward_probe = np.array(1 if attack[1] != defender_actions_flat[1] else 0, dtype=np.int32)
+        att_reward_r2l = np.array(1 if attack[2] != defender_actions_flat[2] else 0, dtype=np.int32)
+        att_reward_u2r = np.array(1 if attack[3] != defender_actions_flat[3] else 0, dtype=np.int32)
         att_reward = [att_reward_dos, att_reward_probe, att_reward_r2l, att_reward_u2r]
+        att_reward = np.array(att_reward, dtype=np.int32)
         
         return def_reward, att_reward
 
