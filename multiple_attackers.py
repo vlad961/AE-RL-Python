@@ -49,7 +49,7 @@ def main(attack_type=None, file_name_suffix=""):
         minibatch_size = 100 # batch of memory ExpRep
         experience_replay = True
         iterations_episode = 100
-        num_episodes = 10 # //FIXME: 100 after validate correct running
+        num_episodes = 100
  
         logging.info("Setting up Attacker and Defender Agents...")
 
