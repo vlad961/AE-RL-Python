@@ -1,7 +1,9 @@
+import gc
 import numpy as np
 from models.q_network import QNetwork
 from models.replay_memory import ReplayMemory
 from models.epsilon_greedy import EpsilonGreedy
+import tensorflow as tf
 from utils.config import GLOBAL_RNG
 
 class Agent(object):
@@ -74,26 +76,31 @@ class Agent(object):
             actions = self.actions.to_numpy(dtype=np.int32)
             done = self.done.to_numpy(dtype=np.bool_)
 
-        next_actions = []
+        states_tf = tf.convert_to_tensor(states, dtype=tf.float32)
+        next_states_tf = tf.convert_to_tensor(next_states, dtype=tf.float32)
+
         # Compute Q targets
-        Q_prime = self.target_model_network.predict(next_states, self.minibatch_size)
+        q_prime = self.target_model_network.predict(next_states_tf).numpy() #q_prime = self.target_model_network.predict(next_states_tf, self.minibatch_size)
+        Q = self.model_network.predict(states_tf).numpy() #Q = self.model_network.predict(states_tf, self.minibatch_size)
+        
         # TODO: fix performance in this loop
-        for row in range(Q_prime.shape[0]):
-            best_next_actions = np.argwhere(Q_prime[row] == np.amax(Q_prime[row]))
+        next_actions = []
+        for row in range(q_prime.shape[0]):
+            best_next_actions = np.argwhere(q_prime[row] == np.amax(q_prime[row]))
             next_actions.append(best_next_actions[GLOBAL_RNG.choice(len(best_next_actions))].item())
         sx = np.arange(len(next_actions))
         # Compute Q(s,a)
         # Map actions to indices of the Q values
         mapped_actions = np.array([self.action_to_index[action] for action in actions])
-        Q = self.model_network.predict(states, self.minibatch_size)
         # Q-learning update
         # target = reward + gamma * max_a'{Q(next_state,next_action)}
         targets = rewards.reshape(Q[sx, mapped_actions].shape) + \
                   self.gamma * Q[sx, next_actions] * \
                   (1 - done.reshape(Q[sx, mapped_actions].shape)) # if done (episode has ended), no update
-        Q[sx, mapped_actions] = targets
-
-        result = self.model_network.model.train_on_batch(states, Q)  # inputs,targets
+        q_updated = Q
+        q_updated[sx, mapped_actions] = targets
+        
+        result = self.model_network.model.train_on_batch(states_tf, q_updated)  # inputs,targets
         mse_before_update = result[1]  # implicit (TensorFlow)
         mae_before_update = result[2]  # implicit (TensorFlow)
         # explicit calculation of MSE and MAE after update
@@ -107,6 +114,10 @@ class Agent(object):
             self.ddqn_update = self.ddqn_time
             #            self.target_model_network.model = QNetwork.copy_model(self.model_network.model)
             self.target_model_network.model.set_weights(self.model_network.model.get_weights())
+
+        # FIXME: still needed ?
+        #del states_tf, next_states_tf, q_prime, Q, q_updated
+        #gc.collect()
 
         return {"result": result, "loss": loss, "mse_before": mse_before_update, "mae_before": mae_before_update , "sample_indices": indices}
 

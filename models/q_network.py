@@ -7,10 +7,6 @@ from tensorflow.python.keras.optimizer_v2.adam import Adam
 from utils.config import TEMPORARY_MODEL_PATH
 # FIXME: --> change to tf.keras.* check whether the code still works, maybe performance improves. Remove the import of the old keras library.
 
-
-cwd = os.getcwd()
-models_dir = os.path.join(cwd, "models/trained-models/")
-
 class QNetwork():
     """
     Q-Network Estimator
@@ -47,6 +43,10 @@ class QNetwork():
         Predicts action values.
         """
         return self.model.predict(state, batch_size=batch_size)
+    
+    @tf.function
+    def predict(self, state):
+        return self.model(state, training=False)
 
     @staticmethod
     def copy_model(model: Sequential) -> Sequential:

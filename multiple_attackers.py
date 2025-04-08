@@ -14,6 +14,8 @@ import time
 import os, sys
 import tensorflow as tf
 
+import gc
+
 """
 This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
 
@@ -30,7 +32,9 @@ def main(attack_type=None, file_name_suffix=""):
     # TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
     try:
         physical_devices = tf.config.list_physical_devices('GPU')
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+        if physical_devices:
+            tf.config.experimental.set_memory_growth(physical_devices[0], True)
+            #tf.debugging.set_log_device_placement(True)
     except tf.errors.InvalidArgumentError:
         print("Invalid device or cannot modify virtual devices once initialized.")
         print("Exiting the script early...")
@@ -267,6 +271,7 @@ def main(attack_type=None, file_name_suffix=""):
                        "att_loss_u2r": att_loss_u2r, "att_total_reward_by_episode_u2r": att_total_reward_by_episode_u2r}
 
             print_end_of_epoch_info(episode_info, metrics, env)
+            gc.collect()
 
         # Save the trained models
         agents = {"dos": agent_dos, "probe": agent_probe, "r2l": agent_r2l,"u2r": agent_u2r, "defender": agent_defender}

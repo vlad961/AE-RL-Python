@@ -59,13 +59,14 @@ class EpsilonGreedy(Policy):
             # Get Q values
             ######
             states_tensor = tf.convert_to_tensor(states, dtype=tf.float32)
-            self.Q = self.estimator.predict(states_tensor, states_tensor.shape[0])  #states.shape[0]
-            ##### inserted in predict method
+            q_tensor = self.estimator.predict(states_tensor)  #states.shape[0]  states_tensor.shape[0]
+            q_values = q_tensor.numpy()
+
             actions: List[int] = []
-            for row in range(self.Q.shape[0]):
-                best_actions = np.argwhere(self.Q[row] == np.amax(self.Q[row])).astype(np.int16)
+            for row in q_values:
+                best_actions = np.argwhere(row == np.amax(row)).astype(np.int16)
                 best_action_index = best_actions[GLOBAL_RNG.choice(len(best_actions))].item()
-                actions.append(list(self.actions)[best_action_index])
+                actions.append(self.actions[best_action_index])
 
         self.step_counter += 1
         # decay epsilon after each episode
