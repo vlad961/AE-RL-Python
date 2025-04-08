@@ -1,9 +1,9 @@
 import os
 import tensorflow as tf
-from tensorflow.python.keras.losses import Huber
-from tensorflow.python.keras.layers import Dense, InputLayer
-from tensorflow.python.keras import Sequential
-from tensorflow.python.keras.optimizer_v2.adam import Adam
+from tensorflow.keras.losses import Huber
+from tensorflow.keras.layers import Dense, InputLayer
+from tensorflow.keras import Sequential
+from tensorflow.keras.optimizers import Adam
 from utils.config import TEMPORARY_MODEL_PATH
 # FIXME: --> change to tf.keras.* check whether the code still works, maybe performance improves. Remove the import of the old keras library.
 

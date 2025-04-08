@@ -6,6 +6,7 @@ import tensorflow as tf
 import time
 
 from data.data_manager import DataManager
+from utils.config import NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN
 from utils.helpers import calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
 from utils.plotting import plot_confusion_matrix
 
@@ -16,14 +17,13 @@ def test_trained_agent_quality(path_to_model, plots_path):
     logging.info(f"Model summary:\n{get_model_summary(model)}")
 
     # Define environment, game, make sure the batch_size is the same in train
-    test_data = DataManager(dataset_type='test')
+    test_data = DataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='test')
 
     total_reward = 0
     true_labels = np.zeros(len(test_data.attack_types),dtype=int)
     predicted_labels = np.zeros(len(test_data.attack_types),dtype=int)
     predicted_correct_labels = np.zeros(len(test_data.attack_types),dtype=int)
 
-    #states , labels = env.get_sequential_batch(test_path,batch_size = env.batch_size)
     states, labels = test_data.get_full() # get test data and true labels.
 
     start_time=time.time()

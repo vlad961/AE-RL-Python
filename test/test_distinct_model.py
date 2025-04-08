@@ -8,9 +8,9 @@ from test_multiple_agents import test_trained_agent_quality
 from datetime import datetime
 from data.data_manager import nsl_kdd_attack_map
 
-defender_model_path = os.path.join(CWD, "models/trained-models/2025-04-07-12-44-WIN-multiple-attackers-balanced-data-att-5L-def-3L-lr-0.001/defender_model.keras")
-plots_path = os.path.join(CWD, "models/trained-models/2025-04-07-12-44-WIN-multiple-attackers-balanced-data-att-5L-def-3L-lr-0.001/plots/")
-destination_log_path = os.path.join(CWD, "models/trained-models/2025-04-07-12-44-WIN-multiple-attackers-balanced-data-att-5L-def-3L-lr-0.001/logs/")
+defender_model_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/defender_model.keras")
+plots_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/plots/")
+destination_log_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/logs/")
 
 if __name__ == "__main__":
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -31,8 +31,8 @@ if __name__ == "__main__":
     attacks_mapped_to_att_type_list = debug_info["attacks_mapped_to_att_type_list"]
     mse_before_history = debug_info["mse_before_history"]
     mae_before_history = debug_info["mae_before_history"]
-    mse_after_history = debug_info["mse_after_history"]
-    mae_after_history = debug_info["mae_after_history"]
+    #mse_after_history = debug_info["mse_after_history"]
+    #mae_after_history = debug_info["mae_after_history"]
     agents = debug_info["agents"]
     attack_id_to_index = debug_info["attack_id_to_index"]
     attack_id_to_type = debug_info["attack_id_to_type"]
@@ -57,18 +57,20 @@ if __name__ == "__main__":
         plots_path
     )
 
-    plot_trend_lines_multiple_agents(rewards, losses, ["Defender", "Attacker: DoS", "Attacker: Probe", "Attacker: R2L", "Attacker: U2R"], plots_path)
+    rewards_list = [rewards["defender"], rewards["dos"], rewards["probe"], rewards["r2l"], rewards["u2r"]]
+    losses_list = [losses["defender"], losses["dos"], losses["probe"], losses["r2l"], losses["u2r"]]
+    plot_trend_lines_multiple_agents(rewards_list, losses_list, ["Defender", "Attacker: DoS", "Attacker: Probe", "Attacker: R2L", "Attacker: U2R"], plots_path)
 
     attack_id_to_index = create_attack_id_to_index_mapping(nsl_kdd_attack_map, attack_names)
     num_attacks = len(attack_names)
     transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
     plot_attack_distribution_for_each_attacker(transformed_attacks, attack_names, plots_path, ['Attacker DoS', 'Attacker Probe', 'Attacker R2L', 'Attacker U2R'])
-    plot_rewards_losses_boxplot(rewards, losses, ["Defender", "Attacker: DoS", "Attacker: Probe", "Attacker: R2L", "Attacker: U2R"], plots_path)# FIXME: überprüfe ob Logik korrekt ist. 
+    plot_rewards_losses_boxplot(rewards_list, losses_list, ["Defender", "Attacker: DoS", "Attacker: Probe", "Attacker: R2L", "Attacker: U2R"], plots_path)# FIXME: überprüfe ob Logik korrekt ist. 
     plot_training_error(
         mse_before_history, 
         mae_before_history, 
-        mse_after_history, 
-        mae_after_history, 
+        #mse_after_history, 
+        #mae_after_history, 
         save_path=plots_path
     )
 

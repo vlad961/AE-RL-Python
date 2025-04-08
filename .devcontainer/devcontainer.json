@@ -1,0 +1,28 @@
+{
+    "name": "TensorFlow GPU Container",
+    "image": "nvcr.io/nvidia/tensorflow:25.02-tf2-py3",
+    "runArgs": [
+      "--gpus", "all",
+      "--ipc=host",
+      "--ulimit", "memlock=-1",
+      "--ulimit", "stack=67108864"
+    ],
+    "postCreateCommand": "pip install --no-cache-dir matplotlib seaborn pandas && git config --global user.name 'Vladislav Sehtman (Linux)' && git config --global user.email 'vlad96@hotmail.de' && git config --global --add safe.directory /workspace && git remote set-url origin git@github.com:vlad961/AE-RL-Python.git",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-python.python",
+          "sonarsource.sonarlint-vscode",
+          "eamodio.gitlens"
+        ]
+      }
+    },
+    "workspaceFolder": "/workspace", 
+    "mounts": [
+      "source=${localWorkspaceFolder},target=/workspace,type=bind",
+      "source=${env:HOME}/.ssh,target=/root/.ssh,type=bind"
+    ],
+    "remoteEnv": {
+      "GIT_SSH_COMMAND": "ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=no"
+  }
+}

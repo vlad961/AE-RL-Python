@@ -160,7 +160,7 @@ def main(attack_type=None, file_name_suffix=""):
                                         gamma=def_gamma,
                                         hidden_size=def_hidden_size,
                                         hidden_layers=def_hidden_layers,
-                                        minibatch_size=200, # //TODO: auf 400 setzen, da 4 agenten?
+                                        minibatch_size=400, # //TODO: auf 400 setzen, da 4 agenten?
                                         mem_size=4000,
                                         learning_rate=def_learning_rate,
                                         ExpRep=experience_replay,
