@@ -23,17 +23,18 @@ The original project can be found at: https://github.com/gcamfer/Anomaly-Reactio
 To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipynb' https://github.com/gcamfer/Anomaly-ReactionRL/blob/master/Notebooks/AE_RL_NSL_KDD.ipynb
 """
 
-# TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
-try:
-  physical_devices = tf.config.list_physical_devices('GPU')
-  tf.config.experimental.set_memory_growth(physical_devices[0], False) # TODO: set to True for memory growth
-except tf.errors.InvalidArgumentError:
-  print("Invalid device or cannot modify virtual devices once initialized.")
-  print("Exiting the script early...")
-  sys.exit(0)  # Exit with code 0 (success)
+
 
 
 def main(attack_type=None, file_name_suffix=""):
+    # TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
+    try:
+        physical_devices = tf.config.list_physical_devices('GPU')
+        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    except tf.errors.InvalidArgumentError:
+        print("Invalid device or cannot modify virtual devices once initialized.")
+        print("Exiting the script early...")
+        sys.exit(0)  # Exit with code 0 (success)
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
     output_root_dir = f"{timestamp_begin}{file_name_suffix}"
     plots_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/plots/")
@@ -176,7 +177,6 @@ def main(attack_type=None, file_name_suffix=""):
         def_loss_chain = []
         def_metrics_chain, att_metrics_chain = [], []
         mse_before_history, mae_before_history = [], []
-        mse_after_history, mae_after_history = [], []
         
         # Main loops
         attack_indices_per_episode, attack_names_per_episode = [], []
@@ -186,7 +186,6 @@ def main(attack_type=None, file_name_suffix=""):
         for episode in range(num_episodes):
             epoch_start_time = time.time()
             epoch_mse_before, epoch_mae_before = [], []
-            epoch_mse_after, epoch_mae_after = [], []
 
             # Attack and defense losses
             att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r = 0.0, 0.0, 0.0, 0.0
@@ -232,7 +231,7 @@ def main(attack_type=None, file_name_suffix=""):
                     
                     def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss = update_models_and_statistics(
                             agent_defender, attackers, def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss, def_metrics_chain, 
-                            att_metrics_chain, epoch_mse_before, epoch_mae_before, epoch_mse_after, epoch_mae_after, sample_indices_list)
+                            att_metrics_chain, epoch_mse_before, epoch_mae_before, sample_indices_list)
 
                 # Update the environment for the next iteration
                 states = next_states
@@ -248,12 +247,12 @@ def main(attack_type=None, file_name_suffix=""):
 
             # Store episode results
             store_episode_results(attack_indices_list, attack_names_list, env, epoch_mse_before, epoch_mae_before,
-                                epoch_mse_after, epoch_mae_after, def_total_reward_by_episode, att_total_reward_by_episode,
+                                def_total_reward_by_episode, att_total_reward_by_episode,
                                 att_total_reward_by_episode_dos, att_total_reward_by_episode_probe,
                                 att_total_reward_by_episode_r2l, att_total_reward_by_episode_u2r, def_loss, agg_att_loss,
                                 att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, attack_indices_per_episode,
                                 attack_names_per_episode, attacks_mapped_to_att_type_list, mse_before_history,
-                                mae_before_history, mse_after_history, mae_after_history, def_reward_chain,
+                                mae_before_history, def_reward_chain,
                                 att_reward_chain, att_reward_chain_dos, att_reward_chain_probe, att_reward_chain_r2l,
                                 att_reward_chain_u2r, def_loss_chain, att_loss_chain, att_loss_chain_dos,
                                 att_loss_chain_probe, att_loss_chain_r2l, att_loss_chain_u2r, sample_indices_per_episode, sample_indices_list)
@@ -299,8 +298,6 @@ def main(attack_type=None, file_name_suffix=""):
             "attacks_mapped_to_att_type_list": attacks_mapped_to_att_type_list,
             "mse_before_history": mse_before_history,
             "mae_before_history": mae_before_history,
-            "mse_after_history": mse_after_history,
-            "mae_after_history": mae_after_history,
             "agents": {
                 "defender": agent_defender.name,
                 "dos": agent_dos.name,
@@ -341,7 +338,7 @@ def main(attack_type=None, file_name_suffix=""):
         plot_mapped_attack_distribution_for_each_attacker(transformed_attacks_by_type, ['Normal','Dos','Probe','R2L', 'U2R'], plots_path, ['Attacker DoS', 'Attacker Probe', 'Attacker R2L', 'Attacker U2R'])
         plot_rewards_losses_boxplot(rewards, losses, [agent_defender.name, agent_dos.name, agent_probe.name, agent_r2l.name, agent_u2r.name], plots_path)# FIXME: überprüfe ob Logik korrekt ist. 
         # Nutze die Funktion nach Abschluss deines Trainings:
-        plot_training_error(mse_before_history, mae_before_history, mse_after_history, mae_after_history, save_path=plots_path)
+        plot_training_error(mse_before_history, mae_before_history, save_path=plots_path)
         
         defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
         test_trained_agent_quality(defender_model_path, plots_path)
@@ -351,7 +348,7 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    main(file_name_suffix="-WIN-multiple-attackers-balanced-data-att-5L-def-3L-lr-0.001")
+    main(file_name_suffix="-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001")
     #main("U2R", file_name_suffix="-WIN-only-DoS")
     #main("equally_balanced_data", file_name_suffix="-WIN-equally-balanced-data")
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)

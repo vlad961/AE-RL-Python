@@ -97,8 +97,8 @@ class Agent(object):
         mse_before_update = result[1]  # implicit (TensorFlow)
         mae_before_update = result[2]  # implicit (TensorFlow)
         # explicit calculation of MSE and MAE after update
-        mse_after_update = np.mean((Q - self.model_network.model.predict(states))**2)
-        mae_after_update = np.mean(np.abs(Q - self.model_network.model.predict(states)))
+        #mse_after_update = np.mean((Q - self.model_network.model.predict(states))**2)
+        #mae_after_update = np.mean(np.abs(Q - self.model_network.model.predict(states)))
         loss = result[0]
         
         # timer to ddqn update
@@ -108,8 +108,7 @@ class Agent(object):
             #            self.target_model_network.model = QNetwork.copy_model(self.model_network.model)
             self.target_model_network.model.set_weights(self.model_network.model.get_weights())
 
-        return {"result": result, "loss": loss, "mse_before": mse_before_update, "mae_before": mae_before_update , "mse_after": mse_after_update, 
-                "mae_after": mae_after_update, "sample_indices": indices}
+        return {"result": result, "loss": loss, "mse_before": mse_before_update, "mae_before": mae_before_update , "sample_indices": indices}
 
     def act(self, state): # NOTE: In comparison to original code, the policy parameter was deleted since it is already defined in the constructor 
         raise NotImplementedError

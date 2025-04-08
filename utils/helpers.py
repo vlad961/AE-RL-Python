@@ -343,8 +343,7 @@ def store_experience(agents: List[Agent], states: List[pd.DataFrame], actions: L
 
 def update_models_and_statistics(agent_defender: DefenderAgent, attackers: List[AttackAgent], def_loss, att_loss_dos, att_loss_probe, 
                                  att_loss_r2l, att_loss_u2r, agg_att_loss, def_metrics_chain: List[dict[str, any]], 
-                                 att_metrics_chain: List[dict[str,any]], epoch_mse_before: list, epoch_mae_before: list, 
-                                 epoch_mse_after: list, epoch_mae_after: list, sample_indices_list: list):
+                                 att_metrics_chain: List[dict[str,any]], epoch_mse_before: list, epoch_mae_before: list, sample_indices_list: list):
     """
     Updates the models of the defender and attackers and updates the loss and statistics.
 
@@ -383,8 +382,6 @@ def update_models_and_statistics(agent_defender: DefenderAgent, attackers: List[
     att_metrics_chain.extend([att_metrics_dos, att_metrics_probe, att_metrics_r2l, att_metrics_u2r])
     epoch_mse_before.append(def_metrics["mse_before"])
     epoch_mae_before.append(def_metrics["mae_before"])
-    epoch_mse_after.append(def_metrics["mse_after"])
-    epoch_mae_after.append(def_metrics["mae_after"])
 
     # Used samples
     sample_indices = def_metrics["sample_indices"]
@@ -423,12 +420,12 @@ def update_episode_statistics(def_reward, att_reward, def_total_reward_by_episod
 
 
 def store_episode_results(attack_indices_list, attack_names_list, env: RLenv, epoch_mse_before, epoch_mae_before,
-                          epoch_mse_after, epoch_mae_after, def_total_reward_by_episode, att_total_reward_by_episode,
+                          def_total_reward_by_episode, att_total_reward_by_episode,
                           att_total_reward_by_episode_dos, att_total_reward_by_episode_probe,
                           att_total_reward_by_episode_r2l, att_total_reward_by_episode_u2r, def_loss, agg_att_loss,
                           att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, attack_indices_per_episode: list,
                           attack_names_per_episode: list, attacks_mapped_to_att_type_list: list, mse_before_history: list,
-                          mae_before_history: list, mse_after_history: list, mae_after_history: list, def_reward_chain: list,
+                          mae_before_history: list, def_reward_chain: list,
                           att_reward_chain: list, att_reward_chain_dos: list, att_reward_chain_probe: list, att_reward_chain_r2l: list,
                           att_reward_chain_u2r: list, def_loss_chain: list, att_loss_chain: list, att_loss_chain_dos: list,
                           att_loss_chain_probe: list, att_loss_chain_r2l: list, att_loss_chain_u2r: list, sample_indices_per_episode:list, sample_indices: list):
@@ -444,11 +441,9 @@ def store_episode_results(attack_indices_list, attack_names_list, env: RLenv, ep
     attack_indices_per_episode.append(attack_indices_list)
     attack_names_per_episode.append(attack_names_list)
     attacks_mapped_to_att_type_list.append(env.att_true_labels)
-    if epoch_mae_after:
+    if epoch_mse_before:
         mse_before_history.append(np.mean(epoch_mse_before))
         mae_before_history.append(np.mean(epoch_mae_before))
-        mse_after_history.append(np.mean(epoch_mse_after))
-        mae_after_history.append(np.mean(epoch_mae_after))
 
     def_reward_chain.append(def_total_reward_by_episode)
     att_reward_chain.append(att_total_reward_by_episode)

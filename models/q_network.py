@@ -48,20 +48,6 @@ class QNetwork():
         """
         return self.model.predict(state, batch_size=batch_size)
 
-    def update(self, states, q):
-        """
-        Updates the estimator with the targets.
-
-        Args:
-          states: Target states
-          q: Estimated values
-
-        Returns:
-          The calculated loss on the batch.
-        """
-        loss = self.model.train_on_batch(states, q)
-        return loss
-
     @staticmethod
     def copy_model(model: Sequential) -> Sequential:
         """Returns a copy of a keras model."""

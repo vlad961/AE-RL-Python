@@ -495,7 +495,7 @@ def plot_training_metrics(history, save_path=None):
         plt.savefig(f"{save_path}/mae_ueber_episoden.png")
     plt.close()
 
-def plot_training_error(mse_before, mae_before, mse_after, mae_after, save_path=None):
+def plot_training_error(mse_before, mae_before, save_path=None):
     epochs = range(1, len(mse_before) + 1)
 
     plt.figure(figsize=(14, 7))
@@ -503,20 +503,18 @@ def plot_training_error(mse_before, mae_before, mse_after, mae_after, save_path=
     # Plot für MSE
     plt.subplot(1, 2, 1)
     plt.plot(epochs, mse_before, label='MSE before Update (implicit)', marker='o')
-    plt.plot(epochs, mse_after, label='MSE after Update (explicit)', marker='x', linestyle='--')
     plt.xlabel('Episode')
     plt.ylabel('MSE')
-    plt.title('MSE-Trend before and after Update')
+    plt.title('MSE-Trend')
     plt.grid(True)
     plt.legend()
 
     # Plot für MAE
     plt.subplot(1, 2, 2)
     plt.plot(epochs, mae_before, label='MAE before Update (implicit)', marker='o')
-    plt.plot(epochs, mae_after, label='MAE after Update (explicit)', marker='x', linestyle='--')
     plt.xlabel('Episode')
     plt.ylabel('MAE')
-    plt.title('MAE-Trend before and after Update')
+    plt.title('MAE-Trend')
     plt.grid(True)
     plt.legend()
 

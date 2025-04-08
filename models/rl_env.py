@@ -137,8 +137,8 @@ class RLenv():
                 raise ValueError(f"No samples found for attack '{attack_name}'. Ensure the dataset contains rows for this attack.")
             
             # Limit the size of the filtered DataFrame if it's too large
-            #if len(filtered_df) > 100000:  # Example threshold
-            #    filtered_df = filtered_df.sample(10000)
+            if len(filtered_df) > 20000:  # Example threshold
+                filtered_df = filtered_df.sample(10000)
 
             if first:
                 minibatch = filtered_df.sample(1)
