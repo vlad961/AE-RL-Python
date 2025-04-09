@@ -1,6 +1,0 @@
-data/datasets/formated/formated_test_adv.data filter=lfs diff=lfs merge=lfs -text
-data/datasets/formated/formated_train_adv.data filter=lfs diff=lfs merge=lfs -text
-data/datasets/formated/formated_test_adv.csv filter=lfs diff=lfs merge=lfs -text
-data/datasets/formated/formated_train_adv.csv filter=lfs diff=lfs merge=lfs -text
-*.data filter=lfs diff=lfs merge=lfs -text
-*.csv filter=lfs diff=lfs merge=lfs -text
