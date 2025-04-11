@@ -121,6 +121,11 @@ I have reused the script of M.Verkeren et. al [Repository](https://gitlab.ilabt.
    choco install awscli
    ```
 
+   Example for Ubuntu:
+   ```sh
+   snap install aws-cli --classic
+   ```
+
    Verify the installation:
    ```sh
    aws --version
@@ -130,8 +135,8 @@ I have reused the script of M.Verkeren et. al [Repository](https://gitlab.ilabt.
    Download the data to `data/datasets/cse-cic-ids-2018/data/`
    Adjust the following example with a corresponding region for your instance:
    ```sh
-   mkdir -p data/datasets/cse-cic-ids-2018
-   cd data/datasets/cse-cic-ids-2018
+   mkdir -p data/datasets/cse-cic-ids-2018/data/
+   cd data/datasets/cse-cic-ids-2018/data/
    aws s3 sync --no-sign-request --region eu-central-1 "s3://cse-cic-ids2018/Processed Traffic Data for ML Algorithms/" .
    ```
 
