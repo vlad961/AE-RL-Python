@@ -103,3 +103,42 @@ contains plain datasets aswell as the formated one.
 
 ## Models
  contains the trained models as well as corresponding test results.
+
+## To-Do: Download CSE-CIC-IDS-2018 Data
+If you want to replicate the experiments for the CSE-CIC-IDS-2018 Data, the data needs to be downloaded first and then preprocessed.
+I have reused the script of M.Verkeren et. al [Repository](https://gitlab.ilabt.imec.be/mverkerk/cic-ids-2018/-/blob/master/notebooks/generate_cleaned_data.py?ref_type=heads) with only adjusting the file structure for my repository.
+1. **Install the AWS CLI**  
+   Follow the official guide to install the AWS CLI:  
+   [AWS CLI Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+
+   Example for macOS:
+   ```sh
+   brew install awscli
+   ```
+
+   Example for Windows:
+   ```sh
+   choco install awscli
+   ```
+
+   Verify the installation:
+   ```sh
+   aws --version
+   ```
+
+2. **Download the data**  
+   Download the data to `data/datasets/cse-cic-ids-2018/data/`
+   Adjust the following example with a corresponding region for your instance:
+   ```sh
+   mkdir -p data/datasets/cse-cic-ids-2018
+   cd data/datasets/cse-cic-ids-2018
+   aws s3 sync --no-sign-request --region eu-central-1 "s3://cse-cic-ids2018/Processed Traffic Data for ML Algorithms/" .
+   ```
+
+3. **Verify the data**  
+   Ensure the data has been successfully downloaded:
+   ```sh
+   ls data/datasets/cse-cic-ids-2018/data/
+   ```
+
+4. **Clean the data by running the [`generate_cleaned_data.py`](./data/datasets/cse-cic-ids-2018/generate_cleaned_data.py) script to preprocess the data.
