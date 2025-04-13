@@ -104,9 +104,15 @@ contains plain datasets aswell as the formated one.
 ## Models
  contains the trained models as well as corresponding test results.
 
-## To-Do: Download CSE-CIC-IDS-2018 Data
-If you want to replicate the experiments for the CSE-CIC-IDS-2018 Data, the data needs to be downloaded first and then preprocessed.
-I have reused the script of M.Verkeren et. al [Repository](https://gitlab.ilabt.imec.be/mverkerk/cic-ids-2018/-/blob/master/notebooks/generate_cleaned_data.py?ref_type=heads) with only adjusting the file structure for my repository.
+
+# Get CIC Datasets
+To replicate the experiments, download both CIC-Datasets and preprocess them.
+I have reused the script of M.Verkeren et. al [Repository](https://gitlab.ilabt.imec.be/mverkerk/ids-dataset-cleaning/-/blob/master/data_cleaning.py?ref_type=heads) with only adjusting the file structure for my repository.
+
+## Download CIC-IDS-2017 Data
+Download [CIC-IDS-2017-Data](http://cicresearch.ca/CICDataset/CIC-IDS-2017/Dataset/) unpack GeneratedLabelledFlows.zip.
+Save the unpacked directory into `<root>/data/cic-ids/cic-ids-2017/original/`.
+## Download CSE-CIC-IDS-2018 Data
 1. **Install the AWS CLI**  
    Follow the official guide to install the AWS CLI:  
    [AWS CLI Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
@@ -132,18 +138,19 @@ I have reused the script of M.Verkeren et. al [Repository](https://gitlab.ilabt.
    ```
 
 2. **Download the data**  
-   Download the data to `data/datasets/cse-cic-ids-2018/data/`
+   Download the data to `<root>/data/datasets/cic-ids/cse-cic-ids-2018/original/`
    Adjust the following example with a corresponding region for your instance:
    ```sh
-   mkdir -p data/datasets/cse-cic-ids-2018/data/
-   cd data/datasets/cse-cic-ids-2018/data/
+   mkdir -p data/datasets/cic-ids/cse-cic-ids-2018/original/
+   cd data/datasets/cic-ids/cse-cic-ids-2018/original/
    aws s3 sync --no-sign-request --region eu-central-1 "s3://cse-cic-ids2018/Processed Traffic Data for ML Algorithms/" .
    ```
 
 3. **Verify the data**  
    Ensure the data has been successfully downloaded:
    ```sh
-   ls data/datasets/cse-cic-ids-2018/data/
+   ls data/datasets/cic-ids/cse-cic-ids-2018/original/
    ```
 
-4. **Clean the data by running the [`generate_cleaned_data.py`](./data/datasets/cse-cic-ids-2018/generate_cleaned_data.py) script to preprocess the data.
+4. **Clean the data** 
+ Clean the data by running the[`generate_cleaned_data.py`](./data/datasets/cic-ids/generate_cleaned_data.py) script to preprocess the data. Hint: This might take some time.
