@@ -71,6 +71,16 @@ def print_end_of_epoch_info(episode_info: dict, metrics: dict, env) -> None:
         f"|Def Estimated: {env.def_estimated_labels}| Att Labels: {env.att_true_labels}|\r\n"
         f"|Def Amount of true predicted attacks: {env.def_true_labels}|"
     )
+
+def print_end_of_epoch_info_cic(episode_info: dict, metrics: dict, env) -> None:
+    logging.info(
+        f"End of Episode.\r\n|Episode {episode_info['episode']:03d}/{episode_info['num_episodes']:03d}| "
+        f"time: {(episode_info['end_time'] - episode_info['epoch_start_time']):2.2f}|\r\n"
+        f"|Def Loss {metrics['def_loss']:4.4f} | Def Reward in ep {metrics['def_total_reward_by_episode']:03d}|\r\n"
+        f"|Att Loss {metrics['att_loss']:4.4f} | Att Reward in ep {metrics['att_total_reward_by_episode']:03d}|\r\n"
+        f"|Def Estimated: {env.def_estimated_labels}| Att Labels: {env.att_true_labels}|\r\n"
+        f"|Def Amount of true predicted attacks: {env.def_true_labels}|"
+    )
     
 def save_debug_info(output_dir, **kwargs):
     """Saves all relevant variables to a JSON file for debugging."""

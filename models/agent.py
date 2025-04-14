@@ -50,7 +50,7 @@ class Agent(object):
         if policy == "EpsilonGreedy":
             self.policy = EpsilonGreedy(self.model_network, actions,
                                          self.epsilon, self.min_epsilon,
-                                         self.decay_rate, self.epoch_length, self)
+                                         self.decay_rate, self.epoch_length, self, multiple_attacker=kwargs.get('multiple_attacker', False), amount_attackers=kwargs.get('amount_attackers', 1))
 
     def learn(self, states, actions, next_states, rewards, done):
         """

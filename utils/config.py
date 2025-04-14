@@ -14,3 +14,23 @@ ORIGINAL_KDD_TRAIN = os.path.join(NSL_KDD_ORIGINAL_DIR, "KDDTrain+.txt")
 ORIGINAL_KDD_TEST = os.path.join(NSL_KDD_ORIGINAL_DIR, "KDDTest+.txt")
 TRAINED_MODELS_DIR = os.path.join(CWD, "models/trained-models/")
 TEMPORARY_MODEL_PATH = os.path.join(TRAINED_MODELS_DIR, "tmp_model.keras")
+
+
+# CICIDS 2017
+CICIDS_2017_DIR = os.path.join(DATA_ROOT_DIR, "cic_ids/cic-ids-2017/")
+CICIDS_2017_CLEAN_DIR = os.path.join(CICIDS_2017_DIR, "clean/")
+CICIDS_2017_CLEAN_ALL_DATA = os.path.join(CICIDS_2017_CLEAN_DIR, "all_data.feather")
+CICIDS_2017_CLEAN_ALL_MALICIOUS = os.path.join(CICIDS_2017_CLEAN_DIR, "all_malicious.feather")
+CICIDS_2017_CLEAN_ALL_BENIGN = os.path.join(CICIDS_2017_CLEAN_DIR, "all_benign.feather")
+CICIDS_2017_CLEAN_ALL_DATA_CSV = os.path.join(CICIDS_2017_CLEAN_DIR, "all_data.csv")
+CICIDS_2017_CLEAN_ALL_MALICIOUS_CSV = os.path.join(CICIDS_2017_CLEAN_DIR, "all_malicious.csv")
+CICIDS_2017_CLEAN_ALL_BENIGN_CSV = os.path.join(CICIDS_2017_CLEAN_DIR, "all_benign.csv")
+# CICIDS 2018
+CICIDS_2018_DIR = os.path.join(DATA_ROOT_DIR, "cic_ids/cse-cic-ids-2018/")
+CICIDS_2018_CLEAN_DIR = os.path.join(CICIDS_2018_DIR, "clean/")
+CICIDS_2018_CLEAN_ALL_DATA = os.path.join(CICIDS_2018_CLEAN_DIR, "all_data.feather")
+CICIDS_2018_CLEAN_ALL_MALICIOUS = os.path.join(CICIDS_2018_CLEAN_DIR, "all_malicious.feather")
+CICIDS_2018_CLEAN_ALL_BENIGN = os.path.join(CICIDS_2018_CLEAN_DIR, "all_benign.feather")
+CICIDS_2018_CLEAN_ALL_DATA_CSV = os.path.join(CICIDS_2018_CLEAN_DIR, "all_data.csv")
+CICIDS_2018_CLEAN_ALL_MALICIOUS_CSV = os.path.join(CICIDS_2018_CLEAN_DIR, "all_malicious.csv")
+CICIDS_2018_CLEAN_ALL_BENIGN_CSV = os.path.join(CICIDS_2018_CLEAN_DIR, "all_benign.csv")

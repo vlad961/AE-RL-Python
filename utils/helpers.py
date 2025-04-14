@@ -272,11 +272,8 @@ def get_defender_actions(agent_defender: AttackAgent, states: List[pd.DataFrame]
         list: List of defender action(s) for each attack type.
         The order is: DoS, Probe, R2L, U2R.
     """
-    defender_actions_dos = agent_defender.act(states[0])
-    defender_actions_probe = agent_defender.act(states[1])
-    defender_actions_r2l = agent_defender.act(states[2])
-    defender_actions_u2r = agent_defender.act(states[3])
-    return [defender_actions_dos, defender_actions_probe, defender_actions_r2l, defender_actions_u2r]
+    # Get actions for each attack type
+    return [agent_defender.act(state) for state in states]
 
 def get_attack_actions(attackers: List[AttackAgent], initial_states: pd.DataFrame) -> List[List[int]]:
     """
@@ -306,18 +303,17 @@ def get_attack_states(env: RLenv, attack_actions) -> Tuple[List[pd.DataFrame], L
             - labels (list of pd.DataFrame): The labels for each attack type in the same order.
             - labels_names (list of str): The names of the attacks for each attack type in the same order.
     """
-    states_dos, labels_dos, dos_attack = env.get_states(attack_actions[0])
-    states_probe, labels_probe, probe_attack = env.get_states(attack_actions[1])
-    states_r2l, labels_r2l, r2l_attack = env.get_states(attack_actions[2])
-    states_u2r, labels_u2r, u2r_attack = env.get_states(attack_actions[3])
-    
-    states = [states_dos, states_probe, states_r2l, states_u2r]
-    labels = [labels_dos, labels_probe, labels_r2l, labels_u2r]
-    labels_names = [dos_attack, probe_attack, r2l_attack, u2r_attack]
+    states, labels, labels_names = [], [], []
+
+    for action in attack_actions:
+        state, label, name = env.get_states(action)
+        states.append(state)
+        labels.append(label)
+        labels_names.append(name)
     
     return states, labels, labels_names
 
-def store_experience(agents: List[Agent], states: List[pd.DataFrame], actions: List[List[int]], next_states: List[pd.DataFrame], rewards: List[int], done):
+def store_experience(agents: List[DefenderAgent | AttackAgent], states: List[pd.DataFrame], actions: List[List[int]], next_states: List[pd.DataFrame], rewards: List[int], done):
     """
     Stores the experience in the memory of the agents.
     For a given state and action, the next state, reward, and done flag are stored.
@@ -389,6 +385,45 @@ def update_models_and_statistics(agent_defender: DefenderAgent, attackers: List[
 
     return def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss
 
+def update_models_and_statistics_cic(agent_defender: DefenderAgent, attackers: AttackAgent, def_loss, att_loss, def_metrics_chain: List[dict[str, any]], 
+                                 att_metrics_chain: List[dict[str,any]], epoch_mse_before: list, epoch_mae_before: list, sample_indices_list: list):
+    """
+    Updates the models of the defender and attackers and updates the loss and statistics.
+
+    Args:
+        agent_defender (DefenderAgent): The defender agent.
+        attackers (list): List of attacker agents (DoS, Probe, R2L, U2R).
+        def_loss (float): Current cumulative loss for the defender.
+        agg_att_loss (float): Aggregate loss for all attackers.
+        def_metrics_chain (list): List to store defender metrics.
+        att_metrics_chain (list): List to store attacker metrics.
+        epoch_mse_before, epoch_mae_before, epoch_mse_after, epoch_mae_after (list): Lists to store MSE and MAE metrics.
+
+    Returns:
+        tuple: Updated values for def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss.
+    """
+    # Train defender
+    def_metrics = agent_defender.update_model()
+    def_loss += def_metrics["loss"]
+
+    # Train attackers
+    att_metrics = attackers.update_model()
+
+    # Update attacker losses
+    att_loss += att_metrics["loss"]
+
+    # Update metrics
+    def_metrics_chain.append(def_metrics)
+    att_metrics_chain.extend([att_metrics])
+    epoch_mse_before.append(def_metrics["mse_before"])
+    epoch_mae_before.append(def_metrics["mae_before"])
+
+    # Used samples
+    sample_indices = def_metrics["sample_indices"]
+    sample_indices_list.append(sample_indices)
+
+    return def_loss, att_loss
+
 def update_episode_statistics(def_reward, att_reward, def_total_reward_by_episode, att_total_reward_by_episode,
                               att_total_reward_by_episode_dos, att_total_reward_by_episode_probe,
                               att_total_reward_by_episode_r2l, att_total_reward_by_episode_u2r):
@@ -417,6 +452,24 @@ def update_episode_statistics(def_reward, att_reward, def_total_reward_by_episod
 
     return (def_total_reward_by_episode, att_total_reward_by_episode, att_total_reward_by_episode_dos,
             att_total_reward_by_episode_probe, att_total_reward_by_episode_r2l, att_total_reward_by_episode_u2r)
+
+def update_episode_statistics_cic(def_reward, att_reward, def_total_reward_by_episode, att_total_reward_by_episode):
+    """
+    Updates the statistics for the current episode.
+
+    Args:
+        def_reward (np.array): Rewards for the defender in the current iteration.
+        att_reward (list): Rewards for the attackers in the current iteration.
+        def_total_reward_by_episode (int): Total reward for the defender in the current episode.
+        att_total_reward_by_episode (int): Total reward for all attackers in the current episode.
+
+    Returns:
+        Updated statistics for the episode.
+    """
+    def_total_reward_by_episode += np.sum(def_reward, dtype=np.int32)
+    att_total_reward_by_episode += sum(np.sum(reward, dtype=np.int32) for reward in att_reward)
+
+    return (def_total_reward_by_episode, att_total_reward_by_episode)
 
 
 def store_episode_results(attack_indices_list, attack_names_list, env: RLenv, epoch_mse_before, epoch_mae_before,
@@ -461,6 +514,35 @@ def store_episode_results(attack_indices_list, attack_names_list, env: RLenv, ep
 
     sample_indices_per_episode.append(sample_indices)
 
+def store_episode_results_cic(attack_indices_list, attack_names_list, env: RLenv, epoch_mse_before, epoch_mae_before,
+                          def_total_reward_by_episode, att_total_reward_by_episode, def_loss, att_loss,
+                          attack_indices_per_episode: list, attack_names_per_episode: list, attacks_mapped_to_att_type_list: list,
+                          mse_before_history: list, mae_before_history: list, def_reward_chain: list,
+                          att_reward_chain: list, def_loss_chain: list, att_loss_chain: list, sample_indices_per_episode:list, sample_indices: list):
+    """
+    Stores the results of the current episode.
+
+    Args:
+        (All arguments are lists or variables that store episode results.)
+
+    Returns:
+        None
+    """
+    attack_indices_per_episode.append(attack_indices_list)
+    attack_names_per_episode.append(attack_names_list)
+    attacks_mapped_to_att_type_list.append(env.att_true_labels)
+    if epoch_mse_before:
+        mse_before_history.append(np.mean(epoch_mse_before))
+        mae_before_history.append(np.mean(epoch_mae_before))
+
+    def_reward_chain.append(def_total_reward_by_episode)
+    att_reward_chain.append(att_total_reward_by_episode)
+
+    def_loss_chain.append(def_loss)
+    att_loss_chain.append(att_loss)
+
+    sample_indices_per_episode.append(sample_indices)
+
 def save_trained_models(agents, output_root_dir, trained_models_dir):
     """
     Saves the trained models for the attackers and the defender.
@@ -486,6 +568,29 @@ def save_trained_models(agents, output_root_dir, trained_models_dir):
     save_model(agents["probe"], model_paths["probe"])
     save_model(agents["r2l"], model_paths["r2l"])
     save_model(agents["u2r"], model_paths["u2r"])
+    save_model(agents["defender"], model_paths["defender"])
+
+    logging.info("Saved trained models.")
+
+def save_trained_models_cic(agents, output_root_dir, trained_models_dir):
+    """
+    Saves the trained models for the attackers and the defender.
+
+    Args:
+        agents (dict): A dictionary containing the agents to save. Keys should be agent names (e.g., "dos", "probe").
+        output_root_dir (str): The root directory for saving the models.
+        trained_models_dir (str): The base directory where trained models are stored.
+
+    Returns:
+        None
+    """
+    model_paths = {
+        "attacker": os.path.join(trained_models_dir, f"{output_root_dir}/attacker_model_cic.keras"),
+        "defender": os.path.join(trained_models_dir, f"{output_root_dir}/defender_model.keras"),
+    }
+
+    # Save each model
+    save_model(agents["attacker"], model_paths["attacker"])
     save_model(agents["defender"], model_paths["defender"])
 
     logging.info("Saved trained models.")

@@ -152,5 +152,11 @@ Save the unpacked directory into `<root>/data/cic-ids/cic-ids-2017/original/`.
    ls data/datasets/cic-ids/cse-cic-ids-2018/original/
    ```
 
-4. **Clean the data** 
+4. **Install pyarrow**
+   Install pyarrow
+   ```sh
+   pip install pyarrow
+   ```
+
+5. **Clean the data** 
  Clean the data by running the[`generate_cleaned_data.py`](./data/datasets/cic-ids/generate_cleaned_data.py) script to preprocess the data. Hint: This might take some time.

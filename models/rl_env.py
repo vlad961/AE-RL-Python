@@ -1,13 +1,14 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
+from data.cic_data_manager import CICDataManager
 from models.defender_agent import DefenderAgent
 import numpy as np
 import pandas as pd
 
-from data.data_manager import DataManager, attack_types
+from data.data_manager import DataManager
 from models.attack_agent import AttackAgent
 
 class RLenv():
-    def __init__(self, data_manager: DataManager, attack_agent: List[AttackAgent], defender_agent: DefenderAgent, **kwargs):
+    def __init__(self, data_manager: Union[DataManager | CICDataManager], attack_agent: List[AttackAgent], defender_agent: DefenderAgent, **kwargs):
         self.true_labels = None
         self.attack_agent: List[AttackAgent] = attack_agent
         self.defender = defender_agent
@@ -109,7 +110,7 @@ class RLenv():
 
         # Done allways false in this continuous task
         #self.done = np.zeros(len(attack_actions), dtype=bool)
-        self.done: np.array[bool] = np.zeros(1, dtype=bool) # FIXME: 4 booleans needed ?
+        self.done: np.array[bool] = np.zeros(1, dtype=bool)
 
         return next_states, next_labels, next_labels_names, def_reward, att_reward, next_attack_actions, self.done
 
@@ -127,29 +128,41 @@ class RLenv():
         Returns:
             State(s): Actual state for the selected attacks
             Label(s): Actual label for the selected attacks
+            attack_name: Name of the attack
         '''
         first = True
         for attack in attacker_actions:
             attack_name = self.all_attack_names[attack]
-            filtered_df: pd.DataFrame | None = self.df[self.df[attack_name] == 1]
+            if isinstance(self.data_manager, CICDataManager):
+                # On CIC: Label-based selection
+                filtered_df: pd.DataFrame = self.df[self.df["Label"] == attack_name]
+            else:
+                filtered_df: pd.DataFrame | None = self.df[self.df[attack_name] == 1]
 
             if filtered_df.empty:
                 raise ValueError(f"No samples found for attack '{attack_name}'. Ensure the dataset contains rows for this attack.")
             
             # Limit the size of the filtered DataFrame if it's too large
-            if len(filtered_df) > 20000:  # Example threshold
+            if len(filtered_df) > 200000:  # Example threshold
                 filtered_df = filtered_df.sample(10000)
 
+            sample = filtered_df.sample(1)
+
             if first:
-                minibatch = filtered_df.sample(1)
+                minibatch = sample
                 first = False
             else:
-                minibatch = minibatch.append(filtered_df.sample(1))
+                minibatch = pd.concat([minibatch, sample], ignore_index=True)
 
-        labels = minibatch[self.attack_names]
-        minibatch.drop(self.all_attack_names, axis=1, inplace=True)
+        # Extract labels
+        if isinstance(self.data_manager, CICDataManager):
+            labels = minibatch["Label"]
+            minibatch = minibatch.drop(columns=["Label", "Timestamp"], errors="ignore")
+        else:
+            labels = minibatch[self.attack_names]
+            minibatch.drop(columns=self.all_attack_names, axis=1, inplace=True, errors="ignore")
+
         states = minibatch
-        
         return states, labels, attack_name
     
     def calculate_rewards(self, defender_actions_flat: np.ndarray, attack: np.ndarray) -> Tuple[np.array, List]:
@@ -164,12 +177,7 @@ class RLenv():
             tuple: Defender reward (np.array) and attacker rewards (list).
         """
         def_reward = (defender_actions_flat == attack).astype(np.int32) # 1 if defender action is correct, else 0
-        att_reward_dos = np.array(1 if attack[0] != defender_actions_flat[0] else 0, dtype=np.int32)
-        att_reward_probe = np.array(1 if attack[1] != defender_actions_flat[1] else 0, dtype=np.int32)
-        att_reward_r2l = np.array(1 if attack[2] != defender_actions_flat[2] else 0, dtype=np.int32)
-        att_reward_u2r = np.array(1 if attack[3] != defender_actions_flat[3] else 0, dtype=np.int32)
-        att_reward = [att_reward_dos, att_reward_probe, att_reward_r2l, att_reward_u2r]
-        att_reward = np.array(att_reward, dtype=np.int32)
+        att_reward = np.array([(defender_actions_flat[i] != attack[i]).astype(np.int32) for i in range(len(self.attack_agent))])
         
         return def_reward, att_reward
 
@@ -181,7 +189,7 @@ class RLenv():
             defender_actions_flat (np.array): Flattened array of defender actions.
             attack (np.array): Array of attack type indices.
         """
-        self.def_estimated_labels += np.bincount(defender_actions_flat, minlength=len(attack_types))
+        self.def_estimated_labels += np.bincount(defender_actions_flat, minlength=len(self.attack_types))
         for idx in attack:
             self.att_true_labels[idx] += 1
         for def_action, att_action in zip(defender_actions_flat, attack):
@@ -199,12 +207,12 @@ class RLenv():
             tuple: Next states, labels, label names, and next attacker actions.
         """
         next_attack_actions = [agent.act(state) for agent, state in zip(self.attack_agent, states)]
-        next_states_dos, next_labels_dos, next_dos_attack = self.get_states(next_attack_actions[0])
-        next_states_probe, next_labels_probe, next_probe_attack = self.get_states(next_attack_actions[1])
-        next_states_r2l, next_labels_r2l, next_r2l_attack = self.get_states(next_attack_actions[2])
-        next_states_u2r, next_labels_u2r, next_u2r_attack = self.get_states(next_attack_actions[3])
-        next_states = [next_states_dos, next_states_probe, next_states_r2l, next_states_u2r]
-        next_labels = [next_labels_dos, next_labels_probe, next_labels_r2l, next_labels_u2r]
-        next_labels_names = [next_dos_attack, next_probe_attack, next_r2l_attack, next_u2r_attack]
+
+        next_states, next_labels, next_label_names = [], [], []
+        for attack_action in next_attack_actions:
+            states, labels, label_name = self.get_states(attack_action)
+            next_states.append(states)
+            next_labels.append(labels)
+            next_label_names.append(label_name)
         
-        return next_states, next_labels, next_labels_names, next_attack_actions
+        return next_states, next_labels, next_label_names, next_attack_actions

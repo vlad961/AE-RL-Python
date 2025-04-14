@@ -150,6 +150,9 @@ def clean_dataset(dataset, filetypes=['feather']):
             df.to_feather(f'{dataset}/clean/{file}.feather')
         if 'parquet' in filetypes:
             df.to_parquet(f'{dataset}/clean/{file}.parquet', index=False)
+        # Save additional to .csv for easy access
+        if 'csv' in filetypes:
+            df.to_csv(f'{dataset}/clean/{file}.csv', index=False)
             
 def aggregate_data(dataset, save=True, filetype='feather'):
     # Will search for all files in the 'clean' directory of the correct filetype and aggregate them
@@ -161,6 +164,8 @@ def aggregate_data(dataset, save=True, filetype='feather'):
             df = pd.read_feather(file)
         if filetype == 'parquet':
             df = pd.read_parquet(file)
+        if filetype == 'csv':
+            df = pd.read_csv(file)
         print(df.shape)
         print(f'{df["Label"].value_counts()}\n')
         all_data = pd.concat([all_data, df], ignore_index=True)
@@ -184,20 +189,22 @@ def aggregate_data(dataset, save=True, filetype='feather'):
             all_data.to_parquet(f'{dataset}/clean/all_data.parquet', index=False)
             malicious.to_parquet(f'{dataset}/clean/all_malicious.parquet', index=False)
             benign.to_parquet(f'{dataset}/clean/all_benign.parquet', index=False)
+        if filetype == 'csv':
+            all_data.to_csv(f'{dataset}/clean/all_data.csv', index=False)
+            malicious.to_csv(f'{dataset}/clean/all_malicious.csv', index=False)
+            benign.to_csv(f'{dataset}/clean/all_benign.csv', index=False)
             
 if __name__ == "__main__":
     # Adjust for cleaning the correct dataset into the desired format
     
-    # Needs directory with dataset name containing empty dir 'clean' and dir 'original' containing de csv's
-    # Bereinigung und Aggregation für cic-ids-2017
+    # Needs directory with dataset name containing dir 'original' containing de csv's
     cic_ids_2017 = 'cic-ids-2017'
-    filetypes = ['feather', 'parquet']
+    filetypes = ['feather', 'csv'] # Supported types ['feather', 'parquet', 'csv']
     clean_dataset(cic_ids_2017, filetypes=filetypes)
     aggregate_data(cic_ids_2017, save=True, filetype='feather')
-    aggregate_data(cic_ids_2017, save=True, filetype='parquet')
+    aggregate_data(cic_ids_2017, save=True, filetype='csv')
 
     cse_cic_ids_2018 = 'cse-cic-ids-2018'
-    # Bereinigung und Aggregation für cse-cic-ids-2018
     clean_dataset(cse_cic_ids_2018, filetypes=filetypes)
     aggregate_data(cse_cic_ids_2018, save=True, filetype='feather')
-    aggregate_data(cse_cic_ids_2018, save=True, filetype='parquet')
+    aggregate_data(cse_cic_ids_2018, save=True, filetype='csv')

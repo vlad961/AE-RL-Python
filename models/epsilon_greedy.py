@@ -16,10 +16,12 @@ class EpsilonGreedy(Policy):
     decays over time to balance exploration and exploitation.
 
     """
-    def __init__(self, estimator: QNetwork, actions, epsilon: float, min_epsilon: float, decay_rate: float, epoch_length: int, parent_agent):
+    def __init__(self, estimator: QNetwork, actions, epsilon: float, min_epsilon: float, decay_rate: float, epoch_length: int, parent_agent, amount_attackers: int, multiple_attacker: bool):
         super().__init__(len(actions), estimator)
         self.name = "Epsilon Greedy"
         self.parent_agent = parent_agent
+        self.amount_attackers = amount_attackers
+        self.multiple_attacker = multiple_attacker
 
         if (epsilon is None or epsilon < 0 or epsilon > 1):
             print("EpsilonGreedy: Invalid value of epsilon", flush=True)
@@ -71,7 +73,7 @@ class EpsilonGreedy(Policy):
         self.step_counter += 1
         # decay epsilon after each episode
         if self.epsilon_decay:
-            decay_interval = self.epoch_length * 4 if self.parent_agent.name == "Defender" else self.epoch_length
+            decay_interval = self.epoch_length * self.amount_attackers if self.multiple_attacker else self.epoch_length # TODO: verify for multiple attackers that this will be triggered
             if self.parent_agent.name == "Defender":
                 decay_step = self.step_counter // 4 # Reduce the step_counter by 4 for the defender, as it takes 4 actions in one step. Otherwise, the epsilon would decay too fast for the defender.
             else:
