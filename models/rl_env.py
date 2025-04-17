@@ -1,15 +1,16 @@
+import logging
 from typing import Dict, List, Optional, Tuple, Union
 from data.cic_data_manager import CICDataManager
 from models.defender_agent import DefenderAgent
 import numpy as np
 import pandas as pd
 
-from data.data_manager import DataManager
+from data.nsl_kdd_data_manager import NslKddDataManager
 from models.attack_agent import AttackAgent
 from utils.config import GLOBAL_RNG
 
 class RLenv():
-    def __init__(self, data_manager: Union[DataManager | CICDataManager], attack_agent: List[AttackAgent], defender_agent: DefenderAgent, **kwargs):
+    def __init__(self, data_manager: Union[NslKddDataManager | CICDataManager], attack_agent: List[AttackAgent], defender_agent: DefenderAgent, **kwargs):
         self.true_labels = None
         self.attack_agent: List[AttackAgent] = attack_agent
         self.defender = defender_agent
@@ -29,6 +30,7 @@ class RLenv():
             self.index = data.index
             self.attack_map: Dict[str, str] = data.attack_map
             self.all_attack_names = data.all_attack_names
+            self.attacks_not_in_training = data.attacks_not_in_training
         else:
             self.attack_names = data_manager.attack_names
             self.attack_types = data_manager.attack_types
@@ -164,6 +166,29 @@ class RLenv():
 
         states = minibatch
         return states, labels, attack_name
+    
+    def get_attack_states(self, attack_actions) -> Tuple[List[pd.DataFrame], List[pd.DataFrame], str]:
+        """
+        Retrieves the states, labels, and attack names for the chosen attack actions.
+
+        Args:
+            attack_actions (list): A list of attack actions, where each entry corresponds to a specific attack of the attackers (expected order of attacker actions: DoS, Probe, R2L, U2R).
+
+        Returns:
+            Tuple:
+                - states (list of pd.DataFrame): The states for each attack type in the order of given attack actions (expected: DoS, Probe, R2L, U2R).
+                - labels (list of pd.DataFrame): The labels for each attack type in the same order.
+                - labels_names (list of str): The names of the attacks for each attack type in the same order.
+        """
+        states, labels, labels_names = [], [], []
+
+        for action in attack_actions:
+            state, label, name = self.get_states(action)
+            states.append(state)
+            labels.append(label)
+            labels_names.append(name)
+        
+        return states, labels, labels_names
     
     def calculate_rewards(self, defender_actions_flat: np.ndarray, attack: np.ndarray) -> Tuple[np.array, List]:
         """

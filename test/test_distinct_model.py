@@ -6,7 +6,7 @@ from utils.helpers import create_attack_id_to_index_mapping, transform_attacks_b
 from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
 from test_multiple_agents import test_trained_agent_quality_on_intra_set
 from datetime import datetime
-from data.data_manager import nsl_kdd_attack_map
+from data.nsl_kdd_data_manager import nsl_kdd_attack_map
 
 defender_model_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/defender_model.keras")
 plots_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/plots/")

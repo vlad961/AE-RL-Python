@@ -1,7 +1,7 @@
 from data.cic_data_manager import CICDataManager
 from utils.config import CICIDS_2017_CLEAN_ALL_BENIGN, CICIDS_2017_CLEAN_ALL_MALICIOUS, CICIDS_2018_CLEAN_ALL_BENIGN, CICIDS_2018_CLEAN_ALL_MALICIOUS, CWD, TRAINED_MODELS_DIR
 from utils.log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, print_end_of_epoch_info_cic, save_debug_info
-from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, get_attack_type_maps, print_total_runtime, save_trained_models, save_trained_models_cic, store_episode_results, store_episode_results_cic, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_episode_statistics_cic, update_models_and_statistics, update_models_and_statistics_cic
+from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, print_total_runtime,  save_trained_models_cic, store_episode_results_cic, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_episode_statistics_cic, update_models_and_statistics, update_models_and_statistics_cic
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
@@ -170,19 +170,19 @@ def main(attack_type=None, file_name_suffix=""):
             # Determine the attack actions for the randomly chosen initial states based on the attackers' policies.
             # Depending on the epsilon value, the attackers either exploit their learned policy to predict the best actions
             # or explore random actions (Exploitation vs. Exploration).
-            attack_actions = get_attack_actions(attackers, initial_state)
+            attack_actions = AttackAgent.get_attack_actions(attackers, initial_state)
 
             # Retrieve the next states based on the chosen attack actions of the attacker agents.
             # Each state represents the environment after the execution of the corresponding attack.
             # The states are derived from the IDS dataset used in the environment.
-            states, labels, labels_names = get_attack_states(env, attack_actions)
+            states, labels, labels_names = env.get_attack_states(attack_actions)
 
             # Iteration in one episode
             for iteration in range(iterations_episode):
                 attack_indices_list.append(attack_actions)
                 attack_names_list.append(labels_names)
                 # Determine the defender agent's actions/classifications for the given attack states.
-                defender_actions = get_defender_actions(agent_defender, states)
+                defender_actions = agent_defender.get_defender_actions(states)
 
                 # Enviroment actuation for those actions
                 next_states, next_labels, next_labels_names, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,

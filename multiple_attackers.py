@@ -1,11 +1,11 @@
 import numpy as np
 from utils.config import CWD, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
 from utils.log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, save_debug_info
-from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, get_attack_type_maps, print_total_runtime, save_trained_models, store_episode_results, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_models_and_statistics
+from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_type_maps, print_total_runtime, save_trained_models, store_episode_results, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_models_and_statistics
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
-from data.data_manager import DataManager, attack_types, nsl_kdd_attack_map
+from data.nsl_kdd_data_manager import NslKddDataManager, attack_types, nsl_kdd_attack_map
 from datetime import datetime
 from test.test_multiple_agents import test_trained_agent_quality_on_intra_set
 from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
@@ -58,7 +58,7 @@ def main(attack_type=None, file_name_suffix=""):
  
         logging.info("Setting up Attacker and Defender Agents...")
 
-        train_data = DataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, normalization='linear')
+        train_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, normalization='linear')
         attack_valid_actions = list(range(len(train_data.attack_names)))
         attack_valid_actions_dos, attack_valid_actions_probe, attack_valid_actions_r2l, attack_valid_actions_u2r = get_attack_type_maps(nsl_kdd_attack_map, train_data.attack_names)
 
@@ -208,19 +208,19 @@ def main(attack_type=None, file_name_suffix=""):
             # Determine the attack actions for the randomly chosen initial states based on the attackers' policies.
             # Depending on the epsilon value, the attackers either exploit their learned policy to predict the best actions
             # or explore random actions (Exploitation vs. Exploration).
-            attack_actions = get_attack_actions(attackers, initial_state)
+            attack_actions = AttackAgent.get_attack_actions(attackers, initial_state)
 
             # Retrieve the next states based on the chosen attack actions of the attacker agents.
             # Each state represents the environment after the execution of the corresponding attack.
             # The states are derived from the IDS dataset used in the environment.
-            states, labels, labels_names = get_attack_states(env, attack_actions)
+            states, labels, labels_names = env.get_attack_states(attack_actions)
 
             # Iteration in one episode
             for iteration in range(iterations_episode):
                 attack_indices_list.append(attack_actions)
                 attack_names_list.append(labels_names)
                 # Determine the defender agent's actions/classifications for the given attack states.
-                defender_actions = get_defender_actions(agent_defender, states)
+                defender_actions = agent_defender.get_defender_actions(states)
 
                 # Enviroment actuation for those actions
                 next_states, next_labels, next_labels_names, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,

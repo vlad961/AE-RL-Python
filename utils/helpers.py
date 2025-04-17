@@ -334,21 +334,6 @@ def create_attack_id_to_type_mapping(attack_map) -> dict:
         attack_id_to_type[idx] = attack_type
     return attack_id_to_type
 
-def get_defender_actions(agent_defender: AttackAgent, states: List[pd.DataFrame]) -> List[List[int]]:
-    """
-    Get actions/classifications of the defender agent for the chosen states/attacks.
-
-    Args:
-        agent_defender (DefenderAgent): The defender agent.
-        states (list): List of states for each attack type.
-
-    Returns:
-        list: List of defender action(s) for each attack type.
-        The order is: DoS, Probe, R2L, U2R.
-    """
-    # Get actions for each attack type
-    return [agent_defender.act(state) for state in states]
-
 def get_attack_actions(attackers: List[AttackAgent], initial_states: pd.DataFrame) -> List[List[int]]:
     """
     Get actions/attacks of all attackers based on their policies.
@@ -362,30 +347,6 @@ def get_attack_actions(attackers: List[AttackAgent], initial_states: pd.DataFram
         The order depends on the order of the attackers. (expected: DoS, Probe, R2L, U2R)
     """
     return [attacker.act(initial_states) for attacker in attackers]
-
-def get_attack_states(env: RLenv, attack_actions) -> Tuple[List[pd.DataFrame], List[pd.DataFrame], str]:
-    """
-    Retrieves the states, labels, and attack names for the chosen attack actions.
-
-    Args:
-        env (RLenv): The environment object that provides the states and labels.
-        attack_actions (list): A list of attack actions, where each entry corresponds to a specific attack of the attackers (expected order of attacker actions: DoS, Probe, R2L, U2R).
-
-    Returns:
-        Tuple:
-            - states (list of pd.DataFrame): The states for each attack type in the order of given attack actions (expected: DoS, Probe, R2L, U2R).
-            - labels (list of pd.DataFrame): The labels for each attack type in the same order.
-            - labels_names (list of str): The names of the attacks for each attack type in the same order.
-    """
-    states, labels, labels_names = [], [], []
-
-    for action in attack_actions:
-        state, label, name = env.get_states(action)
-        states.append(state)
-        labels.append(label)
-        labels_names.append(name)
-    
-    return states, labels, labels_names
 
 def store_experience(agents: List[DefenderAgent | AttackAgent], states: List[pd.DataFrame], actions: List[List[int]], next_states: List[pd.DataFrame], rewards: List[int], done):
     """

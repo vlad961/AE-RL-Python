@@ -64,7 +64,7 @@ nsl_kdd_col_names: List[str] = ["duration", "protocol_type", "service", "flag", 
 
 attack_types: List[str] = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
 
-class DataManager:
+class NslKddDataManager:
     def __init__(self, trainset_path: str, testset_path: str, formated_trainset_path: str,
                  formated_testset_path: str, dataset_type: str = "train", dataset_name: str = "nsl-kdd", normalization: str = 'linear'):
         self.col_names = nsl_kdd_col_names
@@ -87,7 +87,7 @@ class DataManager:
             _, self.df = self.format_nsl_kdd_data_instance(normalization)
         else:
             self.df, _ = self.format_nsl_kdd_data_instance(normalization)
-        self.attack_names = DataManager.update_attack_names(self.attack_map, self.df)
+        self.attack_names = NslKddDataManager.update_attack_names(self.attack_map, self.df)
         # Initialize a reusable random generator
         self.loaded = True
         self.shape = self.df.shape
@@ -172,7 +172,7 @@ class DataManager:
                 self.df = pd.read_csv(self.formated_test_path, sep=',')
             self.index = GLOBAL_RNG.integers(0, self.shape[0] - 1, dtype=np.int32)
             self.loaded = True
-            self.attack_names = DataManager.update_attack_names(self.attack_map, self.df)
+            self.attack_names = NslKddDataManager.update_attack_names(self.attack_map, self.df)
 
     @staticmethod
     def load_formatted_nsl_kdd_if_exists(formated_train_path: str, formated_test_path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -234,12 +234,12 @@ class DataManager:
             Tuple [pd.DataFrame, pd.DataFrame]: Formatted training and test datasets.
         """
         # Load formated data if it exists already
-        train, test = DataManager.load_formatted_nsl_kdd_if_exists(formated_train_path, formated_test_path)
+        train, test = NslKddDataManager.load_formatted_nsl_kdd_if_exists(formated_train_path, formated_test_path)
         if train is not None and test is not None:
             return train, test
 
         # Create Folder if it does not exist
-        DataManager.create_formated_data_dir_if_not_exists(formated_train_path)
+        NslKddDataManager.create_formated_data_dir_if_not_exists(formated_train_path)
 
         # Formating the training dataset
         train_data = pd.read_csv(trainset_path, sep = ',', names = nsl_kdd_col_names, index_col = False)
@@ -269,7 +269,7 @@ class DataManager:
         bool_cols = full_data.select_dtypes(include='bool').columns
         full_data[bool_cols] = full_data[bool_cols].astype('float32')
         # Normalization of the continous columns in the df (0-1) //TODO: Check if I get an improvement if I use log normalization instead of linear normalization!!!
-        full_data = DataManager.normalize_numerical_columns(full_data, normalization=normalization)
+        full_data = NslKddDataManager.normalize_numerical_columns(full_data, normalization=normalization)
         logging.info(f"DataManager<Datatypes>:{full_data.dtypes.value_counts()}")
         assert all(np.issubdtype(dt, np.number) for dt in full_data.dtypes), "Non-numerical columns contained. Please make sure the data is normalized correctly!"
         assert all(full_data.dtypes == np.float32), "Not all columns are float32!"
@@ -293,7 +293,7 @@ class DataManager:
         Returns:
             The method returns the formatted training and test datasets.
         """
-        train_data, test_data = DataManager.get_formated_nsl_kdd_data(self.trainset_path, self.testset_path, self.formated_train_path, self.formated_test_path, normalization=normalization)
+        train_data, test_data = NslKddDataManager.get_formated_nsl_kdd_data(self.trainset_path, self.testset_path, self.formated_train_path, self.formated_test_path, normalization=normalization)
         return train_data, test_data
 
     @staticmethod
@@ -423,8 +423,16 @@ class DataManager:
             attack_names (list): List of attack names to consider in the DataFrame.
         """
         self.attack_names = []
+        valid_columns = []
+        self.attacks_not_in_training = []
         for att in attack_names:
             if att in self.df.columns:
+                # Check if the column contains at least one sample
+                if self.df[att].sum() > 0:
+                    valid_columns.append(att)
+                else:
+                    logging.warning(f"Attack name {att} not found in DataFrame columns.")
+                    self.attacks_not_in_training.append(att)
                 # Add only if there exists at least 1 attack in the column
                 if np.sum(self.df[att].values) >= 1 and att not in self.attack_names:
                     self.attack_names.append(att)
@@ -455,7 +463,8 @@ class DataManager:
 
     def get_balanced_samples(self) -> pd.DataFrame:
         """
-        Get equally balanced data for all attack types.
+        Downsample the normal class to balance the dataset.
+        This method takes 58630 instances of the normal class and 58630 instances of the rest of the attack types.
 
         Note: there are 125973 instances in the NSL-KDD dataset.
         67343 instances are normal class.

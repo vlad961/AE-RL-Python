@@ -1,10 +1,11 @@
-from utils.helpers import download_datasets_if_missing, move_log_files, plot_attack_distributions, plot_rewards_and_losses_during_training, print_total_runtime, save_model, logger_setup
+from utils.config import CWD, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
+from utils.helpers import download_datasets_if_missing, get_attack_actions, print_total_runtime, save_model
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
-from data.data_manager import DataManager, attack_types
+from data.nsl_kdd_data_manager import NslKddDataManager
 from datetime import datetime
-from test import test_trained_agent_quality
+from test.test import test_trained_agent_quality
 
 
 import logging
@@ -12,6 +13,10 @@ import numpy as np
 import time
 import os
 
+from utils.log_config import log_training_parameters, logger_setup, move_log_files
+from utils.plotting import plot_attack_distributions, plot_rewards_and_losses_during_training
+
+# FIXME: The states need to be verified. currently wrong states are used during the pipeline! See multiple_agents and cic_training.py as reference...
 """
 This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
 Notes and credits:
@@ -20,55 +25,39 @@ The original project can be found at: https://github.com/gcamfer/Anomaly-Reactio
 To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipynb' https://github.com/gcamfer/Anomaly-ReactionRL/blob/master/Notebooks/AE_RL_NSL_KDD.ipynb
 """
 
-cwd = os.getcwd()
-data_root_dir = os.path.join(cwd, "data/datasets/")
-data_original_dir = os.path.join(data_root_dir, "origin-kaggle-com/nsl-kdd/")
-data_formated_dir = os.path.join(data_root_dir, "formated/")
-formated_train_path = os.path.join(data_formated_dir, "balanced_training_data.csv") # formated_train_adv
-formated_test_path = os.path.join(data_formated_dir, "balanced_test_data.csv") # formated_test_adv
-kdd_train = os.path.join(data_original_dir, "KDDTrain+.txt")
-kdd_test = os.path.join(data_original_dir, "KDDTest+.txt")
-trained_models_dir = os.path.join(cwd, "models/trained-models/")
-
-
 def main(attack_type=None, file_name_suffix=""):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
+    script_start_time = datetime.now()
     output_root_dir = f"{timestamp_begin}{file_name_suffix}"
     logger_setup(timestamp_begin, file_name_suffix)
-    logging.info(f"Started script at: {timestamp_begin}")
-    logging.info(f"Current working dir: {cwd}")
-    logging.info(f"Used data files: \n{kdd_train},\n{kdd_test}")
-    # Store the start time as a datetime object
-    script_start_time = datetime.now()
-
+    logging.info(f"Started script at: {timestamp_begin}\nCurrent working dir: {CWD}\nUsed data files: \n{ORIGINAL_KDD_TRAIN},\n{ORIGINAL_KDD_TEST}")
+    
     try:
-        download_datasets_if_missing(kdd_train, kdd_test)
+        download_datasets_if_missing(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST)
 
         batch_size = 1 # Train batch
         minibatch_size = 100 # batch of memory ExpRep
-        ExpRep = True
+        experience_replay = True
         iterations_episode = 100
-        # num_episodes = int(env.data_shape[0]/(iterations_episode)/10)
         num_episodes = 100
 
         logging.info("Creating enviroment...")
-        if not os.path.exists(formated_train_path) or not os.path.exists(formated_test_path):
-            DataManager.get_formated_nsl_kdd_data(kdd_train, kdd_test, formated_train_path, formated_test_path, 'linear')
+        if not os.path.exists(NSL_KDD_FORMATTED_TRAIN_PATH) or not os.path.exists(NSL_KDD_FORMATTED_TEST_PATH):
+            NslKddDataManager.get_formated_nsl_kdd_data(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, 'linear')
 
         if(attack_type is not None):
             if attack_type == "equally_balanced_data":
                 # Retrieve equally balanced training data (Same amount of Attack and Normal instances).
-                data_cls_instance = DataManager(dataset_type='train')
-                _, attack_names = data_cls_instance.get_balanced_samples()
+                data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
+                _, attack_names = data_mgr.get_balanced_samples()
             else:
                 # Retrieve training data for given attack types and existing attack instances.
-                data_cls_instance = DataManager(dataset_type='train')
-                _, attack_names = data_cls_instance.get_samples_for_attack_type(attack_type, 0)
+                data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
+                _, attack_names = data_mgr.get_samples_for_attack_type(attack_type, 0)
         else:
-            attack_names = DataManager.get_attack_names(formated_train_path) # Names of attacks in the dataset where at least one sample is present
+            attack_names = NslKddDataManager.get_attack_names(NSL_KDD_FORMATTED_TRAIN_PATH) # Names of attacks in the dataset where at least one sample is present
         
-        attack_valid_actions = list(range(len(attack_names)))
-        attack_num_actions = len(attack_valid_actions)
+        attack_valid_actions = list(range(len(data_mgr.attack_names)))
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
         att_epsilon = 1
@@ -77,11 +66,9 @@ def main(attack_type=None, file_name_suffix=""):
         att_decay_rate = 0.99
         att_hidden_layers = 5
         att_hidden_size = 100
-        att_learning_rate = 0.001         #default learning_rate was hardcoded to = 0.00025 on an ADAM optimizer
-        obs_size = DataManager.get_obs_size_nsl_kdd(formated_train_path) # Amount of features in the dataset (columns) - attack_types
-        
+        att_learning_rate = 0.001
 
-        attacker_agent = AttackAgent(attack_valid_actions, obs_size, "EpsilonGreedy",
+        attacker_agent = AttackAgent(attack_valid_actions, data_mgr.obs_size, "Eve", "EpsilonGreedy",
                                         epoch_length=iterations_episode,
                                         epsilon=att_epsilon,
                                         min_epsilon=att_min_epsilon,
@@ -92,17 +79,12 @@ def main(attack_type=None, file_name_suffix=""):
                                         minibatch_size=minibatch_size,
                                         mem_size=1000,
                                         learning_rate=att_learning_rate,
-                                        ExpRep=ExpRep,
+                                        ExpRep=experience_replay,
                                         target_model_name='attacker_target_model',
                                         model_name='attacker_model')
 
-        if attack_type is not None: # If a specific attack is chosen, the training data is loaded with only this attack type
-            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack_type=attack_type, data=data_cls_instance, attack_names=attack_names)
-        else:
-            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode)
-
         # Defender is trained to detect type of attacks 0: normal, 1: Dos, 2: Probe, 3: R2L, 4: U2R
-        defender_valid_actions = list(range(len(attack_types)))
+        defender_valid_actions = list(range(len(data_mgr.attack_types)))
         defender_num_actions = len(defender_valid_actions)
         def_epsilon = 1  # exploration
         def_min_epsilon = 0.01  # min value for exploration
@@ -112,7 +94,9 @@ def main(attack_type=None, file_name_suffix=""):
         def_hidden_layers = 3
         def_learning_rate = 0.001
 
-        defender_agent = DefenderAgent(defender_valid_actions, obs_size, "EpsilonGreedy",
+        attackers = [attacker_agent]
+        
+        defender_agent = DefenderAgent(defender_valid_actions, data_mgr.obs_size, "EpsilonGreedy",
                                         epoch_length=iterations_episode,
                                         epsilon=def_epsilon,
                                         min_epsilon=def_min_epsilon,
@@ -123,75 +107,64 @@ def main(attack_type=None, file_name_suffix=""):
                                         minibatch_size=minibatch_size,
                                         mem_size=1000,
                                         learning_rate=def_learning_rate,
-                                        ExpRep=ExpRep,
+                                        ExpRep=experience_replay,
                                         target_model_name='defender_target_model',
                                         model_name='defender_model'
                                         )
-        # Statistics
-        att_reward_chain = []
-        def_reward_chain = []
-        att_loss_chain = []
-        def_loss_chain = []
-
-        # Print parameters
-        logging.info(f"Start Training with the following parameters:\n-----------------------------------------------------------------------------------------------------------------------\n"
-                    f"Total epoch: {num_episodes} | Iterations in epoch: {iterations_episode} "
-                    f"| Minibatch from mem size: {minibatch_size} | Total Samples: {num_episodes * iterations_episode} | Data shape: {env.data_shape}\n"
-                    f"-----------------------------------------------------------------------------------------------------------------------\n"
-                    f"Attacker: Num_actions={attack_num_actions} | gamma={att_gamma} | "
-                    f"epsilon={att_epsilon} | ANN hidden size={att_hidden_size} | "
-                    f"ANN hidden layers={att_hidden_layers} | Learning rate={att_learning_rate}\n"
-                    f"-----------------------------------------------------------------------------------------------------------------------\n"
-                    f"Defender: Num_actions={defender_num_actions} | gamma={def_gamma} | "
-                    f"epsilon={def_epsilon} | ANN hidden size={def_hidden_size} | "
-                    f"ANN hidden layers={def_hidden_layers} | Learning rate={def_learning_rate}\n"
-                    f"-----------------------------------------------------------------------------------------------------------------------\n"
-                    f"Used Attack types: '{attack_type if attack_type is not None else 'all: Normal, DoS, Probe, R2L, U2R'}' | Attack name(s): {attack_names}\n"
-                    f"-----------------------------------------------------------------------------------------------------------------------\n"
-                    )
         
+        if attack_type is not None: # If a specific attack is chosen, the training data is loaded with only this attack type
+            env = RLenv(data_mgr, [attacker_agent], defender_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack_type=attack_type, data=data_mgr, attack_names=attack_names)
+        else:
+            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode)
+
+
+        training_params = {"num_episodes": num_episodes, "iterations_episode": iterations_episode, "minibatch_size": minibatch_size,
+                           "total_samples": num_episodes * iterations_episode, "data_shape": data_mgr.shape}
+        attacker_params = {"num_actions": len(attack_valid_actions),"gamma": att_gamma, "epsilon": att_epsilon, "hidden_size": att_hidden_size,
+                           "hidden_layers": att_hidden_layers, "learning_rate": att_learning_rate }
+        defender_params = {"num_actions": defender_num_actions, "gamma": def_gamma, "epsilon": def_epsilon, "hidden_size": def_hidden_size,
+                           "hidden_layers": def_hidden_layers,"learning_rate": def_learning_rate}
+
+        log_training_parameters(training_params, attacker_params, defender_params, data_mgr.attack_types, data_mgr.attack_names)
+        
+        # Statistics
+        att_reward_chain, def_reward_chain, att_loss_chain, def_loss_chain = [], [], [], []
         # Main loops
         attacks_by_epoch = []
         attack_labels_list = []
         for epoch in range(num_episodes):
             epoch_start_time = time.time()
-            att_loss = 0.0
-            def_loss = 0.0
-            def_total_reward_by_episode = 0
-            att_total_reward_by_episode = 0
+            att_loss, def_loss = 0.0, 0.0
+            att_total_reward_by_episode, def_total_reward_by_episode = 0, 0
             # Reset enviromet, actualize the data batch with random states/attacks.
-            states = env.reset()
+            states, labels = env.reset()
             # Get action(s)/attack(s) for randomly chosen state(s)/attack(s) following the policy of the attacker.
             # The attacker's policy can either predict the best possible action(s)/attack(s) with respect to the randomly chosen state(s)/attack(s)
             # or explore random action(s)/attack(s) based on the epsilon value (Exploitation vs. Exploration).
-            attack_actions = attacker_agent.act(states)
+            attack_actions = AttackAgent.get_attack_actions(attackers, states)
             # Based on the chosen actions/attacks, the next states are determined.
             # These states represent the environment after the attacker agent's actions/attacks have been executed.
-            states = env.get_states(attack_actions)
+            states, labels, label_names = env.get_attack_states(attack_actions)
 
             done = False
 # // TODO: 1 mehrere Angreifer-Agenten normal & attack
 # // TODO: 2 Transferability (zuerst nsl-kdd, dann CICIDS2017, dann UNSW-NB15)
 # // TODO: 3. Boruta Tool Document results in Thesis.tex (nutze nur confirmed (ohne automatisch zwang zum entscheiden von tetentative features -> müsste besser abschneiden))
-# // TODO: 4. In R Random Forest Classifier implementieren und testen
             attacks_list = []
             # Iteration in one episode
             for i_iteration in range(iterations_episode):
                 attacks_list.append(attack_actions[0])
                 # Get action(s)/classification(s) of the defender agent for the chosen state(s)/attack(s).
-                defender_actions = defender_agent.act(states)
+                defender_actions = defender_agent.get_defender_actions(states)
                 # Enviroment actuation for this actions
-                next_states, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,
-                                                                                            attack_actions)
+                next_states, _, _, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,
+                                                                                            attack_actions, states)
 
                 attacker_agent.learn(states, attack_actions, next_states, att_reward, done)
                 defender_agent.learn(states, defender_actions, next_states, def_reward, done)
 
                 # Train network, update loss after at least minibatch_learns
-                if ExpRep and epoch * iterations_episode + i_iteration >= minibatch_size:
-                    def_loss += defender_agent.update_model()[0]
-                    att_loss += attacker_agent.update_model()[0]
-                elif not ExpRep:
+                if experience_replay and epoch * iterations_episode + i_iteration >= minibatch_size:
                     def_loss += defender_agent.update_model()[0]
                     att_loss += attacker_agent.update_model()[0]
 
@@ -219,8 +192,8 @@ def main(attack_type=None, file_name_suffix=""):
             attack_labels_list.append(env.att_true_labels)
 
         # Save the trained models
-        attacker_model_path = os.path.join(trained_models_dir, f"{output_root_dir}/attacker_model.keras")
-        defender_model_path = os.path.join(trained_models_dir, f"{output_root_dir}/defender_model.keras")
+        attacker_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/attacker_model.keras")
+        defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
 
         save_model(attacker_agent, attacker_model_path)
         save_model(defender_agent, defender_model_path)
@@ -228,9 +201,9 @@ def main(attack_type=None, file_name_suffix=""):
         print_total_runtime(script_start_time)
 
         # Test and visualize results
-        plots_path = os.path.join(trained_models_dir, f"{output_root_dir}/plots/")
-        current_log_path = os.path.join(cwd, f"logs/{output_root_dir}.log")
-        destination_log_path = os.path.join(trained_models_dir, f"{output_root_dir}/logs/")
+        plots_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/plots/")
+        current_log_path = os.path.join(CWD, f"logs/{output_root_dir}.log")
+        destination_log_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/logs/")
         logging.info(f"Trying to save summary plots under: {plots_path}")
         plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
@@ -241,9 +214,9 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    main(file_name_suffix="-WIN-balanced-data-att-5L-def-3L-lr-0.001")
+    #main(file_name_suffix="-WIN-balanced-data-att-5L-def-3L-lr-0.001")
     #main("U2R", file_name_suffix="-WIN-only-DoS")
-    #main("equally_balanced_data", file_name_suffix="-WIN-equally-balanced-data")
+    main("equally_balanced_data", file_name_suffix="-Mac-equally-balanced-data")
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).

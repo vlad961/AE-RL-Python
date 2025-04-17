@@ -10,13 +10,13 @@ import tensorflow as tf
 import time
 
 from data.cic_data_manager import CICDataManager
-from data.data_manager import DataManager
+from data.nsl_kdd_data_manager import NslKddDataManager
 from utils.config import NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN
 from utils.helpers import calculate_f1_scores_per_class_dynamically, calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
 from utils.plotting import plot_confusion_matrix
 from utils.plotting_multiple_agents import visualize_q_value_errors
 
-def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[DataManager | CICDataManager], plots_path, **kwargs):
+def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKddDataManager | CICDataManager], plots_path, **kwargs):
     one_vs_all = kwargs.get('one_vs_all', False)
     metrics_json = {}
     if one_vs_all:
@@ -230,7 +230,7 @@ def convert_numpy(obj):
     if isinstance(obj, np.ndarray): return obj.tolist()
     return obj
 
-def get_nsl_kdd_true_attack_type_indices(labels: pd.DataFrame, data_mgr: DataManager) -> list:
+def get_nsl_kdd_true_attack_type_indices(labels: pd.DataFrame, data_mgr: NslKddDataManager) -> list:
     true_attack_type_indices=[] # list of true attack types as indices (0-4). 0=normal, 1=dos, 2=probe, 3=r2l, 4=u2r. Length = number of samples
     for _, label in labels.iterrows():
         label_class = label.idxmax()

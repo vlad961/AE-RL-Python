@@ -5,15 +5,15 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from data.data_manager import DataManager
+from data.nsl_kdd_data_manager import NslKddDataManager
 from utils.helpers import logger_setup
 
-test_data  = DataManager(dataset_type="test")
-training_data = DataManager(dataset_type="train")
+test_data  = NslKddDataManager(dataset_type="test")
+training_data = NslKddDataManager(dataset_type="train")
 
 
 
-def view_dataset_statistics(data: DataManager):
+def view_dataset_statistics(data: NslKddDataManager):
     """
     View dataset statistics
     """
@@ -31,20 +31,20 @@ def plot_correlation_matrix(data):
     plt.show()
     plt.close()
 
-def visualize_relationships_within_data(data: DataManager):
+def visualize_relationships_within_data(data: NslKddDataManager):
     """
     Visualize relationships within data
     """
-    test  = DataManager(dataset_type="test")
+    test  = NslKddDataManager(dataset_type="test")
     normal_data, normal_attacks = test.get_samples_for_attack_type(["normal"], 0)
     normal_states, normal_labels = test.get_batch(batch_size=10)
-    test  = DataManager(dataset_type="test")
+    test  = NslKddDataManager(dataset_type="test")
     dos_data, dos_attacks = test.get_samples_for_attack_type(["DoS"], 0)
-    test  = DataManager(dataset_type="test")
+    test  = NslKddDataManager(dataset_type="test")
     probe_data, probe_attacks = test.get_samples_for_attack_type(["Probe"], 0)
-    test  = DataManager(dataset_type="test")
+    test  = NslKddDataManager(dataset_type="test")
     r2l_data, r2l_attacks = test.get_samples_for_attack_type(["R2L"], 0)
-    test  = DataManager(dataset_type="test")
+    test  = NslKddDataManager(dataset_type="test")
     u2r_data, u2r_attacks = test.get_samples_for_attack_type(["U2R"], 0)
 
     normal_data = normal_data[normal_data[normal_attacks]].sample(n=1, random_state=42)
@@ -84,8 +84,8 @@ def balance_r2l_and_u2r_data():
     """
     Balance R2L and U2R data and save the updated DataFrames to new CSV files
     """
-    test_data = DataManager(dataset_type="test")
-    training_data = DataManager(dataset_type="train")
+    test_data = NslKddDataManager(dataset_type="test")
+    training_data = NslKddDataManager(dataset_type="train")
     
     # Balance R2L data
     # Shuffle and extract 725 samples from warezmaster and 950 samples from guess_passwd
