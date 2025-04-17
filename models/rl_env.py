@@ -6,6 +6,7 @@ import pandas as pd
 
 from data.data_manager import DataManager
 from models.attack_agent import AttackAgent
+from utils.config import GLOBAL_RNG
 
 class RLenv():
     def __init__(self, data_manager: Union[DataManager | CICDataManager], attack_agent: List[AttackAgent], defender_agent: DefenderAgent, **kwargs):
@@ -68,11 +69,11 @@ class RLenv():
         self.att_true_labels: np.ndarray[int] = np.zeros(len(self.attack_types), dtype=int) # We set the true labels of attack in the range of the attack types as the defender infers the attack types.
 
         self.data_manager.load_formatted_df() # Reload and set a random index.
-        self.states, self.labels = self.data_manager.get_batch(self.batch_size)
+        self.states, self.labels, self.plain_label = self.data_manager.get_batch(self.batch_size)
         self.total_reward = 0
         self.steps_in_episode = 0
 
-        return self.states, self.labels
+        return self.states, self.labels, self.plain_label
 
     def act(self, defender_actions, attack_actions, states) -> Tuple[List[pd.DataFrame], List[pd.DataFrame], List[str], np.array, List, List[List[int]], np.array]:
         """
@@ -94,7 +95,7 @@ class RLenv():
                 - done (np.array): A flag indicating whether the task is complete (always `False` for continuous tasks).
         """
         # Map attack actions to attack types and corresponding indices
-        attack_names_mapped = [list(self.attack_map.keys())[att[0]] for att in attack_actions] # TODO: the current implementation works only for one attack per attacker action
+        attack_names_mapped = [self.attack_names[att[0]] for att in attack_actions] # TODO: the current implementation works only for one attack per attacker actions
         attack_types_mapped = [self.attack_map[attack_name] for attack_name in attack_names_mapped]
         attack_type_indices = np.array([np.array(self.attack_types.index(attack_type)) for attack_type in attack_types_mapped])
         defender_actions_flat = np.array([action[0] for action in defender_actions])  # // TODO: the current implementation works only for one attack per attacker action
@@ -132,12 +133,8 @@ class RLenv():
         '''
         first = True
         for attack in attacker_actions:
-            attack_name = self.all_attack_names[attack]
-            if isinstance(self.data_manager, CICDataManager):
-                # On CIC: Label-based selection
-                filtered_df: pd.DataFrame = self.df[self.df["Label"] == attack_name]
-            else:
-                filtered_df: pd.DataFrame | None = self.df[self.df[attack_name] == 1]
+            attack_name = self.attack_names[attack]
+            filtered_df = self.df[self.df['Label'] == attack_name]
 
             if filtered_df.empty:
                 raise ValueError(f"No samples found for attack '{attack_name}'. Ensure the dataset contains rows for this attack.")

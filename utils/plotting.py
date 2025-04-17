@@ -5,6 +5,8 @@ import os
 import pandas as pd
 import seaborn as sns
 
+from utils.plotting_multiple_agents import select_epochs_to_plot
+
 cwd = os.getcwd()
 model_comparison_path = os.path.join(cwd, "model-comparison")
 
@@ -73,8 +75,8 @@ def plot_attack_distributions(attacks_by_epoch, attack_names, attacks_mapped_to_
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks distribution throughout episodes")
-    #for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
-    for indx,e in enumerate([0, 1, 2]):
+    epochs = select_epochs_to_plot(attacks_by_epoch)
+    for indx,e in enumerate(epochs):
         plt.subplot(3,3,indx+1)
         plt.hist(attacks_by_epoch[e], bins=bins, width=0.9, align='left')
         plt.xlabel("{} epoch".format(e))
@@ -89,8 +91,7 @@ def plot_attack_distributions(attacks_by_epoch, attack_names, attacks_mapped_to_
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks (mapped) distribution throughout  episodes")
-    #for indx,e in enumerate([0,10,20,30,40,60,70,80,90]):
-    for indx,e in enumerate([0, 1, 2]):
+    for indx,e in enumerate(epochs):
         plt.subplot(3,3,indx+1)
         plt.bar(range(5), attacks_mapped_to_att_type_list[e], tick_label = ['Normal','Dos','Probe','R2L','U2R'])
         plt.xlabel("{} epoch".format(e))
@@ -124,6 +125,8 @@ def plot_confusion_matrix(cm, classes,
     sns.heatmap(cm, annot=True, fmt='g', xticklabels=classes, yticklabels=classes, cmap='Blues')
     plt.xlabel('Predicted label')
     plt.ylabel('True label')
+    if not os.path.exists(path):
+        os.makedirs(path)
     plt.savefig(os.path.join(path, 'confusion_matrix.pdf'), format='pdf', dpi=1000)
     plt.close()
 

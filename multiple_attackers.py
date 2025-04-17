@@ -7,7 +7,7 @@ from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
 from data.data_manager import DataManager, attack_types, nsl_kdd_attack_map
 from datetime import datetime
-from test.test_multiple_agents import test_trained_agent_quality
+from test.test_multiple_agents import test_trained_agent_quality_on_intra_set
 from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
 import logging
 import time
@@ -346,7 +346,7 @@ def main(attack_type=None, file_name_suffix=""):
         plot_training_error(mse_before_history, mae_before_history, save_path=plots_path)
         
         defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
-        test_trained_agent_quality(defender_model_path, plots_path)
+        test_trained_agent_quality_on_intra_set(defender_model_path, plots_path)
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)

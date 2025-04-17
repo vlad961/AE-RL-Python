@@ -4,7 +4,7 @@ from utils.config import CWD
 from utils.log_config import load_debug_info, logger_setup
 from utils.helpers import create_attack_id_to_index_mapping, transform_attacks_by_epoch
 from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
-from test_multiple_agents import test_trained_agent_quality
+from test_multiple_agents import test_trained_agent_quality_on_intra_set
 from datetime import datetime
 from data.data_manager import nsl_kdd_attack_map
 
@@ -75,4 +75,4 @@ if __name__ == "__main__":
     )
 
 
-    test_trained_agent_quality(defender_model_path, plots_path)
+    test_trained_agent_quality_on_intra_set(defender_model_path, plots_path)

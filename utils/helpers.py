@@ -113,7 +113,7 @@ def get_cf_matrix(true_labels, predicted_labels):
     cnf_matrix = confusion_matrix(true_labels, predicted_labels)
     return cnf_matrix
 
-def calculate_f1_scores_per_class(predicted_actions, attack_types, true_labels):
+def calculate_f1_scores_per_class(predicted_actions, attack_types, true_labels, **kwargs):
     predicted_actions_dummies = pd.get_dummies(predicted_actions)
     posible_actions = np.arange(len(attack_types))
     for non_existing_action in posible_actions:
@@ -121,48 +121,122 @@ def calculate_f1_scores_per_class(predicted_actions, attack_types, true_labels):
             predicted_actions_dummies[non_existing_action] = np.uint8(0)
     true_labels_dummies = pd.get_dummies(true_labels)
 
-    normal_f1_score = f1_score(true_labels_dummies[0].values, predicted_actions_dummies[0].values)
-    dos_f1_score = f1_score(true_labels_dummies[1].values, predicted_actions_dummies[1].values)
-    probe_f1_score = f1_score(true_labels_dummies[2].values, predicted_actions_dummies[2].values)
-    r2l_f1_score = f1_score(true_labels_dummies[3].values, predicted_actions_dummies[3].values)
-    u2r_f1_score = f1_score(true_labels_dummies[4].values, predicted_actions_dummies[4].values)
-    overall_f1_score = f1_score(true_labels, predicted_actions, average='weighted')
+    if kwargs.get('one_vs_all', False):
+        normal_f1_score = f1_score(true_labels_dummies[0].values, predicted_actions_dummies[0].values)
+        dos_f1_score = f1_score(true_labels_dummies[1].values, predicted_actions_dummies[1].values)
+        probe_f1_score = f1_score(true_labels_dummies[2].values, predicted_actions_dummies[2].values)
+        r2l_f1_score = f1_score(true_labels_dummies[3].values, predicted_actions_dummies[3].values)
+        u2r_f1_score = f1_score(true_labels_dummies[4].values, predicted_actions_dummies[4].values)
+        overall_f1_score = f1_score(true_labels, predicted_actions, average='weighted')
+        return [normal_f1_score, dos_f1_score, probe_f1_score, r2l_f1_score, u2r_f1_score, overall_f1_score]
+    else:
+        normal_f1_score = f1_score(true_labels_dummies[0].values, predicted_actions_dummies[0].values)
+        attack_f1_score = f1_score(true_labels_dummies[1].values, predicted_actions_dummies[1].values)
+        overall_f1_score = f1_score(true_labels, predicted_actions, average='weighted')
+        return [normal_f1_score, attack_f1_score, overall_f1_score]
 
-    return [normal_f1_score, dos_f1_score, probe_f1_score, r2l_f1_score, u2r_f1_score, overall_f1_score]
+def calculate_f1_scores_per_class_dynamically(predicted_actions, attack_types, true_labels, one_vs_all=False, target_class=None):
+    """
+    Dynamically calculates F1 scores for each class and optionally supports one-vs-all scenarios.
+
+    Args:
+        predicted_actions (list or np.ndarray): Predicted class labels.
+        attack_types (list): List of attack types (e.g., ['normal', 'DoS', 'Probe', 'R2L', 'U2R']).
+        true_labels (list or np.ndarray): True class labels.
+        one_vs_all (bool): Whether to calculate F1 scores in a one-vs-all scenario. Default is False.
+        target_class (int): The target class for one-vs-all. Required if one_vs_all=True.
+
+    Returns:
+        list: List of F1 scores for each class and the overall weighted F1 score.
+    """
+    # One-Hot-Encoding der vorhergesagten und tatsächlichen Labels
+    predicted_actions_dummies = pd.get_dummies(predicted_actions)
+    true_labels_dummies = pd.get_dummies(true_labels)
+
+    # Sicherstellen, dass alle möglichen Aktionen vorhanden sind
+    possible_actions = np.arange(len(attack_types))
+    for non_existing_action in possible_actions:
+        if non_existing_action not in predicted_actions_dummies.columns:
+            predicted_actions_dummies[non_existing_action] = np.uint8(0)
+        if non_existing_action not in true_labels_dummies.columns:
+            true_labels_dummies[non_existing_action] = np.uint8(0)
+
+    # Falls one-vs-all aktiviert ist
+    if one_vs_all:
+        if target_class is None:
+            raise ValueError("For one-vs-all mode, 'target_class' must be specified.")
+        
+        # Zielklasse als positiv, alle anderen als negativ
+        true_binary = (np.array(true_labels) == target_class).astype(int)
+        predicted_binary = (np.array(predicted_actions) == target_class).astype(int)
+        
+        # F1-Score für die Zielklasse berechnen
+        f1 = f1_score(true_binary, predicted_binary)
+        return [f1]  # Nur ein F1-Score für die Zielklasse
+
+    # Dynamische Berechnung der F1-Scores für alle Klassen
+    f1_scores = []
+    for action in possible_actions:
+        f1 = f1_score(true_labels_dummies[action].values, predicted_actions_dummies[action].values)
+        f1_scores.append(f1)
+
+    # Gesamtgewichteter F1-Score
+    overall_f1_score = f1_score(true_labels, predicted_actions, average='weighted')
+    f1_scores.append(overall_f1_score)
+
+    return f1_scores
 
 def print_aggregated_performance_measures(predicted_actions, true_labels):
     logging.info('Performance measures on Test data')
     logging.info('Accuracy =  {:.4f}'.format(accuracy_score(true_labels, predicted_actions)))
-    logging.info('F1 =  {:.4f}'.format(f1_score(true_labels, predicted_actions, average='weighted')))
-    logging.info('Precision_score =  {:.4f}'.format(precision_score(true_labels, predicted_actions, average='weighted')))
-    logging.info('recall_score =  {:.4f}'.format(recall_score(true_labels, predicted_actions, average='weighted')))
+    logging.info('Weighted average F1 =  {:.4f}'.format(f1_score(true_labels, predicted_actions, average='weighted')))
+    logging.info('Weighted average Precision_score =  {:.4f}'.format(precision_score(true_labels, predicted_actions, average='weighted')))
+    logging.info('Weighted recall_score =  {:.4f}'.format(recall_score(true_labels, predicted_actions, average='weighted')))
 
-def calculate_one_vs_all_metrics(true_attack_type_indices, actions):
-    mapa = {0:'normal', 1:'DoS', 2:'Probe',3:'R2L',4:'U2R'}
+def calculate_one_vs_all_metrics(true_attack_type_indices, actions, **kwargs):
+    mapa = kwargs.get('attack_type', {0:'normal', 1:'DoS', 2:'Probe', 3:'R2L', 4:'U2R'})
+    if isinstance(mapa, list): 
+        mapa = {i: label for i, label in enumerate(mapa)}
+        
     yt_app = pd.Series(true_attack_type_indices).map(mapa)
 
-    perf_per_class = pd.DataFrame(index=range(len(yt_app.unique())),columns=['name', 'accuracy','f1', 'precision','recall'])
-    for i,x in enumerate(pd.Series(yt_app).value_counts().index):
-        y_test_hat_check = pd.Series(actions).map(mapa).copy()
-        y_test_hat_check[y_test_hat_check != x] = 'OTHER'
-        yt_app = pd.Series(true_attack_type_indices).map(mapa).copy()
-        yt_app[yt_app != x] = 'OTHER'
-        ac=accuracy_score(yt_app, y_test_hat_check)
-        f1=f1_score(yt_app, y_test_hat_check, pos_label=x, average='binary')
-        pr=precision_score(yt_app, y_test_hat_check, pos_label=x, average='binary')
-        re=recall_score(yt_app, y_test_hat_check, pos_label=x, average='binary')
-        perf_per_class.iloc[i]=[x,ac,f1,pr,re]
+    perf_per_class = pd.DataFrame(columns=['name', 'accuracy', 'f1', 'precision', 'recall'])
+    #perf_per_class = pd.DataFrame(index=range(len(yt_app.unique())),columns=['name', 'accuracy','f1', 'precision','recall'])
+    #for i,x in enumerate(pd.Series(yt_app).value_counts().index):
+    for x in yt_app.unique():
+        #y_test_hat_check = pd.Series(actions).map(mapa).copy()
+        #y_test_hat_check[y_test_hat_check != x] = 'OTHER'
+        #yt_app = pd.Series(true_attack_type_indices).map(mapa).copy()
+        #yt_app[yt_app != x] = 'OTHER'
+        #ac=accuracy_score(yt_app, y_test_hat_check)
+        #f1=f1_score(yt_app, y_test_hat_check, pos_label=x, average='binary', zero_division=0)
+        #pr=precision_score(yt_app, y_test_hat_check, pos_label=x, average='binary', zero_division=0)
+        #re=recall_score(yt_app, y_test_hat_check, pos_label=x, average='binary', zero_division=0)
+        #perf_per_class.iloc[i]=[x,ac,f1,pr,re]
+        y_pred = pd.Series(actions).map(mapa).copy()
+        y_true = yt_app.copy()
+
+        y_pred[y_pred != x] = 'OTHER'
+        y_true[y_true != x] = 'OTHER'
+
+        perf_per_class.loc[len(perf_per_class)] = [
+            x,
+            accuracy_score(y_true, y_pred),
+            f1_score(y_true, y_pred, pos_label=x, average='binary', zero_division=0),
+            precision_score(y_true, y_pred, pos_label=x, average='binary', zero_division=0),
+            recall_score(y_true, y_pred, pos_label=x, average='binary', zero_division=0)
+        ]
         
     return perf_per_class
 
 def calculate_general_overview_per_attack_type(attack_types, estimated_labels, estimated_correct_labels, true_labels, f1_scores, mismatch) -> pd.DataFrame:
-    outputs_df = pd.DataFrame(index = attack_types, columns = ["Estimated", "Correct", "Total", "F1_score", "Mismatch"])
+    outputs_df = pd.DataFrame(index = attack_types, columns = ["Estimated", "Correct", "Total", "Mismatch", "F1_score"])
     for indx, _ in enumerate(attack_types):
         outputs_df.iloc[indx].Estimated = estimated_labels[indx]
         outputs_df.iloc[indx].Correct = estimated_correct_labels[indx]
         outputs_df.iloc[indx].Total = true_labels[indx]
-        outputs_df.iloc[indx].F1_score = f1_scores[indx]*100
         outputs_df.iloc[indx].Mismatch = abs(mismatch[indx])
+        outputs_df.iloc[indx].F1_score = f1_scores[indx]*100
 
     # Add a row for the general F1 score
     general_f1_score = f1_scores[-1]
@@ -170,9 +244,9 @@ def calculate_general_overview_per_attack_type(attack_types, estimated_labels, e
         "Estimated": "",
         "Correct": "",
         "Total": "",
-        "F1_score": general_f1_score * 100,
-        "Mismatch": ""
-    }], index=["General"])
+        "Mismatch": "",
+        "F1_score": general_f1_score * 100
+    }], index=["Weigthed Avg."])
 
     outputs_df = pd.concat([outputs_df, general_row])
 

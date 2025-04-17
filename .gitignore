@@ -195,3 +195,6 @@ data/datasets/formated/training_data_boruta_stratified_and_strat_balanced_confir
 data/datasets/formated/training_data_rm_highly_correlated_features.csv
 data/datasets/cic_ids/cic-ids-2017/
 data/datasets/cic_ids/cse-cic-ids-2018/
+models/trained-models/tmp_model.keras
+data/datasets/formated/formated_training_data.csv
+data/datasets/formated/formated_test_data.csv

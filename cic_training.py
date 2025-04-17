@@ -1,14 +1,13 @@
-import numpy as np
 from data.cic_data_manager import CICDataManager
-from utils.config import CICIDS_2017_CLEAN_ALL_BENIGN, CICIDS_2017_CLEAN_ALL_MALICIOUS, CWD, TRAINED_MODELS_DIR
+from utils.config import CICIDS_2017_CLEAN_ALL_BENIGN, CICIDS_2017_CLEAN_ALL_MALICIOUS, CICIDS_2018_CLEAN_ALL_BENIGN, CICIDS_2018_CLEAN_ALL_MALICIOUS, CWD, TRAINED_MODELS_DIR
 from utils.log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, print_end_of_epoch_info_cic, save_debug_info
 from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, get_attack_actions, get_attack_states, get_defender_actions, get_attack_type_maps, print_total_runtime, save_trained_models, save_trained_models_cic, store_episode_results, store_episode_results_cic, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_episode_statistics_cic, update_models_and_statistics, update_models_and_statistics_cic
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
-from data.cic_data_manager import cic_attack_map_one_vs_all
+from data.cic_data_manager import cic_attack_map_one_vs_all, cic_attack_map
 from datetime import datetime
-from test.test_multiple_agents import test_trained_agent_quality
+from test.test_multiple_agents import test_trained_agent_quality_on_cross_set, test_trained_agent_quality_on_intra_set
 from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
 import logging
 import time
@@ -25,7 +24,6 @@ The following anomaly detection RL system is based on the work of Guillermo Cami
 The original project can be found at: https://github.com/gcamfer/Anomaly-ReactionRL
 To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipynb' https://github.com/gcamfer/Anomaly-ReactionRL/blob/master/Notebooks/AE_RL_NSL_KDD.ipynb
 """
-
 
 def main(attack_type=None, file_name_suffix=""):
     # TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
@@ -47,20 +45,29 @@ def main(attack_type=None, file_name_suffix=""):
     logger_setup(timestamp_begin, file_name_suffix)
     logging.info(f"Started script at: {timestamp_begin}\nCurrent working dir: {CWD}\nUsed data files: \n{CICIDS_2017_CLEAN_ALL_BENIGN},\n{CICIDS_2017_CLEAN_ALL_MALICIOUS}")
     script_start_time = datetime.now()
-
+    
+    # TODO: 1.2 Trainiere Attack & Defender-Agenten sowohl auf benign als auch auf ein <attack-type> Datensatz.
+    #    -> erstelle jeweils Paare für alle Attack Typen. Aggregiere die Resultate und speichere sie in einem Ordner. 
+    #   -> Notiere Ergebnisse in der Thesis. Das kommt am aller nähesten An die Experimente aus Towards Generalization in IDS...
+    # TODO: 3.1 meine typischen zwei Szenarien. 1. One Attacker: All possible traffic type vs. Defender, capable of classifying every class.; 2: Multiple Attackers (each benign & attacktype) vs Defender, capable of classifying every class.;
     try:
         batch_size = 1 # Train batch
         minibatch_size = 100 # batch of memory ExpRep
         experience_replay = True
         iterations_episode = 100
-        num_episodes = 3
+        num_episodes = 100
  
         logging.info("Setting up Attacker and Defender Agents...")
         # Load the CICIDS 2017 dataset
-        cic_2017 = True
-        data_mgr = CICDataManager(benign_path=CICIDS_2017_CLEAN_ALL_BENIGN,
-                                    malicious_path=CICIDS_2017_CLEAN_ALL_MALICIOUS, cic_2017=True, one_vs_all=True)
-        attack_valid_actions = list(range(len([0]))) if cic_2017 else list(range(len(data_mgr.attack_names))) # FIXME: use same condition as defender_valid_actions If i allow multiple attacks during training (the training set needs to be adjusted too then)
+        is_cic_2017 = True
+        multiple_attackers = False
+        one_vs_all = True
+        one_vs_all_target_class = '(D)DOS' # TODO: erweitere auf parameter aus main damit ich gezielt mehrere Tests starten kann.
+        inter_dataset_run = True
+        data_mgr = CICDataManager(benign_path=CICIDS_2017_CLEAN_ALL_BENIGN, malicious_path=CICIDS_2017_CLEAN_ALL_MALICIOUS, 
+                                  cic_2017=is_cic_2017, one_vs_all=one_vs_all, target_attack_type=one_vs_all_target_class, inter_dataset_run=inter_dataset_run, 
+                                  inter_dataset_benign_path=CICIDS_2018_CLEAN_ALL_BENIGN, inter_dataset_malicious_path=CICIDS_2018_CLEAN_ALL_MALICIOUS)
+        attack_valid_actions = list(range(len(data_mgr.attack_names)))
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
         att_epsilon = 1
@@ -133,11 +140,7 @@ def main(attack_type=None, file_name_suffix=""):
         env = RLenv(data_mgr, attackers, agent_defender, batch_size=batch_size, iterations_episode=iterations_episode)
 
         # Print training parameters
-        if cic_2017:
-            attack_names = ['Benign']
-        else:
-            attack_names = data_mgr.attack_names
-        log_training_parameters(training_params, attacker_params, defender_params, attack_type, attack_names)
+        log_training_parameters(training_params, attacker_params, defender_params, data_mgr.attack_types, data_mgr.attack_names)
         # Statistics
         att_reward_chain, def_reward_chain, att_loss_chain, def_loss_chain = [], [], [], []
         def_metrics_chain, att_metrics_chain = [], []
@@ -163,7 +166,7 @@ def main(attack_type=None, file_name_suffix=""):
             done = False
             
             # Reset the environment and initialize a new batch of random states and corresponding attack labels.
-            initial_state, labels = env.reset()
+            initial_state, y, labels = env.reset()
             # Determine the attack actions for the randomly chosen initial states based on the attackers' policies.
             # Depending on the epsilon value, the attackers either exploit their learned policy to predict the best actions
             # or explore random actions (Exploitation vs. Exploration).
@@ -260,28 +263,58 @@ def main(attack_type=None, file_name_suffix=""):
         # Test and visualize results#
         #############################
         logging.info(f"Trying to save summary plots under: {plots_path}")
-        plot_rewards_and_losses_during_training_multiple_agents(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
-        plot_attack_distributions_multiple_agents(attack_indices_per_episode, cic_attack_map_one_vs_all, data_mgr.attack_names, attacks_mapped_to_att_type_list, plots_path)
-        rewards = [def_reward_chain, att_reward_chain]
-        losses = [def_loss_chain, att_loss_chain]
-        plot_trend_lines_multiple_agents(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)
+        if multiple_attackers:
+            plot_rewards_and_losses_during_training_multiple_agents(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path) # Flag setzen
+            plot_attack_distributions_multiple_agents(attack_indices_per_episode, cic_attack_map, data_mgr.attack_names, attacks_mapped_to_att_type_list, plots_path)
+            rewards = [def_reward_chain, att_reward_chain]
+            losses = [def_loss_chain, att_loss_chain]
+            plot_trend_lines_multiple_agents(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)
 
-        attack_id_to_index = create_attack_id_to_index_mapping(cic_attack_map_one_vs_all, data_mgr.attack_names)
-        num_attacks = len(data_mgr.attack_names)
-        transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
-        plot_attack_distribution_for_each_attacker(transformed_attacks, data_mgr.attack_names, plots_path, ['Attacker CIC-2017'])
-        
-        attack_id_to_type = create_attack_id_to_type_mapping(cic_attack_map_one_vs_all)
-        # Daten transformieren
-        transformed_attacks_by_type = transform_attacks_by_type(attack_indices_per_episode, attack_id_to_type, data_mgr.attack_types)
+            attack_id_to_index = create_attack_id_to_index_mapping(cic_attack_map_one_vs_all, data_mgr.attack_names)
+            num_attacks = len(data_mgr.attack_names)
+            transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
+            plot_attack_distribution_for_each_attacker(transformed_attacks, data_mgr.attack_names, plots_path, ['Attacker CIC-2017'])
+            
+            attack_id_to_type = create_attack_id_to_type_mapping(cic_attack_map_one_vs_all)
+            # Daten transformieren
+            transformed_attacks_by_type = transform_attacks_by_type(attack_indices_per_episode, attack_id_to_type, data_mgr.attack_types)
 
-        plot_mapped_attack_distribution_for_each_attacker(transformed_attacks_by_type, ['Benign','Malicious'], plots_path, ['Attacker CIC-2017'])
-        plot_rewards_losses_boxplot(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)# FIXME: überprüfe ob Logik korrekt ist. 
-        # Nutze die Funktion nach Abschluss deines Trainings:
+            plot_mapped_attack_distribution_for_each_attacker(transformed_attacks_by_type, ['Benign','Malicious'], plots_path, ['Attacker CIC-2017'])
+        else:
+            # Rework this block to fit the previous workflow (single attacker vs single defender)
+            #plot_attack_distributions(attack_indices_per_episode, env.attack_names, attacks_mapped_to_att_type_list, plots_path)
+            if is_cic_2017:
+                plot_attack_distributions_multiple_agents(attack_indices_per_episode, cic_attack_map, data_mgr.attack_names, 
+                                                      attacks_mapped_to_att_type_list, plots_path, 
+                                                      attack_type=data_mgr.attack_types, use_direct_name_mapping=True)
+            rewards = [def_reward_chain, att_reward_chain]
+            losses = [def_loss_chain, att_loss_chain]
+            plot_trend_lines_multiple_agents(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)
+
+            attack_id_to_index = create_attack_id_to_index_mapping(cic_attack_map_one_vs_all, data_mgr.attack_names)
+            num_attacks = len(data_mgr.attack_names)
+            transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
+            plot_attack_distribution_for_each_attacker(transformed_attacks, data_mgr.attack_names, plots_path, ['Attacker CIC-2017'])
+            attack_id_to_type = create_attack_id_to_type_mapping(cic_attack_map_one_vs_all)
+            # Daten transformieren
+            transformed_attacks_by_type = transform_attacks_by_type(attack_indices_per_episode, attack_id_to_type, data_mgr.attack_types)
+            plot_mapped_attack_distribution_for_each_attacker(transformed_attacks_by_type, ['Benign','Malicious'], plots_path, ['Attacker CIC-2017'])
+
+
+        plot_rewards_losses_boxplot(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)
         plot_training_error(mse_before_history, mae_before_history, save_path=plots_path)
-        
+        # Plot ROC curve
         defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
-        test_trained_agent_quality(defender_model_path, plots_path)
+        test_trained_agent_quality_on_intra_set(defender_model_path, data_mgr, plots_path, one_vs_all=one_vs_all) # Hier noch eine Flag einbauen, oder DataManager direkt mitliefern...
+        
+        test_trained_agent_quality_on_cross_set(
+            path_to_model=defender_model_path,
+            X_test=data_mgr.x_val,
+            y_test=data_mgr.y_val,
+            plots_path=plots_path,
+            one_vs_all=True,
+            attack_types=data_mgr.attack_types # FIXME: auf data_mgr.attack_types umstellen
+        )
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)
@@ -330,3 +363,7 @@ if __name__ == "__main__":
         # Befinden sich alle numerischen Werte im bereich von 0-1 ? -> überprüfen ob die Daten korrekt formatiert wurden.
     # TODO: Schreibe Tests um zu überprüfen ob während des Trainings NaN auftauchen für die weights und layer outputs.
         # Überprüfe auch ob mehr als die Hälfte der Ausgaben einer Schicht != 0 sind.
+
+    # TODO: Verifiy
+    # - amount of fraud samples in CIC-2017 (Test amount of samples is correct!) für alle Attacken gibt es zum tei letwas weniger Proben als im Paper --> überprüfe nochmal mein pre-processing...
+    # Schau dafür in die ursprünglichen Daten nach label und filtere diese liste nach einer set. Anschließend mein map erweitern. Vielleicht ist dabei etwas entwicht... ansonsten schauen wie ich duplikate entferne evtl. zu hart weggeschnitten.
