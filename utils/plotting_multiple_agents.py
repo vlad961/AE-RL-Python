@@ -288,7 +288,6 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
             # Map using name
             mapped_epoch = [attack_id_to_name.get(value, "UNKNOWN") for value in flattened_epoch]
             mapped_epoch = [val for val in mapped_epoch if val != "UNKNOWN"]
-            attack_counts = pd.Series(mapped_epoch).value_counts()
         else:
             # Map using index
             mapped_epoch = [attack_id_to_index.get(value, -1) for value in flattened_epoch]
@@ -306,6 +305,7 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
                         f'{int(count)}', ha='center', va='bottom', fontsize=8, color='black')
             plt.ylim(0, attack_counts.max() + attack_counts.max() * 0.1)
         else:
+            plt.subplot(3, 3, indx + 1)  # falls du mehrere Epoch-Plots darstellen willst
             counts, _, bars = plt.hist(mapped_epoch, bins=bins, width=0.9, align='left', color='skyblue', edgecolor='black')
             plt.xlabel(f"{e} epoch")
             plt.xticks(bins[:-1], attack_names, rotation=90)

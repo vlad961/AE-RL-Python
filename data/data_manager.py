@@ -5,8 +5,8 @@ import os
 from typing import Dict, List, Tuple
 from utils.config import GLOBAL_RNG
 
-nsl_kdd_attack_map: Dict[str, str] = {'normal': 'normal',
-
+nsl_kdd_attack_map: Dict[str, str] = {
+                'normal': 'normal',
                 'back': 'DoS',
                 'land': 'DoS',
                 'neptune': 'DoS',
@@ -67,35 +67,31 @@ attack_types: List[str] = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
 class DataManager:
     def __init__(self, trainset_path: str, testset_path: str, formated_trainset_path: str,
                  formated_testset_path: str, dataset_type: str = "train", dataset_name: str = "nsl-kdd", normalization: str = 'linear'):
-        if dataset_name == "nsl-kdd":
-            self.col_names = nsl_kdd_col_names
-            self.index: int = 0
-            # Data formated path and test path.
-            self.loaded = False
-            self.dataset_type = dataset_type
-            self.trainset_path = trainset_path
-            self.testset_path = testset_path
+        self.col_names = nsl_kdd_col_names
+        self.index: int = 0
+        # Data formated path and test path.
+        self.loaded = False
+        self.dataset_type = dataset_type
+        self.trainset_path = trainset_path
+        self.testset_path = testset_path
 
-            self.formated_train_path = formated_trainset_path
-            self.formated_test_path = formated_testset_path
+        self.formated_train_path = formated_trainset_path
+        self.formated_test_path = formated_testset_path
 
-            self.attack_types = attack_types
-            
-            self.attack_map = nsl_kdd_attack_map
-            self.all_attack_names = list(self.attack_map.keys())
-            self.df: pd.DataFrame = None
-            if self.dataset_type == 'test':
-                _, self.df = self.format_nsl_kdd_data_instance(normalization)
-            else:
-                self.df, _ = self.format_nsl_kdd_data_instance(normalization)
-            self.attack_names = DataManager.update_attack_names(self.attack_map, self.df)
-            # Initialize a reusable random generator
-            self.loaded = True
-            self.shape = self.df.shape
-            self.obs_size = self.shape[1] - len(list(nsl_kdd_attack_map.keys())) # Number of columns/features - number of all possible attack names
+        self.attack_types = attack_types
+        
+        self.attack_map = nsl_kdd_attack_map
+        self.all_attack_names = list(self.attack_map.keys())
+        self.df: pd.DataFrame = None
+        if self.dataset_type == 'test':
+            _, self.df = self.format_nsl_kdd_data_instance(normalization)
         else:
-            # TODO: Implement other datasets
-            raise ValueError("Currently only nsl-kdd dataset is supported.")
+            self.df, _ = self.format_nsl_kdd_data_instance(normalization)
+        self.attack_names = DataManager.update_attack_names(self.attack_map, self.df)
+        # Initialize a reusable random generator
+        self.loaded = True
+        self.shape = self.df.shape
+        self.obs_size = self.shape[1] - len(list(nsl_kdd_attack_map.keys())) # Number of columns/features - number of all possible attack names
 
     def get_batch(self, batch_size=100) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
