@@ -1,19 +1,18 @@
 import json
 import logging
 import os
-from typing import List, Optional, Tuple, Union
-from matplotlib import pyplot as plt
+from typing import List, Optional, Tuple, Union 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import classification_report, confusion_matrix, f1_score, precision_score, recall_score
+from sklearn.metrics import classification_report, f1_score, precision_score, recall_score
 import tensorflow as tf
 import time
 
 from data.cic_data_manager import CICDataManager
 from data.nsl_kdd_data_manager import NslKddDataManager
 from utils.config import NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN
-from utils.helpers import calculate_f1_scores_per_class_dynamically, calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
-from utils.plotting import plot_confusion_matrix
+from utils.helpers import calculate_f1_scores_per_class_dynamically, calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, get_cf_matrix, get_model_summary
+from utils.plotting import plot_confusion_matrix, plot_roc_curve
 from utils.plotting_multiple_agents import visualize_q_value_errors
 
 def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKddDataManager | CICDataManager], plots_path, **kwargs):
@@ -97,7 +96,7 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     report = classification_report(true_attack_type_indices, actions, target_names=data_mgr.attack_types)
 
     logging.info(f"Classification report:\n{report}")
-    loss, mse, mae = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
+    loss, mse, mae, acc_model, precision, recall, auc_value = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
     logging.info(f"Model metrics: \nloss={loss}, mse={mse}, mae={mae}")
     logging.info(f"Optimizer config: {model.optimizer.get_config()}")
     logging.info(f"Time needed for testing: {time.time() - start_time}")
@@ -174,7 +173,7 @@ def test_trained_agent_quality_on_cross_set(path_to_model: str,
         metrics_json["classification_report"] = report
 
     # Modell-Metriken
-    loss, mse, mae = model.evaluate(states_tensor, pd.get_dummies(true_labels), verbose=2)
+    loss, mse, mae, acc_model, precision, recall, auc_value = model.evaluate(states_tensor, pd.get_dummies(true_labels), verbose=2)
     logging.info(f"[Cross-Set] Model metrics: loss={loss}, mse={mse}, mae={mae}")
 
     metrics_json["model_eval"] = {"loss": loss, "mse": mse, "mae": mae}

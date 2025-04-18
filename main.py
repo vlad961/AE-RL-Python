@@ -1,5 +1,5 @@
 from utils.config import CWD, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
-from utils.helpers import download_datasets_if_missing, get_attack_actions, print_total_runtime, save_model
+from utils.helpers import download_datasets_if_missing, print_total_runtime, save_model, store_experience
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
@@ -16,7 +16,7 @@ import os
 from utils.log_config import log_training_parameters, logger_setup, move_log_files
 from utils.plotting import plot_attack_distributions, plot_rewards_and_losses_during_training
 
-# FIXME: The states need to be verified. currently wrong states are used during the pipeline! See multiple_agents and cic_training.py as reference...
+# FIXME: The process must be verified! See multiple_agents and cic_training.py as reference...
 """
 This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
 Notes and credits:
@@ -39,7 +39,7 @@ def main(attack_type=None, file_name_suffix=""):
         minibatch_size = 100 # batch of memory ExpRep
         experience_replay = True
         iterations_episode = 100
-        num_episodes = 100
+        num_episodes = 3
 
         logging.info("Creating enviroment...")
         if not os.path.exists(NSL_KDD_FORMATTED_TRAIN_PATH) or not os.path.exists(NSL_KDD_FORMATTED_TEST_PATH):
@@ -160,13 +160,13 @@ def main(attack_type=None, file_name_suffix=""):
                 next_states, _, _, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,
                                                                                             attack_actions, states)
 
-                attacker_agent.learn(states, attack_actions, next_states, att_reward, done)
-                defender_agent.learn(states, defender_actions, next_states, def_reward, done)
+                store_experience(attackers, states, attack_actions, next_states, att_reward, done)
+                store_experience([defender_agent], states, defender_actions, next_states, def_reward, done)
 
                 # Train network, update loss after at least minibatch_learns
                 if experience_replay and epoch * iterations_episode + i_iteration >= minibatch_size:
-                    def_loss += defender_agent.update_model()[0]
-                    att_loss += attacker_agent.update_model()[0]
+                    def_loss += defender_agent.update_model()["loss"]
+                    att_loss += attacker_agent.update_model()["loss"]
 
                 # Update the state
                 states = next_states
@@ -207,7 +207,8 @@ def main(attack_type=None, file_name_suffix=""):
         logging.info(f"Trying to save summary plots under: {plots_path}")
         plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
-        test_trained_agent_quality(defender_model_path, plots_path)
+        test_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='test')
+        test_trained_agent_quality(defender_model_path, plots_path, test_data)
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)

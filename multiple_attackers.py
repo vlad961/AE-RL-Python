@@ -54,11 +54,12 @@ def main(attack_type=None, file_name_suffix=""):
         minibatch_size = 100 # batch of memory ExpRep
         experience_replay = True
         iterations_episode = 100
+        multiple_attackers = True
         num_episodes = 100
  
         logging.info("Setting up Attacker and Defender Agents...")
 
-        train_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, normalization='linear')
+        train_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, normalization='linear', multiple_attackers=multiple_attackers)
         attack_valid_actions = list(range(len(train_data.attack_names)))
         attack_valid_actions_dos, attack_valid_actions_probe, attack_valid_actions_r2l, attack_valid_actions_u2r = get_attack_type_maps(nsl_kdd_attack_map, train_data.attack_names)
 

@@ -66,7 +66,7 @@ attack_types: List[str] = ['normal', 'DoS', 'Probe', 'R2L', 'U2R']
 
 class NslKddDataManager:
     def __init__(self, trainset_path: str, testset_path: str, formated_trainset_path: str,
-                 formated_testset_path: str, dataset_type: str = "train", dataset_name: str = "nsl-kdd", normalization: str = 'linear'):
+                 formated_testset_path: str, dataset_type: str = "train", dataset_name: str = "nsl-kdd", normalization: str = 'linear', **kwargs):
         self.col_names = nsl_kdd_col_names
         self.index: int = 0
         # Data formated path and test path.
@@ -74,6 +74,7 @@ class NslKddDataManager:
         self.dataset_type = dataset_type
         self.trainset_path = trainset_path
         self.testset_path = testset_path
+        self.multiple_attackers = kwargs.get('multiple_attackers', False)
 
         self.formated_train_path = formated_trainset_path
         self.formated_test_path = formated_testset_path
@@ -507,6 +508,7 @@ class NslKddDataManager:
 
         self.df = balanced_df
         self.df = self.df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame one more time
+        self.shape = self.df.shape
         self.update_attack_names_for_given_attacks(all_attack_names)
         return self.df, self.attack_names
     

@@ -15,7 +15,9 @@ class RLenv():
         self.attack_agent: List[AttackAgent] = attack_agent
         self.defender = defender_agent
         self.data_manager = data_manager
-        
+        if isinstance(self.data_manager, NslKddDataManager):
+            self.multiple_attackers = data_manager.multiple_attackers
+
         # Train on specific attack type
         self.specific_attack_type = kwargs.get('specific_attack_type')
         data = kwargs.get('data')
@@ -138,7 +140,13 @@ class RLenv():
         '''
         first = True
         for attack in attacker_actions:
-            attack_name = self.attack_names[attack] if isinstance(self.data_manager, CICDataManager) else list(self.attack_map.keys())[attack]
+            if isinstance(self.data_manager, CICDataManager):
+                attack_name = self.attack_names[attack]
+            else:
+                if self.multiple_attackers:
+                    attack_name = list(self.attack_map.keys())[attack] # multiple_attackers.py
+                else:
+                    attack_name = self.attack_names[attack] # single_attacker.py
             filtered_df = self.df[self.df['Label'] == attack_name] if isinstance(self.data_manager, CICDataManager) else self.df[self.df[attack_name] == 1]
 
             if filtered_df.empty:

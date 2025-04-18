@@ -566,5 +566,7 @@ def plot_roc_curve(fpr, tpr, roc_auc, path):
     plt.ylabel('True Positive Rate')
     plt.title('Receiver Operating Characteristic (ROC)')
     plt.legend(loc="lower right")
+    if not os.path.exists(path):
+        os.makedirs(path)
     plt.savefig(os.path.join(path, 'roc_curve.pdf'), format='pdf', dpi=1000)
     plt.close()

@@ -36,7 +36,8 @@ class QNetwork():
 
         # Compilation of the model with optimizer and loss
         self.model.compile(loss=Huber(delta=1.0), optimizer=optimizer,
-                            metrics=["mse", "mae"])
+                            metrics=["mse", "mae", "accuracy", tf.keras.metrics.Precision(), 
+                                     tf.keras.metrics.Recall(), tf.keras.metrics.AUC(num_thresholds=100, name='auc')])
 
     def predict(self, state, batch_size=1):
         """
