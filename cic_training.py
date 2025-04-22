@@ -57,13 +57,13 @@ def main(attack_type=None, file_name_suffix=""):
  
         logging.info("Setting up Attacker and Defender Agents...")
         # Load the CICIDS 2017 dataset
-        is_cic_2017_trainingset = True
+        is_cic_2018_trainingset = False
         multiple_attackers = False
         one_vs_all = True
         one_vs_all_target_class = attack_type
         is_inter_dataset_run = True
         data_mgr = CICDataManager(benign_path=CICIDS_2017_CLEAN_ALL_BENIGN, malicious_path=CICIDS_2017_CLEAN_ALL_MALICIOUS, 
-                                  cic_2017=is_cic_2017_trainingset, one_vs_all=one_vs_all, target_attack_type=one_vs_all_target_class, inter_dataset_run=is_inter_dataset_run, 
+                                  is_cic_2018=is_cic_2018_trainingset, one_vs_all=one_vs_all, target_attack_type=one_vs_all_target_class, inter_dataset_run=is_inter_dataset_run, 
                                   inter_dataset_benign_path=CICIDS_2018_CLEAN_ALL_BENIGN, inter_dataset_malicious_path=CICIDS_2018_CLEAN_ALL_MALICIOUS)
         attack_valid_actions = list(range(len(data_mgr.attack_names)))
 
@@ -263,7 +263,7 @@ def main(attack_type=None, file_name_suffix=""):
         rewards = [def_reward_chain, att_reward_chain]
         losses = [def_loss_chain, att_loss_chain]
         plot_training_diagrams(multiple_attackers, attack_indices_per_episode, cic_attack_map, data_mgr, attacks_mapped_to_att_type_list, plots_path,
-            rewards, losses, is_cic_2017_trainingset, agent_defender, attackers, mse_before_history, mae_before_history)
+            rewards, losses, is_cic_2018_trainingset, agent_defender, attackers, mse_before_history, mae_before_history)
 
         defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
         test_trained_agent_quality_on_intra_set(defender_model_path, data_mgr, plots_path, one_vs_all=one_vs_all)
@@ -282,4 +282,4 @@ def main(attack_type=None, file_name_suffix=""):
 # Run the main function
 if __name__ == "__main__":
     # CIC-IDS Atack Types: 'Benign', 'Botnet', '(D)DOS', 'Probe', 'Brute Force', 'Web Attack', 'Infiltration', 'Heartbleed'
-    main("(D)DOS", file_name_suffix="-Mac-cic17-18-DoS-1st")
+    main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run")

@@ -37,7 +37,7 @@ def plot_training_diagrams(
         transformed_attacks_by_type = transform_attacks_by_type(attack_indices_per_episode, attack_id_to_type, data_mgr.attack_types)
         plot_mapped_attack_distribution_for_each_attacker(transformed_attacks_by_type, data_mgr.attack_types, plots_path, [attacker.name for attacker in attackers])
 
-    if not multiple_attackers and is_cic_2017_trainingset:
+    if not multiple_attackers:
         plot_attack_distributions_multiple_agents(
             attack_indices_per_episode, cic_attack_map, data_mgr.attack_names,
             attacks_mapped_to_att_type_list, plots_path,

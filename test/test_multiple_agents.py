@@ -129,20 +129,11 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
     predictions = np.argmax(q, axis=1)
 
     label_mapping = {'Benign': 0, '(D)DOS': 1}
-    true_labels = y_test.replace(label_mapping).values.flatten().tolist()
+    true_labels = np.array(y_test.replace(label_mapping).astype(int).values.flatten())
 
     if one_vs_all:
-        for true, pred in zip(true_labels, predictions):
-            if pred == true:
-                if true == 1:
-                    true_positive += 1
-                else:
-                    true_negative += 1
-            else:
-                if pred == 1:
-                    false_positive += 1
-                else:
-                    false_negative += 1
+        metrics = calculate_tp_tn_fp_fn(true_labels, predictions, len(attack_types))
+        true_positive, true_negative, false_positive, false_negative = metrics[1]['TP'], metrics[1]['TN'], metrics[1]['FP'], metrics[1]['FN']
 
         accuracy, recall, specificity, precision, f1_score_val, fpr = calculate_metrics(
             true_positive, true_negative, false_positive, false_negative
@@ -154,7 +145,7 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
             "precision": precision, "f1_score": f1_score_val, "false_positive_rate": fpr
         }
 
-        logging.info(f"[Cross-Set] Accuracy: {accuracy:.4f}, Recall: {recall:.4f}, "
+        logging.info(f"[Intra-Set] Accuracy: {accuracy:.4f}, Recall: {recall:.4f}, "
                      f"Precision: {precision:.4f}, F1: {f1_score_val:.4f}")
 
     # Optional: Confusion Matrix
@@ -164,8 +155,8 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
                             classes=attack_types,
                             path=os.path.join(plots_path, 'interset/'),
                             normalize=True,
-                            title="Normalized confusion matrix (Cross-Set)")
-        logging.info(f"[Cross-Set] Confusion matrix saved to {plots_path}")
+                            title="Normalized confusion matrix (Intra-Set)")
+        logging.info(f"[Intra-Set] Confusion matrix saved to {plots_path}")
 
         report = classification_report(true_labels, predictions, target_names=attack_types, output_dict=True)
         metrics_json["classification_report"] = report
@@ -184,8 +175,8 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
     with open(json_path, "w") as f:
         json.dump(metrics_json, f, indent=4, default=convert_numpy)
 
-    logging.info(f"[Cross-Set] Evaluation completed. Metrics exported to: {json_path}")
-    logging.info(f"[Cross-Set] Time needed: {time.time() - start_time:.2f} seconds")
+    logging.info(f"[Intra-Set] Evaluation completed. Metrics exported to: {json_path}")
+    logging.info(f"[Intra-Set] Time needed: {time.time() - start_time:.2f} seconds")
 
 
 def calculate_f1_overview(true_labels, predicted_labels, class_names: list[str]) -> Tuple[pd.DataFrame, float]:
