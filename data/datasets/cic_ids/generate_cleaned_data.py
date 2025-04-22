@@ -33,79 +33,79 @@ mapper = {
     'Dst Port': 'Destination Port',
     'Tot Fwd Pkts': 'Total Fwd Packets',
     'Tot Bwd Pkts': 'Total Backward Packets',
-    'TotLen Fwd Pkts': 'Fwd Packets Length Total', 
-    'Total Length of Fwd Packets': 'Fwd Packets Length Total',
-    'TotLen Bwd Pkts': 'Bwd Packets Length Total',
-    'Total Length of Bwd Packets': 'Bwd Packets Length Total', 
-    'Fwd Pkt Len Max': 'Fwd Packet Length Max',
-    'Fwd Pkt Len Min': 'Fwd Packet Length Min', 
-    'Fwd Pkt Len Mean': 'Fwd Packet Length Mean', 
-    'Fwd Pkt Len Std': 'Fwd Packet Length Std',
-    'Bwd Pkt Len Max': 'Bwd Packet Length Max', 
-    'Bwd Pkt Len Min': 'Bwd Packet Length Min', 
-    'Bwd Pkt Len Mean': 'Bwd Packet Length Mean',
-    'Bwd Pkt Len Std': 'Bwd Packet Length Std', 
-    'Flow Byts/s': 'Flow Bytes/s', 
-    'Flow Pkts/s': 'Flow Packets/s', 
-    'Fwd IAT Tot': 'Fwd IAT Total',
-    'Bwd IAT Tot': 'Bwd IAT Total', 
-    'Fwd Header Len': 'Fwd Header Length', 
-    'Bwd Header Len': 'Bwd Header Length', 
-    'Fwd Pkts/s': 'Fwd Packets/s',
-    'Bwd Pkts/s': 'Bwd Packets/s', 
-    'Pkt Len Min': 'Packet Length Min', 
-    'Min Packet Length': 'Packet Length Min',
-    'Pkt Len Max': 'Packet Length Max', 
-    'Max Packet Length': 'Packet Length Max',
-    'Pkt Len Mean': 'Packet Length Mean',
-    'Pkt Len Std': 'Packet Length Std', 
-    'Pkt Len Var': 'Packet Length Variance', 
-    'FIN Flag Cnt': 'FIN Flag Count', 
-    'SYN Flag Cnt': 'SYN Flag Count',
-    'RST Flag Cnt': 'RST Flag Count', 
-    'PSH Flag Cnt': 'PSH Flag Count', 
-    'ACK Flag Cnt': 'ACK Flag Count', 
-    'URG Flag Cnt': 'URG Flag Count',
-    'ECE Flag Cnt': 'ECE Flag Count', 
-    'Pkt Size Avg': 'Avg Packet Size',
-    'Average Packet Size': 'Avg Packet Size',
-    'Fwd Seg Size Avg': 'Avg Fwd Segment Size',
-    'Bwd Seg Size Avg': 'Avg Bwd Segment Size', 
-    'Fwd Byts/b Avg': 'Fwd Avg Bytes/Bulk',
-    'Fwd Pkts/b Avg': 'Fwd Avg Packets/Bulk', 
-    'Fwd Blk Rate Avg': 'Fwd Avg Bulk Rate', 
-    'Bwd Byts/b Avg': 'Bwd Avg Bytes/Bulk',
-    'Bwd Pkts/b Avg': 'Bwd Avg Packets/Bulk', 
-    'Bwd Blk Rate Avg': 'Bwd Avg Bulk Rate', 
-    'Subflow Fwd Pkts': 'Subflow Fwd Packets',
-    'Subflow Fwd Byts': 'Subflow Fwd Bytes', 
-    'Subflow Bwd Pkts': 'Subflow Bwd Packets', 
-    'Subflow Bwd Byts': 'Subflow Bwd Bytes',
-    'Init Fwd Win Byts': 'Init Fwd Win Bytes', 
-    'Init_Win_bytes_forward': 'Init Fwd Win Bytes',
-    'Init Bwd Win Byts': 'Init Bwd Win Bytes', 
-    'Init_Win_bytes_backward': 'Init Bwd Win Bytes',
-    'Fwd Act Data Pkts': 'Fwd Act Data Packets',
-    'act_data_pkt_fwd': 'Fwd Act Data Packets',
-    'Fwd Seg Size Min': 'Fwd Seg Size Min',
-    'min_seg_size_forward': 'Fwd Seg Size Min'
+    'TotLen Fwd Pkts': 'Fwd Packets Length Total', # 18 ->
+    'Total Length of Fwd Packets': 'Fwd Packets Length Total', # 17 ->
+    'TotLen Bwd Pkts': 'Bwd Packets Length Total', # 18 ->
+    'Total Length of Bwd Packets': 'Bwd Packets Length Total', # 17 ->
+    'Fwd Pkt Len Max': 'Fwd Packet Length Max', # 18 -> 17
+    'Fwd Pkt Len Min': 'Fwd Packet Length Min', # 18 -> 17
+    'Fwd Pkt Len Mean': 'Fwd Packet Length Mean', # 18 -> 17
+    'Fwd Pkt Len Std': 'Fwd Packet Length Std', # 18 -> 17
+    'Bwd Pkt Len Max': 'Bwd Packet Length Max', # 18 -> 17
+    'Bwd Pkt Len Min': 'Bwd Packet Length Min', # 18 -> 17
+    'Bwd Pkt Len Mean': 'Bwd Packet Length Mean', # 18 -> 17
+    'Bwd Pkt Len Std': 'Bwd Packet Length Std', # 18 -> 17
+    'Flow Byts/s': 'Flow Bytes/s', # 18 -> 17
+    'Flow Pkts/s': 'Flow Packets/s', # 18 -> 17
+    'Fwd IAT Tot': 'Fwd IAT Total', # 18 -> 17
+    'Bwd IAT Tot': 'Bwd IAT Total', # 18 -> 17
+    'Fwd Header Len': 'Fwd Header Length', # 18 -> 17
+    'Bwd Header Len': 'Bwd Header Length', # 18 -> 17
+    'Fwd Pkts/s': 'Fwd Packets/s', # 18 -> 17
+    'Bwd Pkts/s': 'Bwd Packets/s', # 18 -> 17
+    'Pkt Len Min': 'Packet Length Min', # 18
+    'Min Packet Length': 'Packet Length Min', # 17 
+    'Pkt Len Max': 'Packet Length Max', # 18
+    'Max Packet Length': 'Packet Length Max', # 17
+    'Pkt Len Mean': 'Packet Length Mean', # 18 -> 17
+    'Pkt Len Std': 'Packet Length Std', #  18 -> 17
+    'Pkt Len Var': 'Packet Length Variance', # 18 -> 17
+    'FIN Flag Cnt': 'FIN Flag Count', # 18 -> 17
+    'SYN Flag Cnt': 'SYN Flag Count', # 18 -> 17
+    'RST Flag Cnt': 'RST Flag Count', # 18 -> 17
+    'PSH Flag Cnt': 'PSH Flag Count', # 18 -> 17
+    'ACK Flag Cnt': 'ACK Flag Count', # 18 -> 17
+    'URG Flag Cnt': 'URG Flag Count', # 18 -> 17
+    'ECE Flag Cnt': 'ECE Flag Count', # 18 -> 17
+    'Pkt Size Avg': 'Avg Packet Size', # 18 
+    'Average Packet Size': 'Avg Packet Size', # 17
+    'Fwd Seg Size Avg': 'Avg Fwd Segment Size', # 18 -> 17
+    'Bwd Seg Size Avg': 'Avg Bwd Segment Size', # 18 -> 17
+    'Fwd Byts/b Avg': 'Fwd Avg Bytes/Bulk', # 18 -> 17 will be dropped
+    'Fwd Pkts/b Avg': 'Fwd Avg Packets/Bulk', # 18 -> 17 will be dropped
+    'Fwd Blk Rate Avg': 'Fwd Avg Bulk Rate', # 18 -> 17 will be dropped
+    'Bwd Byts/b Avg': 'Bwd Avg Bytes/Bulk', # 18 -> 17 will be dropped
+    'Bwd Pkts/b Avg': 'Bwd Avg Packets/Bulk', # 18 -> 17 will be dropped
+    'Bwd Blk Rate Avg': 'Bwd Avg Bulk Rate', # 18 -> 17 will be dropped
+    'Subflow Fwd Pkts': 'Subflow Fwd Packets', # 18 -> 17
+    'Subflow Fwd Byts': 'Subflow Fwd Bytes', # 18 -> 17
+    'Subflow Bwd Pkts': 'Subflow Bwd Packets', # 18 -> 17
+    'Subflow Bwd Byts': 'Subflow Bwd Bytes', # 18 -> 17
+    'Init Fwd Win Byts': 'Init Fwd Win Bytes', # 18
+    'Init_Win_bytes_forward': 'Init Fwd Win Bytes', # 17
+    'Init Bwd Win Byts': 'Init Bwd Win Bytes', # 18
+    'Init_Win_bytes_backward': 'Init Bwd Win Bytes', # 17
+    'Fwd Act Data Pkts': 'Fwd Act Data Packets', # 18
+    'act_data_pkt_fwd': 'Fwd Act Data Packets', # 17
+    'Fwd Seg Size Min': 'Fwd Seg Size Min', # 18 -> 18
+    'min_seg_size_forward': 'Fwd Seg Size Min' # 17 -> 18
 }
 
 def clean_dataset(dataset, filetypes=['feather']):
     # Will search for all files in the dataset subdirectory 'orignal'
     for file in os.listdir(f'{dataset}/original'):
         if not file.endswith('.csv'):
-            print(f"Ignoriere Datei: {file}")
+            print(f"Ignore file: {file}")
             continue
         print(f"------- {file} -------")
-        df = pd.read_csv(f"{dataset}/original/{file}", skipinitialspace=True, encoding='latin')
+        df = pd.read_csv(f"{dataset}/original/{file}", skipinitialspace=True, encoding='latin', low_memory=False)
         print(df["Label"].value_counts())
-        print(f"Shape: {df.shape}")
+        print(f"Shape before transformation: {df.shape}")
 
         # Rename column names for uniform column names across files
         df.rename(columns=mapper, inplace=True)
 
-        # Drop unrelevant columns
+        # I. Drop unrelevant columns
         df.drop(columns=drop_columns, inplace=True, errors="ignore")
 
         # Parse Timestamp column to pandas datetime
@@ -126,15 +126,18 @@ def clean_dataset(dataset, filetypes=['feather']):
         print(f'Columns with dtype == object: {obj_col}')
         df[obj_col] = df[obj_col].apply(pd.to_numeric, errors='coerce')
 
-        # Drop rows with invalid data
+        # II. Drop rows with invalid data
+        print(f"Shape before replacing np.inf values to np.nan: {df.shape}")
         df.replace([np.inf, -np.inf], np.nan, inplace=True)
         print(f"{df.isna().any(axis=1).sum()} invalid rows dropped")
         df.dropna(inplace=True)
 
-        # Drop duplicate rows
+        # III. Drop duplicate rows
+        print(f"Shape before dropping duplicates: {df.shape}")
+        print(f"Value counts before dropping duplicates: {df['Label'].value_counts()}")
         df.drop_duplicates(inplace=True, subset=df.columns.difference(['Label', 'Timestamp']))
-        print(df["Label"].value_counts())
-        print(f"shape: {df.shape}\n")
+        print(f"Value counts after dropping duplicates: {df['Label'].value_counts()}")
+        print(f"Shape after dropping duplicates: {df.shape}\n")
 
         # Reset index
         df.reset_index(inplace=True, drop=True)
@@ -152,7 +155,7 @@ def clean_dataset(dataset, filetypes=['feather']):
             df.to_parquet(f'{dataset}/clean/{file}.parquet', index=False)
         # Save additional to .csv for easy access
         if 'csv' in filetypes:
-            df.to_csv(f'{dataset}/clean/{file}.csv', index=False)
+            df.to_csv(f'{dataset}/clean/{file}', index=False)
             
 def aggregate_data(dataset, save=True, filetype='feather'):
     # Will search for all files in the 'clean' directory of the correct filetype and aggregate them

@@ -21,7 +21,6 @@ def test_trained_agent_quality(path_to_model, plots_path, test_data: NslKddDataM
     predicted_labels = np.zeros(len(test_data.attack_types),dtype=int)
     predicted_correct_labels = np.zeros(len(test_data.attack_types),dtype=int)
 
-    #states , labels = env.get_sequential_batch(test_path,batch_size = env.batch_size)
     states, labels = test_data.get_full() # get test data and true labels.
 
     start_time=time.time()
@@ -63,7 +62,7 @@ def test_trained_agent_quality(path_to_model, plots_path, test_data: NslKddDataM
 
     perf_per_class = calculate_one_vs_all_metrics(true_attack_type_indices, actions)
     logging.info(f"\r\nOne vs All metrics: \r\n{perf_per_class}")
-    loss, _, _, acc_model, precision, recall, auc_value = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
+    loss, _, _, acc_model, precision, recall, _ = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
     # loss, mse, mae, accuracy, precision, recall, auc
     # logging.info(f"AUC: {auc_value}") Doesnt make sense because we have a linear output layer to model the Q-Values.
     # Berechnen der ROC-Kurve und der AUC

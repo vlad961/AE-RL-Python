@@ -264,14 +264,14 @@ def transform_attacks_by_epoch(attacks_by_epoch, attack_id_to_index, num_attack_
     Returns:
         list: Transformed structure where each attacker has a list of epochs with attack frequencies.
     """
-    num_attackers = len(attacks_by_epoch[0][0])  # Anzahl der Angreifer
+    num_attackers = len(attacks_by_epoch[0][0])
     transformed = [[] for _ in range(num_attackers)]
 
     for epoch in attacks_by_epoch:
         epoch_counts = [np.zeros(num_attack_types, dtype=int) for _ in range(num_attackers)]
         for iteration in epoch:
             for attacker_idx, attack in enumerate(iteration):
-                attack_index = attack_id_to_index.get(int(attack[0]), -1)  # Umwandlung in int
+                attack_index = attack_id_to_index.get(int(attack[0]), -1)
                 if attack_index != -1:
                     epoch_counts[attacker_idx][attack_index] += 1
         for attacker_idx in range(num_attackers):

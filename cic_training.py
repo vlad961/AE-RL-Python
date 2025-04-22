@@ -1,24 +1,21 @@
 from data.cic_data_manager import CICDataManager
+from utils.plot_manager import plot_training_diagrams
 from utils.config import CICIDS_2017_CLEAN_ALL_BENIGN, CICIDS_2017_CLEAN_ALL_MALICIOUS, CICIDS_2018_CLEAN_ALL_BENIGN, CICIDS_2018_CLEAN_ALL_MALICIOUS, CWD, TRAINED_MODELS_DIR
-from utils.log_config import log_training_parameters, print_end_of_epoch_info, move_log_files, logger_setup, print_end_of_epoch_info_cic, save_debug_info
-from utils.helpers import create_attack_id_to_index_mapping, create_attack_id_to_type_mapping, print_total_runtime,  save_trained_models_cic, store_episode_results_cic, store_experience, transform_attacks_by_epoch, transform_attacks_by_type, update_episode_statistics, update_episode_statistics_cic, update_models_and_statistics, update_models_and_statistics_cic
+from utils.log_config import log_training_parameters, move_log_files, logger_setup, print_end_of_epoch_info_cic, save_debug_info
+from utils.helpers import print_total_runtime,  save_trained_models_cic, store_episode_results_cic, store_experience, update_episode_statistics_cic, update_models_and_statistics_cic
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
 from models.attack_agent import AttackAgent
-from data.cic_data_manager import cic_attack_map_one_vs_all, cic_attack_map
+from data.cic_data_manager import cic_attack_map
 from datetime import datetime
-from test.test_multiple_agents import test_trained_agent_quality_on_cross_set, test_trained_agent_quality_on_intra_set
-from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_mapped_attack_distribution_for_each_attacker, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
+from test.test_multiple_agents import test_trained_agent_quality_on_inter_set, test_trained_agent_quality_on_intra_set
+import gc
 import logging
-import time
 import os, sys
 import tensorflow as tf
-
-import gc
+import time
 
 """
-This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
-
 Notes and credits:
 The following anomaly detection RL system is based on the work of Guillermo Caminero, Manuel Lopez-Martin, Belen Carro "Adversarial environment reinforcement learning algorithm for intrusion detection".
 The original project can be found at: https://github.com/gcamfer/Anomaly-ReactionRL
@@ -49,7 +46,8 @@ def main(attack_type=None, file_name_suffix=""):
     # TODO: 1.2 Trainiere Attack & Defender-Agenten sowohl auf benign als auch auf ein <attack-type> Datensatz.
     #    -> erstelle jeweils Paare für alle Attack Typen. Aggregiere die Resultate und speichere sie in einem Ordner. 
     #   -> Notiere Ergebnisse in der Thesis. Das kommt am aller nähesten An die Experimente aus Towards Generalization in IDS...
-    # TODO: 3.1 meine typischen zwei Szenarien. 1. One Attacker: All possible traffic type vs. Defender, capable of classifying every class.; 2: Multiple Attackers (each benign & attacktype) vs Defender, capable of classifying every class.;
+    # TODO: 3.1 meine typischen zwei Szenarien. 1. One Attacker: All possible traffic type vs. Defender, capable of classifying every class.; 
+    # TODO: 3.2: Multiple Attackers (each benign & attacktype) vs Defender, capable of classifying every class.;
     try:
         batch_size = 1 # Train batch
         minibatch_size = 100 # batch of memory ExpRep
@@ -59,13 +57,13 @@ def main(attack_type=None, file_name_suffix=""):
  
         logging.info("Setting up Attacker and Defender Agents...")
         # Load the CICIDS 2017 dataset
-        is_cic_2017 = True
+        is_cic_2017_trainingset = True
         multiple_attackers = False
         one_vs_all = True
-        one_vs_all_target_class = '(D)DOS' # TODO: erweitere auf parameter aus main damit ich gezielt mehrere Tests starten kann.
-        inter_dataset_run = True
+        one_vs_all_target_class = attack_type
+        is_inter_dataset_run = True
         data_mgr = CICDataManager(benign_path=CICIDS_2017_CLEAN_ALL_BENIGN, malicious_path=CICIDS_2017_CLEAN_ALL_MALICIOUS, 
-                                  cic_2017=is_cic_2017, one_vs_all=one_vs_all, target_attack_type=one_vs_all_target_class, inter_dataset_run=inter_dataset_run, 
+                                  cic_2017=is_cic_2017_trainingset, one_vs_all=one_vs_all, target_attack_type=one_vs_all_target_class, inter_dataset_run=is_inter_dataset_run, 
                                   inter_dataset_benign_path=CICIDS_2018_CLEAN_ALL_BENIGN, inter_dataset_malicious_path=CICIDS_2018_CLEAN_ALL_MALICIOUS)
         attack_valid_actions = list(range(len(data_mgr.attack_names)))
 
@@ -78,7 +76,6 @@ def main(attack_type=None, file_name_suffix=""):
         att_hidden_layers = 5
         att_learning_rate = 0.001
 
-        # Defender is trained to detect type of attacks 0: attack, 1: normal FIXME: hier evtl attack und noraml wechseln
         defender_valid_actions = list(range(len(data_mgr.attack_types)))
         defender_num_actions = len(defender_valid_actions)
         def_epsilon = 1  # exploration
@@ -97,7 +94,7 @@ def main(attack_type=None, file_name_suffix=""):
                            "hidden_layers": def_hidden_layers,"learning_rate": def_learning_rate}
 
         # Create the attacker and defender agents
-        agent_cic_2017_attacker = AttackAgent(attack_valid_actions, data_mgr.obs_size, "CIC-2017", "EpsilonGreedy",
+        agent_cic_2017_attacker = AttackAgent(attack_valid_actions, data_mgr.obs_size, "CIC-2017-" + one_vs_all_target_class, "EpsilonGreedy",
                                         epoch_length=iterations_episode,
                                         epsilon=att_epsilon,
                                         min_epsilon=att_min_epsilon,
@@ -125,7 +122,7 @@ def main(attack_type=None, file_name_suffix=""):
                                         gamma=def_gamma,
                                         hidden_size=def_hidden_size,
                                         hidden_layers=def_hidden_layers,
-                                        minibatch_size=100, # //TODO: höhere minibatch_size für schnelleres Training
+                                        minibatch_size=100,
                                         mem_size=1000,
                                         learning_rate=def_learning_rate,
                                         ExpRep=experience_replay,
@@ -166,7 +163,7 @@ def main(attack_type=None, file_name_suffix=""):
             done = False
             
             # Reset the environment and initialize a new batch of random states and corresponding attack labels.
-            initial_state, y, labels = env.reset()
+            initial_state, _, _ = env.reset()
             # Determine the attack actions for the randomly chosen initial states based on the attackers' policies.
             # Depending on the epsilon value, the attackers either exploit their learned policy to predict the best actions
             # or explore random actions (Exploitation vs. Exploration).
@@ -175,7 +172,7 @@ def main(attack_type=None, file_name_suffix=""):
             # Retrieve the next states based on the chosen attack actions of the attacker agents.
             # Each state represents the environment after the execution of the corresponding attack.
             # The states are derived from the IDS dataset used in the environment.
-            states, labels, labels_names = env.get_attack_states(attack_actions)
+            states, _, labels_names = env.get_attack_states(attack_actions)
 
             # Iteration in one episode
             for iteration in range(iterations_episode):
@@ -185,7 +182,7 @@ def main(attack_type=None, file_name_suffix=""):
                 defender_actions = agent_defender.get_defender_actions(states)
 
                 # Enviroment actuation for those actions
-                next_states, next_labels, next_labels_names, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,
+                next_states, _, next_labels_names, def_reward, att_reward, next_attack_actions, done = env.act(defender_actions,
                                                                                             attack_actions, states)
 
                 # Store experiences
@@ -263,57 +260,20 @@ def main(attack_type=None, file_name_suffix=""):
         # Test and visualize results#
         #############################
         logging.info(f"Trying to save summary plots under: {plots_path}")
-        if multiple_attackers:
-            plot_rewards_and_losses_during_training_multiple_agents(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path) # Flag setzen
-            plot_attack_distributions_multiple_agents(attack_indices_per_episode, cic_attack_map, data_mgr.attack_names, attacks_mapped_to_att_type_list, plots_path)
-            rewards = [def_reward_chain, att_reward_chain]
-            losses = [def_loss_chain, att_loss_chain]
-            plot_trend_lines_multiple_agents(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)
+        rewards = [def_reward_chain, att_reward_chain]
+        losses = [def_loss_chain, att_loss_chain]
+        plot_training_diagrams(multiple_attackers, attack_indices_per_episode, cic_attack_map, data_mgr, attacks_mapped_to_att_type_list, plots_path,
+            rewards, losses, is_cic_2017_trainingset, agent_defender, attackers, mse_before_history, mae_before_history)
 
-            attack_id_to_index = create_attack_id_to_index_mapping(cic_attack_map_one_vs_all, data_mgr.attack_names)
-            num_attacks = len(data_mgr.attack_names)
-            transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
-            plot_attack_distribution_for_each_attacker(transformed_attacks, data_mgr.attack_names, plots_path, ['Attacker CIC-2017'])
-            
-            attack_id_to_type = create_attack_id_to_type_mapping(cic_attack_map_one_vs_all)
-            # Daten transformieren
-            transformed_attacks_by_type = transform_attacks_by_type(attack_indices_per_episode, attack_id_to_type, data_mgr.attack_types)
-
-            plot_mapped_attack_distribution_for_each_attacker(transformed_attacks_by_type, ['Benign','Malicious'], plots_path, ['Attacker CIC-2017'])
-        else:
-            # Rework this block to fit the previous workflow (single attacker vs single defender)
-            #plot_attack_distributions(attack_indices_per_episode, env.attack_names, attacks_mapped_to_att_type_list, plots_path)
-            if is_cic_2017:
-                plot_attack_distributions_multiple_agents(attack_indices_per_episode, cic_attack_map, data_mgr.attack_names, 
-                                                      attacks_mapped_to_att_type_list, plots_path, 
-                                                      attack_type=data_mgr.attack_types, use_direct_name_mapping=True)
-            rewards = [def_reward_chain, att_reward_chain]
-            losses = [def_loss_chain, att_loss_chain]
-            plot_trend_lines_multiple_agents(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)
-
-            attack_id_to_index = create_attack_id_to_index_mapping(cic_attack_map_one_vs_all, data_mgr.attack_names)
-            num_attacks = len(data_mgr.attack_names)
-            transformed_attacks = transform_attacks_by_epoch(attack_indices_per_episode, attack_id_to_index, num_attacks)
-            plot_attack_distribution_for_each_attacker(transformed_attacks, data_mgr.attack_names, plots_path, ['Attacker CIC-2017'])
-            attack_id_to_type = create_attack_id_to_type_mapping(cic_attack_map_one_vs_all)
-            # Daten transformieren
-            transformed_attacks_by_type = transform_attacks_by_type(attack_indices_per_episode, attack_id_to_type, data_mgr.attack_types)
-            plot_mapped_attack_distribution_for_each_attacker(transformed_attacks_by_type, ['Benign','Malicious'], plots_path, ['Attacker CIC-2017'])
-
-
-        plot_rewards_losses_boxplot(rewards, losses, [agent_defender.name, agent_cic_2017_attacker.name], plots_path)
-        plot_training_error(mse_before_history, mae_before_history, save_path=plots_path)
-        # Plot ROC curve
         defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
-        test_trained_agent_quality_on_intra_set(defender_model_path, data_mgr, plots_path, one_vs_all=one_vs_all) # Hier noch eine Flag einbauen, oder DataManager direkt mitliefern...
-        
-        test_trained_agent_quality_on_cross_set(
+        test_trained_agent_quality_on_intra_set(defender_model_path, data_mgr, plots_path, one_vs_all=one_vs_all)
+        test_trained_agent_quality_on_inter_set(
             path_to_model=defender_model_path,
-            X_test=data_mgr.x_val,
+            x_test=data_mgr.x_val,
             y_test=data_mgr.y_val,
             plots_path=plots_path,
             one_vs_all=True,
-            attack_types=data_mgr.attack_types # FIXME: auf data_mgr.attack_types umstellen
+            attack_types=data_mgr.attack_types
         )
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:
@@ -321,49 +281,5 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    main(file_name_suffix="-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001")
-    #main("U2R", file_name_suffix="-WIN-only-DoS")
-    #main("equally_balanced_data", file_name_suffix="-WIN-equally-balanced-data")
-    #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
-    #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
-    #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
-    #main(file_name_suffix="mac-all-attacks") # Run the main function with all attack types and save the results in a specific folder (mac-all-attacks)
-    #main("normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R)
-    #main("normal", file_name_suffix="mac-normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R) and save the results in a specific folder
-    # // TODO: 1 mehrere Angreifer-Agenten normal & attack
-    # // TODO: 2 Transferability (zuerst nsl-kdd, dann CICIDS2017, dann UNSW-NB15)
-    # // TODO: 3. Boruta Tool Document results in Thesis.tex (nutze nur confirmed (ohne automatisch zwang zum entscheiden von tetentative features -> müsste besser abschneiden))
-    # // TODO: 4. In R Random Forest Classifier implementieren und testen
-    # TODO: lass mal zuerst abwechselnd normal, dann DoS, dann Probe, dann R2L, dann U2R angriffe auswählen für eine bestimmte anzahl an Episoden + Iterationen pro Episode.
-    # Idee: zu beginn eine möglichst gleichverteiltes Training durchführen, um den Verteidiger-Agenten zunächst auf alle möglichen Angriffe zu trainieren. 
-    # Dadurch soll eine bessere Generalisierung erreicht werden bzw. eine Verzerrung der Daten vermieden werden.
-    
-    # Idee: 1. 10 Episoden mit normalen angriffen, 10 Episoden mit DoS angriffen, 10 Episoden mit Probe angriffen, 10 Episoden mit R2L angriffen, 10 Episoden mit U2R angriffen
-    # anschließend komplett zufällige angriffe auswählen wie bisher.
-
-    # Zweite Idee: belohne den Verteidiger-Agenten stärker, wenn er einen Angriff richtig erkennt im Gegensatz zu einem normalen Zustand. Also korrekter Angriff + 2, korrekter normaler Zustand + 1.
-    # -> dadurch wird der Verteidiger-Agent stärker darauf trainiert Angriffe zu erkennen, was in der Praxis auch wichtiger ist.
-    # Weiterhin kann ich versuchen Belohnungen dynamisch an die Anzahl der Angriffe anpassen, sodass der Verteidiger-Agent nicht nur auf die Anzahl der Angriffe trainiert wird, sondern auch auf die Art der Angriffe.
-    # Messe ob dadurch normale Angriffe gleichbleibend erkannt werden, aber Angriffe (vor allem seltene) besser erkannt werden.
-    # Ansatz 1: Statische belohnungen (seltene Angriffe erhalten dennoch eine größere Belohnung)
-    # Ansatz 2: Proportionale belohnungen (Anzahl der Angriffe wird berücksichtigt)
-        # -> da U2R am wenigsten instanzen hat würde ich die anzahl von iterationen pro episode verkürzen auf 52 (das ist die Anzahl der U2R instanzen)
-        # ->
-        #
-
-        # blei gleichverteilten Daten scheine ich leicht bessere Ergebnisse zu erhalten (down sampling von normalen instanzen) //TODO: verifizier schaue in meine Ergebnise auf PC (evtl. 2+3 Durchlauf)
-        # -> 
-
-    # TODO: Add False Positive Rate for each class. (FP / (FP + TN)) -> FP = False Positives, TN = True Negatives
-    # TODO: Prediction Bias für Angriffsklassen berechnen um zu sehen ob der Verteidiger-Agent eine Verzerrung in der Vorhersage hat. Vergleich usprüngliche Verteilung der Angriffe mit der Vorhersage des Verteidiger-Agenten.
-    # TODO: Test F
-    # TODO: ich könnte anstelle der bisherigen modell ausgaben softmax nutzen, thresholds setzen und damit die vorhersage beeinflussen. -> dadurch könnte ich die FP-Rate für bestimmte Klassen reduzieren.
-    # TODO: Data-scheme erstellen. Unit tests schreiben für die Ursprünglichen Daten vs die Formatierten Daten. -> Überprüfen ob die Daten korrekt formatiert wurden. 
-        # kategorischen Wert korrekt ? nur eine 1 an der richtigen Stelle ? -> überprüfen ob die Daten korrekt formatiert wurden.
-        # Befinden sich alle numerischen Werte im bereich von 0-1 ? -> überprüfen ob die Daten korrekt formatiert wurden.
-    # TODO: Schreibe Tests um zu überprüfen ob während des Trainings NaN auftauchen für die weights und layer outputs.
-        # Überprüfe auch ob mehr als die Hälfte der Ausgaben einer Schicht != 0 sind.
-
-    # TODO: Verifiy
-    # - amount of fraud samples in CIC-2017 (Test amount of samples is correct!) für alle Attacken gibt es zum tei letwas weniger Proben als im Paper --> überprüfe nochmal mein pre-processing...
-    # Schau dafür in die ursprünglichen Daten nach label und filtere diese liste nach einer set. Anschließend mein map erweitern. Vielleicht ist dabei etwas entwicht... ansonsten schauen wie ich duplikate entferne evtl. zu hart weggeschnitten.
+    # CIC-IDS Atack Types: 'Benign', 'Botnet', '(D)DOS', 'Probe', 'Brute Force', 'Web Attack', 'Infiltration', 'Heartbleed'
+    main("(D)DOS", file_name_suffix="-Mac-cic17-18-DoS-1st")

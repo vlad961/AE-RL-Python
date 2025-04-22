@@ -7,32 +7,36 @@ from data.datasets.cic_ids.data_loader import load_data, load_data_fraud
 from typing import List, Tuple
 from utils.config import GLOBAL_RNG
 
+ATTACK_TYPE_DDOS = "(D)DOS"
+ATTACK_TYPE_BRUTE_FORCE = "Brute Force"
+ATTACK_TYPE_WEB_ATTACK = "Web Attack"
+
 cic_attack_map = {
     'Benign': 'Benign',
     'Bot': 'Botnet',
-    'DDOS attack-LOIC-UDP': '(D)DOS',
-    'DDoS': '(D)DOS',
-    'DDoS attacks-LOIC-HTTP': '(D)DOS',
-    'DDOS attack-HOIC': '(D)DOS',
-    'DoS attacks-Hulk': '(D)DOS',
-    'DoS attacks-GoldenEye': '(D)DOS',
-    'DoS attacks-Slowloris': '(D)DOS',
-    'DoS attacks-SlowHTTPTest': '(D)DOS',
-    'DoS Hulk': '(D)DOS',
-    'DoS GoldenEye': '(D)DOS',
-    'DoS slowloris': '(D)DOS',
-    'DoS Slowhttptest': '(D)DOS',
+    'DDOS attack-LOIC-UDP': ATTACK_TYPE_DDOS,
+    'DDoS': ATTACK_TYPE_DDOS,
+    'DDoS attacks-LOIC-HTTP': ATTACK_TYPE_DDOS,
+    'DDOS attack-HOIC': ATTACK_TYPE_DDOS,
+    'DoS attacks-Hulk': ATTACK_TYPE_DDOS,
+    'DoS attacks-GoldenEye': ATTACK_TYPE_DDOS,
+    'DoS attacks-Slowloris': ATTACK_TYPE_DDOS,
+    'DoS attacks-SlowHTTPTest': ATTACK_TYPE_DDOS,
+    'DoS Hulk': ATTACK_TYPE_DDOS,
+    'DoS GoldenEye': ATTACK_TYPE_DDOS,
+    'DoS slowloris': ATTACK_TYPE_DDOS,
+    'DoS Slowhttptest': ATTACK_TYPE_DDOS,
     'PortScan': 'Probe',
-    'FTP-Patator': 'Brute Force',
-    'SSH-Patator': 'Brute Force',
-    'FTP-BruteForce': 'Brute Force',
-    'SSH-Bruteforce': 'Brute Force',
-    'Web Attack  Brute Force': 'Web Attack',
-    'Web Attack  XSS': 'Web Attack',
-    'Web Attack  Sql Injection': 'Web Attack',
-    'Brute Force -Web': 'Web Attack',
-    'Brute Force -XSS': 'Web Attack',
-    'SQL Injection': 'Web Attack',
+    'FTP-Patator': ATTACK_TYPE_BRUTE_FORCE,
+    'SSH-Patator': ATTACK_TYPE_BRUTE_FORCE,
+    'FTP-BruteForce': ATTACK_TYPE_BRUTE_FORCE,
+    'SSH-Bruteforce': ATTACK_TYPE_BRUTE_FORCE,
+    'Web Attack  Brute Force': ATTACK_TYPE_WEB_ATTACK,
+    'Web Attack  XSS': ATTACK_TYPE_WEB_ATTACK,
+    'Web Attack  Sql Injection': ATTACK_TYPE_WEB_ATTACK,
+    'Brute Force -Web': ATTACK_TYPE_WEB_ATTACK,
+    'Brute Force -XSS': ATTACK_TYPE_WEB_ATTACK,
+    'SQL Injection': ATTACK_TYPE_WEB_ATTACK,
     'Infilteration': 'Infiltration', #CICIDS2018
     'Infiltration': 'Infiltration', #CICIDS2017
     'Heartbleed': 'Heartbleed',
@@ -58,7 +62,7 @@ cic_attack_map = {normalize_label(k): v for k, v in cic_attack_map.items()}
 cic_attack_map_one_vs_all = {k: ('Benign' if v == 'Benign' else 'attack') for k, v in cic_attack_map.items()}
 
 class CICDataManager:
-    def __init__(self, benign_path: str, malicious_path: str, cic_2017: bool, normalization: str = 'linear', one_vs_all: bool = False, target_attack_type: str = "(D)DOS", inter_dataset_run: bool = False, inter_dataset_benign_path: str = None, inter_dataset_malicious_path: str = None):
+    def __init__(self, benign_path: str, malicious_path: str, cic_2017: bool, normalization: str = 'linear', one_vs_all: bool = False, target_attack_type: str = ATTACK_TYPE_DDOS, inter_dataset_run: bool = False, inter_dataset_benign_path: str = None, inter_dataset_malicious_path: str = None):
         self.benign_path = benign_path
         self.malicious_path = malicious_path
         self.cic_2017 = cic_2017
@@ -88,7 +92,7 @@ class CICDataManager:
             self.load_default_dataset()
 
 
-    def get_batch(self, batch_size=100) -> Tuple[pd.DataFrame, np.ndarray]: # FIXME: hier werden mehr als batch_size zurückgegeben siehe ursprüngliche Implementierung und transferiere hier her.
+    def get_batch(self, batch_size=100) -> Tuple[pd.DataFrame, np.ndarray]:
         indexes = list(range(self.index, self.index + batch_size))
         if max(indexes) > self.shape[0] - 1:
             dif = max(indexes) - self.shape[0]
@@ -132,22 +136,20 @@ class CICDataManager:
             self.index = GLOBAL_RNG.integers(0, self.df.shape[0] - 1, dtype=np.int32)
             return
 
-        # Kombiniere Trainingsdaten (Features und Labels)
+        # Combine train data and corresponding labels
         self.df = self.x_train.copy()
         self.df["Label"] = self.train_labels.reset_index(drop=True)
 
         self.loaded = True
         self.index = GLOBAL_RNG.integers(0, self.df.shape[0] - 1, dtype=np.int32)
 
-        # Attack names = konkrete Klassenbezeichner im Label
-        #self.attack_names = sorted(self.df["Label"].unique())
-        self.attack_names = sorted(set(cic_attack_map.keys())) # FIXME: nur die vorhandenen Angriffe hier auflisten 
+        self.attack_names = sorted(set(cic_attack_map.keys()))
 
     def load_one_vs_all_split(
         self,
         benign_path: str,
         malicious_path: str,
-        target_attack_type: str = "(D)DOS",
+        target_attack_type: str = ATTACK_TYPE_DDOS,
         benign_total: int = 250000,
         train_benign_size: int = 50000,
         benign_ratio = 0.8032, # CIC-IDS-2017 Ratio of total Data
@@ -157,14 +159,7 @@ class CICDataManager:
         file_format: str = "feather",
         random_state: int = 42
     ):
-        """
-        Erstellt ein One-vs-All Dataset im Verhältnis des Originalpapers:
-        Train auf benign-only, Validierung & Test auf benign + target_attack_type.
-        """
         # Helper
-        def label_encode(label):
-            return 0 if label == "Benign" else 1
-
         def process(df, x_min=None, x_max=None):
             labels = df["OriginalLabel"].copy() if "OriginalLabel" in df.columns else df["Label"].copy()
             y = df["Label"]#.apply(label_encode).values FIXME: warum zerschießt mir das alle ergebnisse wenn ich label_encode anwende ?
@@ -173,8 +168,8 @@ class CICDataManager:
                 if x_min is None or x_max is None:
                     x_min = X.min()
                     x_max = X.max()
-                X_norm = (X - x_min) / (x_max - x_min)                
-                return X_norm, y, labels, x_min, x_max
+                x_norm = (X - x_min) / (x_max - x_min)                
+                return x_norm, y, labels, x_min, x_max
 
             return X, y, labels, None, None
 
@@ -210,30 +205,27 @@ class CICDataManager:
         attack_df = attack_df.sample(frac=1.0, random_state=random_state)  # Shuffle einmal komplett
         attack_train = attack_df.iloc[:attack_train_count]
         remaining_attack_df = attack_df.iloc[attack_train_count:]
-        #attack_val, attack_test = train_test_split(attack_df, test_size=test_size_ratio, random_state=random_state)
         attack_val, attack_test = train_test_split(remaining_attack_df, test_size=test_size_ratio, random_state=random_state)
 
 
-        # Kombiniere
+        # combine
         val_df = pd.concat([benign_val, attack_val], ignore_index=True)
         test_df = pd.concat([benign_test, attack_test], ignore_index=True)
         train_df = pd.concat([benign_train, attack_train], ignore_index=True)
-        #attack_train = attack_df.drop(attack_val.index.union(attack_test.index))
 
-        # Verarbeite
-        X_train, y_train, plain_labels_train, x_min, x_max = process(train_df)
-        X_val, y_val, plain_labels_val, _, _ = process(val_df, x_min=x_min, x_max=x_max)
-        X_test, y_test, plain_labels_test, _, _ = process(test_df, x_min=x_min, x_max=x_max)
+        # process
+        x_train, y_train, plain_labels_train, x_min, x_max = process(train_df)
+        x_val, y_val, plain_labels_val, _, _ = process(val_df, x_min=x_min, x_max=x_max)
+        x_test, y_test, plain_labels_test, _, _ = process(test_df, x_min=x_min, x_max=x_max)
 
-        # Logging
         logging.info(f"One-vs-All Split ready (target: {target_attack_type}):")
-        logging.info(f"Train: {X_train.shape}, Validation: {X_val.shape}, Test: {X_test.shape}")
+        logging.info(f"Train: {x_train.shape}, Validation: {x_val.shape}, Test: {x_test.shape}")
 
-        # Rückgabe als Dict
+        # Return as Dict
         return {
-            "train": (X_train, y_train, plain_labels_train),
-            "val": (X_val, y_val, plain_labels_val),
-            "test": (X_test, y_test, plain_labels_test)
+            "train": (x_train, y_train, plain_labels_train),
+            "val": (x_val, y_val, plain_labels_val),
+            "test": (x_test, y_test, plain_labels_test)
         }
     
 
@@ -241,7 +233,7 @@ class CICDataManager:
         self,
         benign_path: str,
         malicious_path: str,
-        target_attack_type: str = "(D)DOS",
+        target_attack_type: str = ATTACK_TYPE_DDOS,
         is_cic_2018: bool = False,
         file_format: str = "feather"
     ):
@@ -259,16 +251,16 @@ class CICDataManager:
         return splits["test"]
 
 
-    def initialize_from_one_vs_all_split(self, splits, attack_label="(D)DOS"):
-        X_train, y_train, plain_label_train = splits["train"]
-        X_val, y_val, plain_label_val = splits["val"]
-        X_test, y_test, plain_label_test = splits["test"]
+    def initialize_from_one_vs_all_split(self, splits, attack_label=ATTACK_TYPE_DDOS):
+        x_train, y_train, plain_label_train = splits["train"]
+        x_val, y_val, plain_label_val = splits["val"]
+        x_test, y_test, plain_label_test = splits["test"]
 
-        self.x_train = X_train
+        self.x_train = x_train
         self.y_train = y_train
-        self.x_val = X_val
+        self.x_val = x_val
         self.y_val = y_val
-        self.x_test = X_test
+        self.x_test = x_test
         self.y_test = y_test
         self.plain_label_train = plain_label_train
         self.plain_label_val = plain_label_val
@@ -279,11 +271,11 @@ class CICDataManager:
         self.test_labels = pd.Series(["Benign" if y == 0 else attack_label for y in y_test])
         self.test_labels_original = self.test_labels.copy()
         assert len(self.x_train) == len(self.plain_label_train), f"Mismatch: {len(self.x_train)} features vs. {len(self.plain_label_train)} labels"
-        assert len(X_train) == len(self.plain_label_train), (f"❌ Label mismatch: {len(X_train)} samples vs {len(self.plain_label_train)} labels")
+        assert len(x_train) == len(self.plain_label_train), (f"❌ Label mismatch: {len(x_train)} samples vs {len(self.plain_label_train)} labels")
         assert not pd.Series(self.plain_label_train).isna().any(), "NaNs in plain_label_train!"
 
         # Baue vollständiges Trainings-DF
-        self.df = pd.DataFrame(X_train).reset_index(drop=True).assign(Label=pd.Series(self.plain_label_train).reset_index(drop=True))
+        self.df = pd.DataFrame(x_train).reset_index(drop=True).assign(Label=pd.Series(self.plain_label_train).reset_index(drop=True))
         # DataFrame fürs Logging o. Replay
 
         assert not self.df["Label"].isna().any(), "NaN-Labels present – Merge failed!"

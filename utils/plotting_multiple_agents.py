@@ -18,15 +18,14 @@ def plot_attack_distribution_for_each_attacker(attacks_by_epoch, attack_names, p
         path (str): Path to save the plots.
         attacker_labels (list): Names of attacker models (optional).
     """
-    # Definiere explizit das Layout
     fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(20, 15))
     epochs_to_plot = select_epochs_to_plot(attacks_by_epoch[0])
     num_attacks = len(attack_names)
     indices = np.arange(num_attacks)
-    bar_width = 0.8 / len(attacks_by_epoch)  # Dynamisch angepasst auf Anzahl der Angreifer
+    bar_width = 0.8 / len(attacks_by_epoch)
 
     for idx, epoch in enumerate(epochs_to_plot):
-        ax = axes.flatten()[idx]  # einfacher Zugriff auf die Subplots
+        ax = axes.flatten()[idx]
         for attacker_idx, attacker in enumerate(attacks_by_epoch):
             ax.bar(indices + attacker_idx * bar_width,
                 attacker[epoch],
@@ -38,19 +37,14 @@ def plot_attack_distribution_for_each_attacker(attacks_by_epoch, attack_names, p
         ax.set_xticklabels(attack_names, rotation=90, fontsize=7)
         ax.set_ylabel("Frequency")
 
-    # Titel der Abbildung mit etwas Platz nach oben
     fig.suptitle("Attack distribution for each attacker", fontsize=16, y=0.95)
 
-    # Legende etwas tiefer platzieren, direkt unter der Überschrift
     handles, labels = axes.flatten()[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center', ncol=len(attacks_by_epoch), 
             bbox_to_anchor=(0.5, 0.94), fontsize=10)
 
-    # Layout optimieren, sodass die Legende Platz hat
     fig.tight_layout(rect=[0, 0, 1, 0.92])
 
-
-    # Pfadprüfung und Speicherung
     if not os.path.exists(os.path.join(path, 'distribution')):
         os.makedirs(os.path.join(path, 'distribution'))
 
@@ -212,7 +206,7 @@ def plot_trend_lines_multiple_agents(rewards_list, losses_list, model_labels, pa
     plt.subplot(211)
     for idx, rewards in enumerate(rewards_list):
         plt.plot(np.arange(num_entries), rewards, label=f'{model_labels[idx]} Reward')
-    plt.title('Total Rewards by Episode (All Agents)')
+    plt.title('Total Rewards by Episode')
     plt.xlabel('Episode')
     plt.ylabel('Reward')
     plt.xticks(x_ticks, x_labels)
@@ -222,7 +216,7 @@ def plot_trend_lines_multiple_agents(rewards_list, losses_list, model_labels, pa
     plt.subplot(212)
     for idx, losses in enumerate(losses_list):
         plt.plot(np.arange(num_entries), losses, label=f'{model_labels[idx]} Loss')
-    plt.title('Losses by Episode (All Agents)')
+    plt.title('Losses by Episode')
     plt.xlabel('Episode')
     plt.ylabel('Loss')
     plt.xticks(x_ticks, x_labels)

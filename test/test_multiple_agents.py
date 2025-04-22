@@ -34,8 +34,6 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
                             if isinstance(data_mgr, CICDataManager)
                             else get_nsl_kdd_true_attack_type_indices(labels, data_mgr))
 
-    #aggregated_data_test = np.array(true_attack_type_indices)
-    #np.set_printoptions(precision=4)
     plot_confusion_matrix(get_cf_matrix(true_attack_type_indices, actions), 
                         classes=data_mgr.attack_types, path=os.path.join(plots_path, 'intraset/'), normalize=True,
                         title='Normalized confusion matrix')
@@ -96,7 +94,7 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     report = classification_report(true_attack_type_indices, actions, target_names=data_mgr.attack_types)
 
     logging.info(f"Classification report:\n{report}")
-    loss, mse, mae, acc_model, precision, recall, auc_value = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
+    loss, mse, mae, _, precision, recall, _ = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
     logging.info(f"Model metrics: \nloss={loss}, mse={mse}, mae={mae}")
     logging.info(f"Optimizer config: {model.optimizer.get_config()}")
     logging.info(f"Time needed for testing: {time.time() - start_time}")
@@ -114,8 +112,8 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     logging.info(f"Metrics exported to: {json_path}")
 
 
-def test_trained_agent_quality_on_cross_set(path_to_model: str, 
-                                            X_test: np.ndarray, 
+def test_trained_agent_quality_on_inter_set(path_to_model: str, 
+                                            x_test: np.ndarray, 
                                             y_test: np.ndarray,
                                             plots_path: str, 
                                             one_vs_all: bool = True,
@@ -126,7 +124,7 @@ def test_trained_agent_quality_on_cross_set(path_to_model: str,
     true_positive, true_negative, false_positive, false_negative = 0, 0, 0, 0
 
     model = tf.keras.models.load_model(path_to_model)
-    states_tensor = tf.convert_to_tensor(X_test, dtype=tf.float32)
+    states_tensor = tf.convert_to_tensor(x_test, dtype=tf.float32)
     q = model.predict(states_tensor)
     predictions = np.argmax(q, axis=1)
 
@@ -164,7 +162,7 @@ def test_trained_agent_quality_on_cross_set(path_to_model: str,
         cf = get_cf_matrix(true_labels, predictions)
         plot_confusion_matrix(cf,
                             classes=attack_types,
-                            path=os.path.join(plots_path, 'crossset/'),
+                            path=os.path.join(plots_path, 'interset/'),
                             normalize=True,
                             title="Normalized confusion matrix (Cross-Set)")
         logging.info(f"[Cross-Set] Confusion matrix saved to {plots_path}")
@@ -173,7 +171,7 @@ def test_trained_agent_quality_on_cross_set(path_to_model: str,
         metrics_json["classification_report"] = report
 
     # Modell-Metriken
-    loss, mse, mae, acc_model, precision, recall, auc_value = model.evaluate(states_tensor, pd.get_dummies(true_labels), verbose=2)
+    loss, mse, mae, _, precision, recall, _ = model.evaluate(states_tensor, pd.get_dummies(true_labels), verbose=2)
     logging.info(f"[Cross-Set] Model metrics: loss={loss}, mse={mse}, mae={mae}")
 
     metrics_json["model_eval"] = {"loss": loss, "mse": mse, "mae": mae}
