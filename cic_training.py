@@ -283,11 +283,13 @@ def main(attack_type=None, file_name_suffix=""):
 # Run the main function
 if __name__ == "__main__":
     # CIC-IDS Atack Types: 'Benign', 'Botnet', '(D)DOS', 'Probe', 'Brute Force', 'Web Attack', 'Infiltration', 'Heartbleed'
+    # Hint: 'Probe' and 'Heartbleed' are only in the CICIDS 2017 dataset contained. The other attacks are in both datasets.
+    #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run")
+    #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-2nd-Run")
     #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-3rd-Run")
-    main("Probe", file_name_suffix="-Linux-CIC-2017-18-Probe-1st-Run")
-    main("Probe", file_name_suffix="-Linux-CIC-2017-18-Probe-2nd-Run")
-    main("Probe", file_name_suffix="-Linux-CIC-2017-18-Probe-3rd-Run")
+    #main("Probe", file_name_suffix="-Linux-CIC-2017-18-Probe-1st-Run")
     main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-1st-Run")
+    """
     main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-2nd-Run")
     main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-3rd-Run")
     main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-1st-Run")
@@ -296,6 +298,4 @@ if __name__ == "__main__":
     main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-1st-Run")
     main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-2nd-Run")
     main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-3rd-Run")
-    main("Heartbleed", file_name_suffix="-Linux-CIC-2017-18-Heartbleed-1st-Run")
-    main("Heartbleed", file_name_suffix="-Linux-CIC-2017-18-Heartbleed-2nd-Run")
-    main("Heartbleed", file_name_suffix="-Linux-CIC-2017-18-Heartbleed-3rd-Run")
+    """

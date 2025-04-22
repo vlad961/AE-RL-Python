@@ -11,10 +11,41 @@ from utils.config import GLOBAL_RNG
 ATTACK_TYPE_DDOS = "(D)DOS"
 ATTACK_TYPE_BRUTE_FORCE = "Brute Force"
 ATTACK_TYPE_WEB_ATTACK = "Web Attack"
+ATTACK_TYPE_NORMAL = "Benign"
+ATTACK_TYPE_BOTNET = "Botnet"
+ATTACK_TYPE_DDOS = "(D)DOS"
+ATTACK_TYPE_BRUTE_FORCE = "Brute Force"
+ATTACK_TYPE_WEB_ATTACK = "Web Attack"
+ATTACK_TYPE_PROBE = "Probe"
+ATTACK_TYPE_INFILTRATION = "Infiltration"
+ATTACK_TYPE_HEARTBLEED = "Heartbleed"
+
+malicious_ratios = {
+    False: {  # CIC-IDS-2017
+        ATTACK_TYPE_NORMAL: 0.8032,
+        ATTACK_TYPE_DDOS: 0.1343,
+        ATTACK_TYPE_PROBE: 0.0562,
+        ATTACK_TYPE_BRUTE_FORCE: 0.0049,
+        ATTACK_TYPE_WEB_ATTACK: 0.0008,
+        ATTACK_TYPE_BOTNET: 0.0007,
+        ATTACK_TYPE_INFILTRATION: 0.0001,
+        ATTACK_TYPE_HEARTBLEED: 0.0001,
+    },
+    True: {  # CIC-IDS-2018
+        ATTACK_TYPE_NORMAL: 0.8459,
+        ATTACK_TYPE_DDOS: 0.1117,
+        ATTACK_TYPE_PROBE: 0.0,
+        ATTACK_TYPE_BRUTE_FORCE: 0.0108,
+        ATTACK_TYPE_WEB_ATTACK: 0.0010,
+        ATTACK_TYPE_BOTNET: 0.0166,
+        ATTACK_TYPE_INFILTRATION: 0.0149,
+        ATTACK_TYPE_HEARTBLEED: 0.0,
+    }
+}
 
 cic_attack_map = {
-    'Benign': 'Benign',
-    'Bot': 'Botnet',
+    'Benign': ATTACK_TYPE_NORMAL,
+    'Bot': ATTACK_TYPE_BOTNET,
     'DDOS attack-LOIC-UDP': ATTACK_TYPE_DDOS,
     'DDoS': ATTACK_TYPE_DDOS,
     'DDoS attacks-LOIC-HTTP': ATTACK_TYPE_DDOS,
@@ -27,7 +58,7 @@ cic_attack_map = {
     'DoS GoldenEye': ATTACK_TYPE_DDOS,
     'DoS slowloris': ATTACK_TYPE_DDOS,
     'DoS Slowhttptest': ATTACK_TYPE_DDOS,
-    'PortScan': 'Probe',
+    'PortScan': ATTACK_TYPE_PROBE,
     'FTP-Patator': ATTACK_TYPE_BRUTE_FORCE,
     'SSH-Patator': ATTACK_TYPE_BRUTE_FORCE,
     'FTP-BruteForce': ATTACK_TYPE_BRUTE_FORCE,
@@ -38,9 +69,9 @@ cic_attack_map = {
     'Brute Force -Web': ATTACK_TYPE_WEB_ATTACK,
     'Brute Force -XSS': ATTACK_TYPE_WEB_ATTACK,
     'SQL Injection': ATTACK_TYPE_WEB_ATTACK,
-    'Infilteration': 'Infiltration', #CICIDS2018
-    'Infiltration': 'Infiltration', #CICIDS2017
-    'Heartbleed': 'Heartbleed',
+    'Infilteration': ATTACK_TYPE_INFILTRATION, #CICIDS2018
+    'Infiltration': ATTACK_TYPE_INFILTRATION, #CICIDS2017
+    'Heartbleed': ATTACK_TYPE_HEARTBLEED,
 }
 
 @staticmethod
@@ -72,21 +103,28 @@ class CICDataManager:
         self.loaded = False
         self.df = None
         if self.one_vs_all:
-            splits = self.load_one_vs_all_split(benign_path=benign_path,
-                malicious_path=malicious_path,
-                target_attack_type=target_attack_type,
-                is_cic_2018=is_cic_2018,
-                normalization=normalization
-            )
+            try:
+                malicious_ratio = malicious_ratios[self.is_cic_2018_training_set][target_attack_type]
+            except ValueError:
+                raise ValueError(f"Unknown attack type: {target_attack_type}. Please use one of the predefined attack types.")
+
+            splits = self.load_one_vs_all_split(benign_path=benign_path, malicious_path=malicious_path,
+                                                 target_attack_type=target_attack_type, is_cic_2018=is_cic_2018,
+                                                 normalization=normalization, malicious_ratio=malicious_ratio)
             self.initialize_from_one_vs_all_split(splits, attack_label=target_attack_type)
             if inter_dataset_run: # Load inter dataset
                 assert inter_dataset_benign_path is not None, "Inter dataset <benign> path must be provided for inter dataset run."
                 assert inter_dataset_malicious_path is not None, "Inter dataset <malicious> path must be provided for inter dataset run."
+                try:
+                    malicious_ratio = malicious_ratios[not self.is_cic_2018_training_set][target_attack_type]
+                except ValueError:
+                    raise ValueError(f"Unknown attack type: {target_attack_type}. Please use one of the predefined attack types.")
                 validation_splits = self.load_inter_dataset_split(
                     benign_path=inter_dataset_benign_path,
                     malicious_path=inter_dataset_malicious_path,
                     target_attack_type=target_attack_type,
-                    is_cic_2018=not is_cic_2018
+                    is_cic_2018=not is_cic_2018,
+                    malicious_ratio=malicious_ratio,
                 )
                 self.x_val, self.y_val, self.plain_label_val = validation_splits # overwrite the intra dataset validation set
         else:
@@ -235,13 +273,9 @@ class CICDataManager:
         }
     
 
-    def load_inter_dataset_split(
-        self,
-        benign_path: str,
-        malicious_path: str,
-        target_attack_type: str = ATTACK_TYPE_DDOS,
-        is_cic_2018: bool = False,
-    ):
+    def load_inter_dataset_split(self, benign_path: str,
+                                 malicious_path: str, target_attack_type: str = ATTACK_TYPE_DDOS,
+                                 is_cic_2018: bool = False, malicious_ratio: float = None):
         """
         Creates a pure test set from a second dataset for evaluation.
         Uses internally load_one_vs_all_split(), but returs only the test part.
@@ -253,6 +287,7 @@ class CICDataManager:
             benign_ratio=0.8459 if is_cic_2018 else 0.8032,
             target_attack_type=target_attack_type,
             is_cic_2018=is_cic_2018,
+            malicious_ratio=malicious_ratio
         )
         return splits["test"]
 

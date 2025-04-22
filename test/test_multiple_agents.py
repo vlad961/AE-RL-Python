@@ -128,7 +128,7 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
     q = model.predict(states_tensor)
     predictions = np.argmax(q, axis=1)
 
-    label_mapping = {'Benign': 0, '(D)DOS': 1}
+    label_mapping = {type: index for index, type in enumerate(attack_types)}
     true_labels = np.array(y_test.replace(label_mapping).astype(int).values.flatten())
 
     if one_vs_all:
