@@ -41,5 +41,5 @@ def plot_training_diagrams(
         plot_attack_distributions_multiple_agents(
             attack_indices_per_episode, cic_attack_map, data_mgr.attack_names,
             attacks_mapped_to_att_type_list, plots_path,
-            attack_type=data_mgr.attack_types, use_direct_name_mapping=True
+            attack_types=data_mgr.attack_types, use_direct_name_mapping=True
         )
