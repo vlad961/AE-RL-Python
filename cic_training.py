@@ -275,8 +275,8 @@ def main(attack_type=None, file_name_suffix=""):
             one_vs_all=True,
             attack_types=data_mgr.attack_types
         )
-        move_log_files(current_log_path, destination_log_path)
         logging.info(f"Finished script at: {datetime.now().strftime('%Y-%m-%d-%H-%M')}\nTotal runtime: {datetime.now() - script_start_time}")
+        move_log_files(current_log_path, destination_log_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)
 
@@ -284,18 +284,16 @@ def main(attack_type=None, file_name_suffix=""):
 if __name__ == "__main__":
     # CIC-IDS Atack Types: 'Benign', 'Botnet', '(D)DOS', 'Probe', 'Brute Force', 'Web Attack', 'Infiltration', 'Heartbleed'
     # Hint: 'Probe' and 'Heartbleed' are only in the CICIDS 2017 dataset contained. The other attacks are in both datasets.
-    #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run")
+    main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run")
     #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-2nd-Run")
     #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-3rd-Run")
     #main("Probe", file_name_suffix="-Linux-CIC-2017-18-Probe-1st-Run")
-    main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-1st-Run")
-    """
-    main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-2nd-Run")
-    main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-3rd-Run")
-    main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-1st-Run")
-    main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-2nd-Run")
-    main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-3rd-Run")
-    main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-1st-Run")
-    main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-2nd-Run")
-    main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-3rd-Run")
-    """
+    #main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-1st-Run")
+    #main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-2nd-Run")
+    #main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-3rd-Run")
+    #main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-1st-Run")
+    #main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-2nd-Run")
+    #main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-3rd-Run")
+    #main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-1st-Run")
+    #main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-2nd-Run")
+    #main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-3rd-Run")
