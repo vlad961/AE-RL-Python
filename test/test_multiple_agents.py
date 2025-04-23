@@ -33,10 +33,11 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     true_attack_type_indices = (get_cic_true_attack_type_indices(labels, data_mgr, one_vs_all)
                             if isinstance(data_mgr, CICDataManager)
                             else get_nsl_kdd_true_attack_type_indices(labels, data_mgr))
-
+    dataset_name = "CIC-IDS-2018" if data_mgr.is_cic_2018_training_set else "CIC-IDS-2017"
+    title = f"Model trained on {dataset_name} (Intra-Set)"
     plot_confusion_matrix(get_cf_matrix(true_attack_type_indices, actions), 
                         classes=data_mgr.attack_types, path=os.path.join(plots_path, 'intraset/'), normalize=True,
-                        title='Normalized confusion matrix')
+                        title=title)
     
     logging.info(f"Model summary:\n{get_model_summary(model)}\nloaded from: {path_to_model}")
     
@@ -88,10 +89,7 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     logging.info("\n" + metrics_df.to_string(index=False))
     logging.info(f"Overall weighted F1-score: {weighted_f1:.4f}")
     #if not one_vs_all:
-    perf_per_class = calculate_one_vs_all_metrics(true_attack_type_indices, actions, attack_type=data_mgr.attack_types)
-    logging.info(f"\r\nOne vs All metrics: \r\n{perf_per_class}")
-    metrics_json["one_vs_all_detailed"] = perf_per_class.to_dict(orient="records")
-    report = classification_report(true_attack_type_indices, actions, target_names=data_mgr.attack_types)
+    report = classification_report(true_attack_type_indices, actions, target_names=data_mgr.attack_types, zero_division=0)
 
     logging.info(f"Classification report:\n{report}")
     loss, mse, mae, _, precision, recall, _ = model.evaluate(states_tensor, pd.get_dummies(true_attack_type_indices), verbose=2)
@@ -100,7 +98,7 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     logging.info(f"Time needed for testing: {time.time() - start_time}")
     metrics_json['f1_per_class'] = metrics_df.to_dict(orient='records')
     metrics_json['weighted_f1'] = weighted_f1
-    report_json = classification_report(true_attack_type_indices, actions, target_names=data_mgr.attack_types, output_dict=True)
+    report_json = classification_report(true_attack_type_indices, actions, target_names=data_mgr.attack_types, output_dict=True, zero_division=0)
     metrics_json["classification_report"] = report_json
     metrics_json["model_eval"] = {"loss": loss, "mse": mse, "mae": mae}
     metrics_json["optimizer"] = model.optimizer.get_config()
@@ -109,7 +107,7 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     json_path = os.path.join(os.path.dirname(path_to_model), "logs", f"evaluation_metrics_{model.name}.json")
     with open(json_path, "w") as f:
         json.dump(metrics_json, f, indent=4, default=convert_numpy)
-    logging.info(f"Metrics exported to: {json_path}")
+    logging.info(f"[Intra Set] Metrics exported to: {json_path}")
 
 
 def test_trained_agent_quality_on_inter_set(path_to_model: str, 
@@ -117,7 +115,11 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
                                             y_test: np.ndarray,
                                             plots_path: str, 
                                             one_vs_all: bool = True,
-                                            attack_types: Optional[List[str]] = None):
+                                            attack_types: Optional[List[str]] = None, 
+                                            is_cic_2018_training_set: bool = False):
+
+    if not attack_types:
+        raise ValueError("attack_types must be provided for inter-set evaluation.")
 
     start_time = time.time()
     metrics_json = {}
@@ -128,8 +130,16 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
     q = model.predict(states_tensor)
     predictions = np.argmax(q, axis=1)
 
+    # Map y_test string labels to integer indices based on attack_types
     label_mapping = {type: index for index, type in enumerate(attack_types)}
-    true_labels = np.array(y_test.replace(label_mapping).astype(int).values.flatten())
+    mapped_labels = y_test.map(label_mapping)
+    mask = mapped_labels.notna()
+
+    true_labels = mapped_labels[mask].astype(int).to_numpy()
+    predictions = predictions[mask.to_numpy()]
+    excluded = y_test[~mask].unique()
+    if len(excluded) > 0:
+        logging.warning(f"[Inter-Set] The following labels were not mapped and excluded: {excluded}")
 
     if one_vs_all:
         metrics = calculate_tp_tn_fp_fn(true_labels, predictions, len(attack_types))
@@ -145,24 +155,30 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
             "precision": precision, "f1_score": f1_score_val, "false_positive_rate": fpr
         }
 
-        logging.info(f"[Intra-Set] Accuracy: {accuracy:.4f}, Recall: {recall:.4f}, "
+        logging.info(f"[Inter-Set] Accuracy: {accuracy:.4f}, Recall: {recall:.4f}, "
                      f"Precision: {precision:.4f}, F1: {f1_score_val:.4f}")
 
     # Optional: Confusion Matrix
     if attack_types:
         cf = get_cf_matrix(true_labels, predictions)
+        dataset_name = "trained on CIC-IDS-2018, tested on CIC-IDS-2017" if is_cic_2018_training_set else "trained on CIC-IDS-2017, tested on CIC-IDS-2018"
+        title = f"Model {dataset_name}(Inter-Set)"
         plot_confusion_matrix(cf,
                             classes=attack_types,
                             path=os.path.join(plots_path, 'interset/'),
                             normalize=True,
-                            title="Normalized confusion matrix (Intra-Set)")
-        logging.info(f"[Intra-Set] Confusion matrix saved to {plots_path}")
+                            title=title)
+        logging.info(f"[Inter-Set] Confusion matrix saved to {plots_path}")
 
-        report = classification_report(true_labels, predictions, target_names=attack_types, output_dict=True)
+        report = classification_report(true_labels, predictions, target_names=attack_types, output_dict=True, zero_division=0)
         metrics_json["classification_report"] = report
 
     # Modell-Metriken
-    loss, mse, mae, _, precision, recall, _ = model.evaluate(states_tensor, pd.get_dummies(true_labels), verbose=2)
+    #loss, mse, mae, _, precision, recall, _ = model.evaluate(states_tensor, pd.get_dummies(true_labels), verbose=2)
+    if is_cic_2018_training_set:
+        states_tensor = states_tensor[mask.to_numpy()] # only keep the mapped labels
+    y_dummy = pd.get_dummies(true_labels, dtype=np.float32).reindex(columns=range(len(attack_types)), fill_value=0)
+    loss, mse, mae, _, precision, recall, _ = model.evaluate(states_tensor, y_dummy, verbose=2)
     logging.info(f"[Cross-Set] Model metrics: loss={loss}, mse={mse}, mae={mae}")
 
     metrics_json["model_eval"] = {"loss": loss, "mse": mse, "mae": mae}
@@ -175,8 +191,8 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
     with open(json_path, "w") as f:
         json.dump(metrics_json, f, indent=4, default=convert_numpy)
 
-    logging.info(f"[Intra-Set] Evaluation completed. Metrics exported to: {json_path}")
-    logging.info(f"[Intra-Set] Time needed: {time.time() - start_time:.2f} seconds")
+    logging.info(f"[Inter-Set] Evaluation completed. Metrics exported to: {json_path}")
+    logging.info(f"[Inter-Set] Time needed: {time.time() - start_time:.2f} seconds")
 
 
 def calculate_f1_overview(true_labels, predicted_labels, class_names: list[str]) -> Tuple[pd.DataFrame, float]:
@@ -249,6 +265,9 @@ def get_cic_true_attack_type_indices(labels: np.ndarray, data_mgr: CICDataManage
         elif label in data_mgr.attack_map: # Map attack name to attack type
             attack_type = data_mgr.attack_map[label]  # Map attack name to attack type
             attack_type_index = data_mgr.attack_types.index(attack_type)  # Get index of attack type
+            true_attack_type_indices.append(attack_type_index)
+        elif label in data_mgr.attack_map.values(): # Map attack type to attack type index
+            attack_type_index = data_mgr.attack_types.index(label)
             true_attack_type_indices.append(attack_type_index)
         else:
             # Handle unmapped labels (e.g., unknown attacks)

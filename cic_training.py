@@ -1,4 +1,5 @@
 from data.cic_data_manager import CICDataManager
+from enum import Enum
 from utils.plot_manager import plot_training_diagrams
 from utils.config import CICIDS_2017_CLEAN_ALL_BENIGN, CICIDS_2017_CLEAN_ALL_MALICIOUS, CICIDS_2018_CLEAN_ALL_BENIGN, CICIDS_2018_CLEAN_ALL_MALICIOUS, CWD, TRAINED_MODELS_DIR
 from utils.log_config import log_training_parameters, move_log_files, logger_setup, print_end_of_epoch_info_cic, save_debug_info
@@ -22,7 +23,27 @@ The original project can be found at: https://github.com/gcamfer/Anomaly-Reactio
 To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipynb' https://github.com/gcamfer/Anomaly-ReactionRL/blob/master/Notebooks/AE_RL_NSL_KDD.ipynb
 """
 
-def main(attack_type=None, file_name_suffix=""):
+class DataSet(Enum):
+    CICIDS_2017 = 1
+    CICIDS_2018 = 2
+
+def get_dataset_paths(dataset: DataSet):
+    if dataset == DataSet.CICIDS_2017:
+        # Load the CICIDS 2017 dataset
+        benign_path = CICIDS_2017_CLEAN_ALL_BENIGN
+        malicious_path = CICIDS_2017_CLEAN_ALL_MALICIOUS
+        inter_dataset_benign_path = CICIDS_2018_CLEAN_ALL_BENIGN
+        inter_dataset_malicious_path = CICIDS_2018_CLEAN_ALL_MALICIOUS
+        is_cic_2018_trainingset = False
+    elif dataset == DataSet.CICIDS_2018:
+        # Load the CICIDS 2018 dataset
+        benign_path = CICIDS_2018_CLEAN_ALL_BENIGN
+        malicious_path = CICIDS_2018_CLEAN_ALL_MALICIOUS
+        inter_dataset_benign_path = CICIDS_2017_CLEAN_ALL_BENIGN
+        inter_dataset_malicious_path = CICIDS_2017_CLEAN_ALL_MALICIOUS
+        is_cic_2018_trainingset = True
+    return benign_path, malicious_path, inter_dataset_benign_path, inter_dataset_malicious_path, is_cic_2018_trainingset
+def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs_all=True, is_inter_dataset_run=True, dataset=DataSet.CICIDS_2017):
     # TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
     try:
         physical_devices = tf.config.list_physical_devices('GPU')
@@ -38,9 +59,10 @@ def main(attack_type=None, file_name_suffix=""):
     plots_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/plots/")
     current_log_path = os.path.join(CWD, f"logs/{output_root_dir}.log")
     destination_log_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/logs/")
-    
+    benign_path, malicious_path, inter_dataset_benign_path, inter_dataset_malicious_path, is_cic_2018_trainingset = get_dataset_paths(dataset)
     logger_setup(timestamp_begin, file_name_suffix)
-    logging.info(f"Started script at: {timestamp_begin}\nCurrent working dir: {CWD}\nUsed data files: \n{CICIDS_2017_CLEAN_ALL_BENIGN},\n{CICIDS_2017_CLEAN_ALL_MALICIOUS}")
+    logging.info(f"Started script at: {timestamp_begin}\nCurrent working dir: {CWD}\nUsed training data files: \n{benign_path},\n{malicious_path}\n"
+                 + f"Used inter set for validation:\n{inter_dataset_benign_path},\n{inter_dataset_malicious_path}")
     script_start_time = datetime.now()
     
     # TODO: 1.2 Trainiere Attack & Defender-Agenten sowohl auf benign als auch auf ein <attack-type> Datensatz.
@@ -54,17 +76,17 @@ def main(attack_type=None, file_name_suffix=""):
         experience_replay = True
         iterations_episode = 100
         num_episodes = 100
- 
+
         logging.info("Setting up Attacker and Defender Agents...")
         # Load the CICIDS 2017 dataset
-        is_cic_2018_trainingset = False
-        multiple_attackers = False
-        one_vs_all = True
+        if attack_type == "all":
+            one_vs_all = False
         one_vs_all_target_class = attack_type
-        is_inter_dataset_run = True
-        data_mgr = CICDataManager(benign_path=CICIDS_2017_CLEAN_ALL_BENIGN, malicious_path=CICIDS_2017_CLEAN_ALL_MALICIOUS, 
+
+
+        data_mgr = CICDataManager(benign_path=benign_path, malicious_path=malicious_path, 
                                   is_cic_2018=is_cic_2018_trainingset, one_vs_all=one_vs_all, target_attack_type=one_vs_all_target_class, inter_dataset_run=is_inter_dataset_run, 
-                                  inter_dataset_benign_path=CICIDS_2018_CLEAN_ALL_BENIGN, inter_dataset_malicious_path=CICIDS_2018_CLEAN_ALL_MALICIOUS)
+                                  inter_dataset_benign_path=inter_dataset_benign_path, inter_dataset_malicious_path=inter_dataset_malicious_path)
         attack_valid_actions = list(range(len(data_mgr.attack_names)))
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
@@ -267,13 +289,20 @@ def main(attack_type=None, file_name_suffix=""):
 
         defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
         test_trained_agent_quality_on_intra_set(defender_model_path, data_mgr, plots_path, one_vs_all=one_vs_all)
+        if one_vs_all_target_class == 'Probe' or one_vs_all_target_class == 'Heartbleed':
+            logging.info(f"Skipping inter dataset test for {one_vs_all_target_class} as it is not present in the CICIDS 2018 dataset.")
+            logging.info(f"Finished script at: {datetime.now().strftime('%Y-%m-%d-%H-%M')}\nTotal runtime: {datetime.now() - script_start_time}")
+            move_log_files(current_log_path, destination_log_path)
+            return
+
         test_trained_agent_quality_on_inter_set(
             path_to_model=defender_model_path,
             x_test=data_mgr.x_val,
             y_test=data_mgr.y_val,
             plots_path=plots_path,
-            one_vs_all=True,
-            attack_types=data_mgr.attack_types
+            one_vs_all=one_vs_all,
+            attack_types=data_mgr.attack_types,
+            is_cic_2018_training_set=is_cic_2018_trainingset,
         )
         logging.info(f"Finished script at: {datetime.now().strftime('%Y-%m-%d-%H-%M')}\nTotal runtime: {datetime.now() - script_start_time}")
         move_log_files(current_log_path, destination_log_path)
@@ -284,7 +313,12 @@ def main(attack_type=None, file_name_suffix=""):
 if __name__ == "__main__":
     # CIC-IDS Atack Types: 'Benign', 'Botnet', '(D)DOS', 'Probe', 'Brute Force', 'Web Attack', 'Infiltration', 'Heartbleed'
     # Hint: 'Probe' and 'Heartbleed' are only in the CICIDS 2017 dataset contained. The other attacks are in both datasets.
-    main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run")
+    #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run", dataset=DataSet.CICIDS_2017)
+
+    # Hint: The given dataset corresponds to the training set. The validation set is the other dataset. In case no inter dataset run is needed, set the 'is_inter_dataset_run' parameter to False.
+    main("all", file_name_suffix="-mac-cic-2017-18-multi-class-1st-run", one_vs_all=False, dataset=DataSet.CICIDS_2017)
+    main("all", file_name_suffix="-mac-cic-2018-17-multi-class-1st-run", one_vs_all=False, dataset=DataSet.CICIDS_2018)
+
     #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-2nd-Run")
     #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-3rd-Run")
     #main("Probe", file_name_suffix="-Linux-CIC-2017-18-Probe-1st-Run")

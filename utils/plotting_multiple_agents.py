@@ -315,7 +315,7 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
     plt.close()
 
     # Plot attacks distribution alongside
-    plt.figure(3,figsize=[10,10])
+    plt.figure(3,figsize=[12,10])
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks (mapped) distribution throughout  episodes")
@@ -330,6 +330,7 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
         plt.xlabel("{} epoch".format(e))
 
         # Set Y-Axis to integer ticks only
+        plt.xticks(rotation=45, ha='right')  # 45° Rotation & rechtsbündig
         plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
 
         # Dynamic y-axis limit
@@ -342,7 +343,7 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
             plt.text(bar.get_x() + bar.get_width() / 2, height + 0.5,  # Position over the bar
                      f'{int(height)}', ha='center', va='bottom', fontsize=8, color='black')
 
-    plt.tight_layout()
+    plt.tight_layout(pad=2.0)
     plt.savefig(os.path.join(path, 'distribution/attacks_mapped_distribution.pdf'), format='pdf', dpi=1000)
     plt.close()
 

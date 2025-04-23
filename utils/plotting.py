@@ -121,10 +121,17 @@ def plot_confusion_matrix(cm, classes,
 
 
     logging.info(f"\nConfusion Matrix:\n{cm}")
-    plt.figure(figsize=(10,7))
-    sns.heatmap(cm, annot=True, fmt='g', xticklabels=classes, yticklabels=classes, cmap='Blues')
-    plt.xlabel('Predicted label')
-    plt.ylabel('True label')
+    fig_height = max(9, 0.6 * len(classes))
+    fig_width = max(10, 0.6 * len(classes))
+    fmt = '.4f' if normalize else 'd'
+    plt.figure(figsize=(fig_width, fig_height))
+    sns.heatmap(cm, annot=True, fmt=fmt, xticklabels=classes, yticklabels=classes, cmap='Blues')
+    plt.title(title, fontsize=14)
+    plt.xlabel('Predicted label', fontsize=12)
+    plt.ylabel('True label', fontsize=12)
+    plt.xticks(rotation=45, ha='right', fontsize=9)
+    plt.yticks(rotation=0, fontsize=9)
+
     if not os.path.exists(path):
         os.makedirs(path)
     plt.savefig(os.path.join(path, 'confusion_matrix.pdf'), format='pdf', dpi=1000)

@@ -8,19 +8,16 @@ from data.datasets.cic_ids.data_loader import load_data, load_data_fraud
 from typing import List, Tuple
 from utils.config import GLOBAL_RNG
 
-ATTACK_TYPE_DDOS = "(D)DOS"
-ATTACK_TYPE_BRUTE_FORCE = "Brute Force"
-ATTACK_TYPE_WEB_ATTACK = "Web Attack"
 ATTACK_TYPE_NORMAL = "Benign"
-ATTACK_TYPE_BOTNET = "Botnet"
 ATTACK_TYPE_DDOS = "(D)DOS"
 ATTACK_TYPE_BRUTE_FORCE = "Brute Force"
 ATTACK_TYPE_WEB_ATTACK = "Web Attack"
+ATTACK_TYPE_BOTNET = "Botnet"
 ATTACK_TYPE_PROBE = "Probe"
 ATTACK_TYPE_INFILTRATION = "Infiltration"
 ATTACK_TYPE_HEARTBLEED = "Heartbleed"
 
-malicious_ratios = {
+CIC_RATIOS = {
     False: {  # CIC-IDS-2017
         ATTACK_TYPE_NORMAL: 0.8032,
         ATTACK_TYPE_DDOS: 0.1343,
@@ -104,11 +101,11 @@ class CICDataManager:
         self.df = None
         if self.one_vs_all:
             try:
-                malicious_ratio = malicious_ratios[self.is_cic_2018_training_set][target_attack_type]
+                malicious_ratio = CIC_RATIOS[self.is_cic_2018_training_set][target_attack_type]
             except ValueError:
                 raise ValueError(f"Unknown attack type: {target_attack_type}. Please use one of the predefined attack types.")
 
-            splits = self.load_one_vs_all_split(benign_path=benign_path, malicious_path=malicious_path,
+            splits = self.load_and_split_data(benign_path=benign_path, malicious_path=malicious_path,
                                                  target_attack_type=target_attack_type, is_cic_2018=is_cic_2018,
                                                  normalization=normalization, malicious_ratio=malicious_ratio)
             self.initialize_from_one_vs_all_split(splits, attack_label=target_attack_type)
@@ -116,20 +113,32 @@ class CICDataManager:
                 assert inter_dataset_benign_path is not None, "Inter dataset <benign> path must be provided for inter dataset run."
                 assert inter_dataset_malicious_path is not None, "Inter dataset <malicious> path must be provided for inter dataset run."
                 try:
-                    malicious_ratio = malicious_ratios[not self.is_cic_2018_training_set][target_attack_type]
+                    malicious_ratio = CIC_RATIOS[not self.is_cic_2018_training_set][target_attack_type]
                 except ValueError:
                     raise ValueError(f"Unknown attack type: {target_attack_type}. Please use one of the predefined attack types.")
-                validation_splits = self.load_inter_dataset_split(
-                    benign_path=inter_dataset_benign_path,
-                    malicious_path=inter_dataset_malicious_path,
-                    target_attack_type=target_attack_type,
-                    is_cic_2018=not is_cic_2018,
-                    malicious_ratio=malicious_ratio,
-                )
+                validation_splits = self.load_inter_dataset_split(benign_path=inter_dataset_benign_path, malicious_path=inter_dataset_malicious_path,
+                                                                  target_attack_type=target_attack_type, is_cic_2018=not is_cic_2018,
+                                                                  malicious_ratio=malicious_ratio)
                 self.x_val, self.y_val, self.plain_label_val = validation_splits # overwrite the intra dataset validation set
-        else:
-            self.load_default_dataset()
+        else: # Multi-Class
+            if is_cic_2018:
+                benign_total = 550000
+                benign_ratio = 0.8459
+            else:
+                benign_total = 250000
+                benign_ratio = 0.8032
+            splits = self.load_and_split_data(benign_path=benign_path, malicious_path=malicious_path, target_attack_type=target_attack_type,
+                                              benign_total=benign_total, benign_ratio=benign_ratio, is_cic_2018=is_cic_2018,
+                                              normalization=normalization)
+            self.initialize_full_dataset(splits)
+            if inter_dataset_run:
+                assert inter_dataset_benign_path is not None, "Inter dataset <benign> path must be provided for inter dataset run."
+                assert inter_dataset_malicious_path is not None, "Inter dataset <malicious> path must be provided for inter dataset run."
 
+                validation_splits = self.load_inter_dataset_split(benign_path=inter_dataset_benign_path, malicious_path=inter_dataset_malicious_path,
+                                                                  target_attack_type=target_attack_type, is_cic_2018=not is_cic_2018,)
+                self.x_val, self.y_val, self.plain_label_val = validation_splits
+            
 
     def get_batch(self, batch_size=100) -> Tuple[pd.DataFrame, np.ndarray]:
         indexes = list(range(self.index, self.index + batch_size))
@@ -141,7 +150,7 @@ class CICDataManager:
             self.index += batch_size
         batch = self.x_train.iloc[indexes]
         y = self.y_train[indexes]
-        plain_labels = self.train_labels.iloc[indexes]
+        plain_labels = self.plain_label_train.iloc[indexes]
         return batch, y, plain_labels
 
     def get_full(self) -> Tuple[pd.DataFrame, np.ndarray]:
@@ -157,13 +166,12 @@ class CICDataManager:
         Returns all attack types (i.e., abstract categories) found in the test set, based on the original label mapping.
         """
         attack_map = cic_attack_map_one_vs_all if self.one_vs_all else cic_attack_map
-        mapped = self.test_labels.map(attack_map)
+        mapped = self.plain_label_test.map(attack_map)
 
-        unmapped = self.test_labels[mapped.isna()]
+        unmapped = self.plain_label_test[mapped.isna()]
         if not unmapped.empty:
                 logging.warning(f"⚠️ Warning: Found {len(unmapped)} unmapped label entries:\n{unmapped.value_counts()}")
         return sorted(mapped.dropna().unique())
-
 
     def load_formatted_df(self):
         """
@@ -179,26 +187,17 @@ class CICDataManager:
 
         # Combine train data and corresponding labels
         self.df = self.x_train.copy()
-        self.df["Label"] = self.train_labels.reset_index(drop=True)
+        self.df["Label"] = self.plain_label_train.reset_index(drop=True)
 
         self.loaded = True
         self.index = GLOBAL_RNG.integers(0, self.df.shape[0] - 1, dtype=np.int32)
 
         self.attack_names = sorted(set(cic_attack_map.keys()))
 
-    def load_one_vs_all_split(
-        self,
-        benign_path: str,
-        malicious_path: str,
-        target_attack_type: str = ATTACK_TYPE_DDOS,
-        benign_total: int = 250000,
-        train_benign_size: int = 50000,
-        benign_ratio = 0.8032, # CIC-IDS-2017 Ratio of total Data
-        malicious_ratio: float = 0.1343, # CIC-IDS-2017 Ratio of total
-        normalization: str = "linear",
-        is_cic_2018: bool = False,
-        random_state: int = 42
-    ):
+    def load_and_split_data(self, benign_path: str, malicious_path: str, target_attack_type: str = ATTACK_TYPE_DDOS,
+                              benign_total: int = 250000, train_benign_size: int = 50000, benign_ratio = 0.8032, # CIC-IDS-2017 Ratio of total Data
+                              malicious_ratio: float = 0.1343, # CIC-IDS-2017 Ratio of total
+                              normalization: str = "linear", is_cic_2018: bool = False, random_state: int = 42):
         # Helper
         def process(df, x_min=None, x_max=None):
             labels = df["OriginalLabel"].copy() if "OriginalLabel" in df.columns else df["Label"].copy()
@@ -212,8 +211,9 @@ class CICDataManager:
                 return x_norm, y, labels, x_min, x_max
 
             return X, y, labels, None, None
+        
+        logging.info(f"Loading benign data from:\n{benign_path}\nLoading malicious data from:\n{malicious_path}")
         file_format = benign_path.split(".")[-1]
-        # Lade Daten
         benign_df = pd.read_feather(benign_path) if file_format == "feather" else pd.read_csv(benign_path)
         benign_df["OriginalLabel"] = benign_df["Label"]
         benign_df = benign_df[benign_df["Label"] == "Benign"].sample(n=benign_total, random_state=random_state)
@@ -224,7 +224,6 @@ class CICDataManager:
         malicious_df["OriginalLabel"] = malicious_df["Label"] 
         malicious_df["Label"] = malicious_df["Abstract"]
 
-
         # Split ratios
         test_size_ratio = 0.85 if is_cic_2018 else 0.7
 
@@ -233,25 +232,16 @@ class CICDataManager:
         benign_remaining = benign_df.iloc[train_benign_size:]
         benign_val, benign_test = train_test_split(benign_remaining, test_size=test_size_ratio, random_state=random_state)
 
-        # Filter gewünschter Angriff
-        attack_df = malicious_df[malicious_df["Abstract"] == target_attack_type]
-        if attack_df.empty:
-            raise ValueError(f"No samples found for attack type '{target_attack_type}'.")
-
-        # Berechne Samplegröße
-        #attack_total = int((benign_total * malicious_ratio) / (1 - malicious_ratio))
-        attack_train_count = int(train_benign_size * (malicious_ratio / benign_ratio))
-
-        attack_df = attack_df.sample(frac=1.0, random_state=random_state)  # Shuffle einmal komplett
-        attack_train = attack_df.iloc[:attack_train_count]
-        remaining_attack_df = attack_df.iloc[attack_train_count:]
-        attack_val, attack_test = train_test_split(remaining_attack_df, test_size=test_size_ratio, random_state=random_state)
-
+        attack_train_df, attack_remaining_df = self.split_attack_data_for_training(
+            malicious_df, target_attack_type=target_attack_type, is_cic_2018=is_cic_2018, train_benign_size=train_benign_size,
+            benign_ratio=benign_ratio, malicious_ratio=malicious_ratio, random_state=random_state)
+        
+        attack_val, attack_test = train_test_split(attack_remaining_df, test_size=test_size_ratio, random_state=random_state)
 
         # combine
+        train_df = pd.concat([benign_train, attack_train_df], ignore_index=True)
         val_df = pd.concat([benign_val, attack_val], ignore_index=True)
         test_df = pd.concat([benign_test, attack_test], ignore_index=True)
-        train_df = pd.concat([benign_train, attack_train], ignore_index=True)
 
         # process
         x_train, y_train, plain_labels_train, x_min, x_max = process(train_df)
@@ -262,7 +252,7 @@ class CICDataManager:
         x_val, y_val, plain_labels_val = shuffle(x_val, y_val, plain_labels_val, random_state=42)
         x_test, y_test, plain_labels_test = shuffle(x_test, y_test, plain_labels_test, random_state=42)
 
-        logging.info(f"One-vs-All Split ready (target: {target_attack_type}):")
+        logging.info(f"{'One-vs-All Split ready (target: ' + target_attack_type + ').' if self.one_vs_all else 'Multi-Class Split ready.'}")
         logging.info(f"Train: {x_train.shape}, Validation: {x_val.shape}, Test: {x_test.shape}")
 
         # Return as Dict
@@ -280,7 +270,7 @@ class CICDataManager:
         Creates a pure test set from a second dataset for evaluation.
         Uses internally load_one_vs_all_split(), but returs only the test part.
         """
-        splits = self.load_one_vs_all_split(
+        splits = self.load_and_split_data(
             benign_path=benign_path,
             malicious_path=malicious_path,
             benign_total=550000 if is_cic_2018 else 250000,
@@ -291,48 +281,56 @@ class CICDataManager:
         )
         return splits["test"]
 
+    def initialize_full_dataset(self, splits):
+        self.x_train, self.y_train, self.plain_label_train = splits["train"]
+        self.x_val, self.y_val, self.plain_label_val = splits["val"]
+        self.x_test, self.y_test, self.plain_label_test = splits["test"]
 
-    def initialize_from_one_vs_all_split(self, splits, attack_label=ATTACK_TYPE_DDOS):
-        x_train, y_train, plain_label_train = splits["train"]
-        x_val, y_val, plain_label_val = splits["val"]
-        x_test, y_test, plain_label_test = splits["test"]
-
-        self.x_train = x_train
-        self.y_train = y_train
-        self.x_val = x_val
-        self.y_val = y_val
-        self.x_test = x_test
-        self.y_test = y_test
-        self.plain_label_train = plain_label_train
-        self.plain_label_val = plain_label_val
-        self.plain_label_test = plain_label_test
-
-        self.train_labels = pd.Series(["Benign" if y == 'Benign' else attack_label for y in y_train])
-        self.test_labels = pd.Series(["Benign" if y == 'Benign' else attack_label for y in y_test])
         assert len(self.x_train) == len(self.plain_label_train), f"Mismatch: {len(self.x_train)} features vs. {len(self.plain_label_train)} labels"
-        assert len(x_train) == len(self.plain_label_train), (f"❌ Label mismatch: {len(x_train)} samples vs {len(self.plain_label_train)} labels")
         assert not pd.Series(self.plain_label_train).isna().any(), "NaNs in plain_label_train!"
-
-        # Baue vollständiges Trainings-DF
-        self.df = pd.DataFrame(x_train).reset_index(drop=True).assign(Label=pd.Series(self.plain_label_train).reset_index(drop=True))
-        # DataFrame fürs Logging o. Replay
-
+        self.df = pd.DataFrame(self.x_train).reset_index(drop=True).assign(Label=pd.Series(self.plain_label_train).reset_index(drop=True))        
         assert not self.df["Label"].isna().any(), "NaN-Labels present Merge failed!"
 
-        # Dimensions-/Index-Infos
+        self.obs_size = self.x_train.shape[1]
+        self.shape = self.x_train.shape
+        self.index = GLOBAL_RNG.integers(0, self.shape[0] - 1, dtype=np.int32)
+        
+        available_labels = set(self.df["Label"].unique())
+        
+        attack_names = ["Benign"] + [
+            name for name in cic_attack_map
+            if cic_attack_map[name] != ATTACK_TYPE_NORMAL and name in available_labels]
+
+        self.attack_names = sorted(attack_names)
+        if self.is_cic_2018_training_set:
+            self.attack_types = [ATTACK_TYPE_NORMAL, ATTACK_TYPE_DDOS, ATTACK_TYPE_BRUTE_FORCE, ATTACK_TYPE_WEB_ATTACK, 
+                         ATTACK_TYPE_BOTNET, ATTACK_TYPE_INFILTRATION]
+        else:
+            self.attack_types = [ATTACK_TYPE_NORMAL, ATTACK_TYPE_DDOS, ATTACK_TYPE_BRUTE_FORCE, ATTACK_TYPE_WEB_ATTACK, 
+                         ATTACK_TYPE_BOTNET, ATTACK_TYPE_PROBE, ATTACK_TYPE_INFILTRATION, ATTACK_TYPE_HEARTBLEED] 
+        self.attack_map = cic_attack_map
+        self.all_attack_names = sorted(set(cic_attack_map.keys()))
+        self.loaded = True
+        logging.info(f"[Init full dataset] Loaded {self.x_train.shape[0]} train, {self.x_test.shape[0]} test samples.")
+
+    def initialize_from_one_vs_all_split(self, splits, attack_label=ATTACK_TYPE_DDOS):
+        self.x_train, self.y_train, self.plain_label_train = splits["train"]
+        self.x_val, self.y_val, self.plain_label_val = splits["val"]
+        self.x_test, self.y_test, self.plain_label_test = splits["test"]
+        
+        assert len(self.x_train) == len(self.plain_label_train), f"Mismatch: {len(self.x_train)} features vs. {len(self.plain_label_train)} labels"
+        assert not pd.Series(self.plain_label_train).isna().any(), "NaNs in plain_label_train!"
+        self.df = pd.DataFrame(self.x_train).reset_index(drop=True).assign(Label=pd.Series(self.plain_label_train).reset_index(drop=True))
+        assert not self.df["Label"].isna().any(), "NaN-Labels present Merge failed!"
+
         self.obs_size = self.x_train.shape[1]
         self.shape = self.x_train.shape
         self.index = GLOBAL_RNG.integers(0, self.shape[0] - 1, dtype=np.int32)
 
-        # Infofelder für spätere Agentenlogik
-        #self.attack_names = sorted([label for label in cic_attack_map])
         available_labels = set(self.df["Label"].unique())
 
-        # Relevant: Alle Benign + Attack-Typ-spezifischen Labels, die im DF vorkommen
         attack_names = ["Benign"] + [
-            name for name in cic_attack_map
-            if cic_attack_map[name] == attack_label and name in available_labels
-        ]
+            name for name in cic_attack_map if cic_attack_map[name] == attack_label and name in available_labels]
 
         self.attack_names = sorted(attack_names)
         self.attack_types = ["Benign", attack_label]
@@ -342,7 +340,49 @@ class CICDataManager:
         logging.info(f"[Init from split] Loaded {self.x_train.shape[0]} train, {self.x_test.shape[0]} test samples.")
 
 
-    def load_default_dataset(self): # 
+    def split_attack_data_for_training(self, malicious_df: pd.DataFrame, target_attack_type: str,
+                                                      is_cic_2018: bool, train_benign_size: int,
+                                                      benign_ratio: float, malicious_ratio: float,
+                                                      random_state: int = 42) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        if target_attack_type != "all": # One-vs-ALl: One specific attack type
+            attack_df = malicious_df[malicious_df["Abstract"] == target_attack_type]
+            if attack_df.empty:
+                raise ValueError(f"No samples found for attack type '{target_attack_type}'.")
+            
+            attack_df = attack_df.sample(frac=1.0, random_state=random_state)  # shuffle
+            attack_train_count = int(train_benign_size * (malicious_ratio / benign_ratio))
+            attack_train_df = attack_df.iloc[:attack_train_count]
+            attack_remaining_df = attack_df.iloc[attack_train_count:]
+        else: # Multi-Class (all): Ratios correspond the overall CIC statistics
+            attack_train_list, attack_val_test_list = [], []
+            ratios = CIC_RATIOS[is_cic_2018]
+            
+            for attack_type, ratio in ratios.items():
+                if attack_type == "Benign":
+                    continue
+
+                attack_train_size = int(train_benign_size * ratio / benign_ratio) # Calculate the amount of samples for the attack type
+                subset_df = malicious_df[malicious_df["Abstract"] == attack_type]
+                if subset_df.empty:
+                    logging.warning(f"No samples found for attack type '{attack_type}'.")
+                    continue
+                
+                subset_df = subset_df.sample(frac=1.0, random_state=random_state)  # shuffle
+                attack_train = subset_df.iloc[:attack_train_size]
+                attack_remaining = subset_df.iloc[attack_train_size:]
+                attack_train_list.append(attack_train)
+                attack_val_test_list.append(attack_remaining)
+
+            if not attack_train_list:
+                raise ValueError(f"No samples found for attack type '{target_attack_type}'.")
+
+            # Combine the attack train samples
+            attack_train_df = pd.concat(attack_train_list, ignore_index=True)
+            attack_remaining_df = pd.concat(attack_val_test_list, ignore_index=True)
+        
+        return attack_train_df, attack_remaining_df
+
+    def load_default_dataset(self): 
         x_train, x_test, y_train, y_test, _train_labels, _test_labels = load_data(
             data_file_path=self.benign_path,
             train_size=50000,
@@ -364,14 +404,14 @@ class CICDataManager:
 
         assert self.x_train.shape[0] == self.y_train.shape[0], "Anzahl Zeilen passt nicht!"
 
-        self.train_labels = _train_labels.reset_index(drop=True)
-        self.test_labels = pd.concat([_test_labels, labels_fraud], ignore_index=True)
-        self.test_labels = self.test_labels.apply(normalize_label)
-        self.test_labels_original = self.test_labels
+        self.plain_label_train = _train_labels.reset_index(drop=True)
+        self.plain_label_test = pd.concat([_test_labels, labels_fraud], ignore_index=True)
+        self.plain_label_test = self.plain_label_test.apply(normalize_label)
+        self.plain_label_test_original = self.plain_label_test
 
         self.df = pd.concat([
             self.x_train.reset_index(drop=True),
-            self.train_labels.reset_index(drop=True).rename("Label")
+            self.plain_label_train.reset_index(drop=True).rename("Label")
         ], axis=1)
 
         assert not self.df["Label"].isna().any(), "NaN-Labels present – Merge failed!"
@@ -381,15 +421,15 @@ class CICDataManager:
         self.index = GLOBAL_RNG.integers(0, self.shape[0] - 1, dtype=np.int32)
 
         if self.one_vs_all:
-            self.y_train = self.train_labels.map(cic_attack_map_one_vs_all)
-            self.y_test = self.test_labels.map(cic_attack_map_one_vs_all)
+            self.y_train = self.plain_label_train.map(cic_attack_map_one_vs_all)
+            self.y_test = self.plain_label_test.map(cic_attack_map_one_vs_all)
             self.attack_map = cic_attack_map_one_vs_all
         else:
             self.y_train = y_train.reset_index(drop=True)
             self.y_test = pd.concat([y_test, y_fraud], ignore_index=True)
             self.attack_map = cic_attack_map
 
-        self.attack_names = sorted(set(self.test_labels.unique()))
+        self.attack_names = sorted(set(self.plain_label_test.unique()))
         self.attack_types = self.get_attack_types()
         self.all_attack_names = list(self.attack_map.keys())
         self.loaded = True

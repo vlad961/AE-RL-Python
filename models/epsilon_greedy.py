@@ -75,7 +75,7 @@ class EpsilonGreedy(Policy):
         if self.epsilon_decay:
             decay_interval = self.epoch_length * self.amount_attackers if self.multiple_attacker else self.epoch_length # TODO: verify for multiple attackers that this will be triggered
             if self.parent_agent.name == "Defender":
-                decay_step = self.step_counter // 4 # Reduce the step_counter by 4 for the defender, as it takes 4 actions in one step. Otherwise, the epsilon would decay too fast for the defender.
+                decay_step = self.step_counter // self.amount_attackers # Reduce the step_counter by 4 for the defender, as it takes 4 actions in one step. Otherwise, the epsilon would decay too fast for the defender.
             else:
                 decay_step = self.step_counter # Attacker takes only one action in one step, so decay_step is equal to step_counter
             if self.step_counter % decay_interval == 0:

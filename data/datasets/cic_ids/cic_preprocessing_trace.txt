@@ -71,11 +71,11 @@ cic-ids-17:
 name, before clean, after clean
 infiltration, 36, 36
 Bot, 1966, 1948
-PortScan, 158930, 90694
+PortScan, 158930, 90694, # <-- ≈60k
 DDoS, 128027, 128014
 FTP-Patator, 7938, 5931
 SSH-Patator, 5897, 3219
-DoS Hulk, 440031, 172841
+DoS Hulk, 440031, 172841, # <-- ≈270k
 DoS GoldenEye, 10293, 10286
 DoS slowloris, 5796, 5385
 DoS Slowhttptest, 5499, 5228
