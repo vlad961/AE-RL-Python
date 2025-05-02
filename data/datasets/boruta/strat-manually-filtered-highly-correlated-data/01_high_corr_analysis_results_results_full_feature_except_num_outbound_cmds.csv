@@ -1,0 +1,9 @@
+"Feature","Highest_Positive_Feature","Highest_Positive_Correlation","Lowest_Negative_Feature","Lowest_Negative_Correlation"
+"num_root","num_compromised",0.998833452577696,"dst_host_count",-0.0115459853258432
+"srv_serror_rate","serror_rate",0.993289242538421,"same_srv_rate",-0.756784029232432
+"srv_rerror_rate","rerror_rate",0.989007652981732,"SF",-0.445486972809697
+"dst_host_srv_serror_rate","srv_serror_rate",0.986251716494804,"same_srv_rate",-0.765322059382749
+"dst_host_srv_rerror_rate","srv_rerror_rate",0.970207997450906,"SF",-0.4293204009673
+"S0","srv_serror_rate",0.982659962260382,"same_srv_rate",-0.765292142549633
+"serror_rate","srv_serror_rate",0.993289242538421,"same_srv_rate",-0.761887513950434
+"rerror_rate","srv_rerror_rate",0.989007652981732,"SF",-0.447630113756091

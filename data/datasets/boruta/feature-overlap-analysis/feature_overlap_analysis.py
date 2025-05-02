@@ -1,5 +1,5 @@
 import json
-from typing import TextIO
+import os
 
 import numpy as np
 import pandas as pd
@@ -141,8 +141,8 @@ boruta_results = ["/Users/vsehtman/PycharmProjects/AE-RL-Pure-Python/data/datase
 #                  "/Users/vsehtman/PycharmProjects/AE-RL-Pure-Python/data/datasets/boruta/single-attack-type-analysis/normal-vs-u2r/01_boruta_result_U2R_vs_Normal_before_tentative.csv"
           ]
 
-#boruta_subsets = ["Random", "Stratified", "Balanced", "Manually filtered highly correlated data"]
-boruta_subsets = ["Random", "Stratified", "Balanced", "Manually filtered highly correlated data", "Normal vs DoS", "Normal vs Probe", "Normal vs R2L", "Normal vs U2R"]
+boruta_subsets = ["Random", "Stratified", "Balanced", "Manually filtered highly correlated features"]
+#boruta_subsets = ["Random", "Stratified", "Balanced", "Manually filtered highly correlated features", "Normal vs DoS", "Normal vs Probe", "Normal vs R2L", "Normal vs U2R"]
 
 matching_features = filter_common_decisions(boruta_results)
 matching_features.update({
@@ -153,12 +153,22 @@ matching_features.update({
     "file_paths": boruta_results,
 })
 
+path = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(path, "boruta_subsets_feature_overlap_analysis_wo_single_types")
+if not os.path.exists(path):
+    os.makedirs(path)
+path = os.path.join(path, "wo_single_type_analysis_features_overlapping_analysis.json")
 
-#with open("wo_single_type_analysis_features_overlapping_analysis.json", "w") as json_file:
-#    json.dump(matching_features, json_file, indent=4)
-
-with open("boruta_all_subsets_feature_overlap_analysis/with_single_type_analysis_features_overlapping_analysis.json", "w") as json_file:
+with open(path, "w") as json_file:
     json.dump(matching_features, json_file, indent=4)
+path = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(path, "boruta_all_subsets_feature_overlap_analysis")
+if not os.path.exists(path):
+    os.makedirs(path)
+
+path = os.path.join(path, "with_single_type_analysis_features_overlapping_analysis.json")
+#with open(path, "w") as json_file:
+#    json.dump(matching_features, json_file, indent=4)
 
 visualize_feature_relevance(boruta_results, boruta_subsets, decision_filter="Confirmed")
 visualize_feature_relevance(boruta_results, boruta_subsets, decision_filter="Rejected")

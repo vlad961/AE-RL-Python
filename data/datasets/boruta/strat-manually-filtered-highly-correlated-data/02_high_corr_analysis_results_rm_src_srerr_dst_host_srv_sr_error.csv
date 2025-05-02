@@ -1,0 +1,5 @@
+"Feature","Highest_Positive_Feature","Highest_Positive_Correlation","Lowest_Negative_Feature","Lowest_Negative_Correlation"
+"num_root","num_compromised",0.998833452577696,"dst_host_count",-0.0115459853258432
+"S0","serror_rate",0.979174091491527,"same_srv_rate",-0.765292142549633
+"serror_rate","dst_host_serror_rate",0.979373082985932,"same_srv_rate",-0.761887513950434
+"rerror_rate","dst_host_rerror_rate",0.926748503576978,"SF",-0.447630113756091

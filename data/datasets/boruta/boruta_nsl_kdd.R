@@ -14,14 +14,15 @@ setwd("/Users/vsehtman/PycharmProjects/AE-RL-Pure-Python/data/datasets/boruta")
 # Load data
 nsl_kdd <- read_csv("formated_train.csv")
 # Beneatch uncommented features are highly correlated.
-#nsl_kdd <- nsl_kdd %>% select(-num_outbound_cmds) # only 0 values
-#nsl_kdd <- nsl_kdd %>% select (-srv_serror_rate) #nsl_kdd <- nsl_kdd %>% select ()
-#nsl_kdd <- nsl_kdd %>% select (-srv_rerror_rate)
-#nsl_kdd <- nsl_kdd %>% select (-dst_host_srv_serror_rate)
-#nsl_kdd <- nsl_kdd %>% select (-dst_host_srv_rerror_rate) # dst_host_serror_rate
-#nsl_kdd <- nsl_kdd %>% select (-dst_host_serror_rate) # dst_host_rerror_rate
-#nsl_kdd <- nsl_kdd %>% select (-dst_host_rerror_rate)
-#nsl_kdd <- nsl_kdd %>% select (-S0)
+nsl_kdd <- nsl_kdd %>% select(-num_outbound_cmds) # only 0 values
+nsl_kdd <- nsl_kdd %>% select (-srv_serror_rate) # serror_rate
+nsl_kdd <- nsl_kdd %>% select (-srv_rerror_rate) # rerror_rate
+nsl_kdd <- nsl_kdd %>% select (-S0) # srv_serror_rate, s_error_rate (2nd run)
+nsl_kdd <- nsl_kdd %>% select (-dst_host_srv_serror_rate) # srv_serror_rate,  
+nsl_kdd <- nsl_kdd %>% select (-dst_host_srv_rerror_rate) # srv_rerror_rate,  
+nsl_kdd <- nsl_kdd %>% select (-dst_host_serror_rate) # serror_rate (2nd run)
+nsl_kdd <- nsl_kdd %>% select (-dst_host_rerror_rate) # rerror_rate (2nd run)
+nsl_kdd <- nsl_kdd %>% select (-num_compromised) # num_root
 
 attack_map <- list(
   normal = c("normal"),
@@ -44,6 +45,7 @@ get_attack_category <- function(row) {
 
 # Apply the Mapping mapping on each row
 #nsl_kdd$attack_category <- apply(nsl_kdd[114:154], 1, get_attack_category)
+nsl_kdd$attack_category <- apply(nsl_kdd[113:153], 1, get_attack_category) # manually filtered high correlated features
 
 # ==========================
 #  Use only X samples
@@ -65,7 +67,8 @@ nsl_kdd_sample <- nsl_kdd[sample_index, ]
 
 # select only features without labels
 #features <- nsl_kdd %>% select(1:122)
-features <- nsl_kdd_sample %>% select(1:122)  # in case the stratified data shall be used.
+#features <- nsl_kdd_sample %>% select(1:122)  # in case the stratified data shall be used.
+features <- nsl_kdd_sample %>% select(1:113)  # in case the manually filtered highly correlated featuers.
 # run Boruta algorithm to determine all relevant features
 boruta_result <- Boruta(x = features, y = nsl_kdd_sample$attack_category, doTrace = 1)
 # In case tentative features are present, decide automatically.
