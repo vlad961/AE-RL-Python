@@ -9,10 +9,10 @@ library(readr)
 library(dplyr)
 library(caret) # in case stratified tests are executed
 
-setwd("/Users/vsehtman/PycharmProjects/AE-RL-Pure-Python/data/datasets/boruta")
+setwd("/Users/vsehtman/PycharmProjects/AE-RL-Pure-Python/data/datasets/boruta/")
 
 # Load data
-nsl_kdd <- read_csv("formated_train.csv")
+#nsl_kdd <- read_csv("formated_trainining_data.csv")
 # Beneatch uncommented features are highly correlated.
 nsl_kdd <- nsl_kdd %>% select(-num_outbound_cmds) # only 0 values
 nsl_kdd <- nsl_kdd %>% select (-srv_serror_rate) # serror_rate
