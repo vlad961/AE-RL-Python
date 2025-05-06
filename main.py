@@ -42,9 +42,6 @@ def main(attack_type=None, file_name_suffix=""):
         num_episodes = 3
 
         logging.info("Creating enviroment...")
-        if not os.path.exists(NSL_KDD_FORMATTED_TRAIN_PATH) or not os.path.exists(NSL_KDD_FORMATTED_TEST_PATH):
-            NslKddDataManager.get_formated_nsl_kdd_data(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, 'linear')
-
         if(attack_type is not None):
             if attack_type == "equally_balanced_data":
                 # Retrieve equally balanced training data (Same amount of Attack and Normal instances).
@@ -54,7 +51,8 @@ def main(attack_type=None, file_name_suffix=""):
                 # Retrieve training data for given attack types and existing attack instances.
                 data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
                 _, attack_names = data_mgr.get_samples_for_attack_type(attack_type, 0)
-        else:
+        else: # If no attack type is given, all attacks are used for training.
+            data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
             attack_names = NslKddDataManager.get_attack_names(NSL_KDD_FORMATTED_TRAIN_PATH) # Names of attacks in the dataset where at least one sample is present
         
         attack_valid_actions = list(range(len(data_mgr.attack_names)))
@@ -113,9 +111,9 @@ def main(attack_type=None, file_name_suffix=""):
                                         )
         
         if attack_type is not None: # If a specific attack is chosen, the training data is loaded with only this attack type
-            env = RLenv(data_mgr, [attacker_agent], defender_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack_type=attack_type, data=data_mgr, attack_names=attack_names)
+            env = RLenv(data_mgr, attackers, defender_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack_type=attack_type, data=data_mgr, attack_names=attack_names)
         else:
-            env = RLenv('train', attacker_agent, batch_size=batch_size, iterations_episode=iterations_episode)
+            env = RLenv(data_mgr, attackers, defender_agent, batch_size=batch_size, iterations_episode=iterations_episode)
 
 
         training_params = {"num_episodes": num_episodes, "iterations_episode": iterations_episode, "minibatch_size": minibatch_size,
@@ -147,9 +145,6 @@ def main(attack_type=None, file_name_suffix=""):
             states, labels, label_names = env.get_attack_states(attack_actions)
 
             done = False
-# // TODO: 1 mehrere Angreifer-Agenten normal & attack
-# // TODO: 2 Transferability (zuerst nsl-kdd, dann CICIDS2017, dann UNSW-NB15)
-# // TODO: 3. Boruta Tool Document results in Thesis.tex (nutze nur confirmed (ohne automatisch zwang zum entscheiden von tetentative features -> müsste besser abschneiden))
             attacks_list = []
             # Iteration in one episode
             for i_iteration in range(iterations_episode):
@@ -215,43 +210,13 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    #main(file_name_suffix="-WIN-balanced-data-att-5L-def-3L-lr-0.001")
+    main(file_name_suffix="-WIN-balanced-data-att-5L-def-3L-lr-0.001")
     #main("U2R", file_name_suffix="-WIN-only-DoS")
-    main("equally_balanced_data", file_name_suffix="-Mac-equally-balanced-data")
+    #main("equally_balanced_data", file_name_suffix="-Mac-equally-balanced-data")
+    #main(["normal", "R2L"], file_name_suffix="-Mac-normal")
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
     #main(file_name_suffix="mac-all-attacks") # Run the main function with all attack types and save the results in a specific folder (mac-all-attacks)
     #main("normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R)
     #main("normal", file_name_suffix="mac-normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R) and save the results in a specific folder
-    # TODO: lass mal zuerst abwechselnd normal, dann DoS, dann Probe, dann R2L, dann U2R angriffe auswählen für eine bestimmte anzahl an Episoden + Iterationen pro Episode.
-    # Idee: zu beginn eine möglichst gleichverteiltes Training durchführen, um den Verteidiger-Agenten zunächst auf alle möglichen Angriffe zu trainieren. 
-    # Dadurch soll eine bessere Generalisierung erreicht werden bzw. eine Verzerrung der Daten vermieden werden.
-    
-    # Idee: 1. 10 Episoden mit normalen angriffen, 10 Episoden mit DoS angriffen, 10 Episoden mit Probe angriffen, 10 Episoden mit R2L angriffen, 10 Episoden mit U2R angriffen
-    # anschließend komplett zufällige angriffe auswählen wie bisher.
-
-    # Zweite Idee: belohne den Verteidiger-Agenten stärker, wenn er einen Angriff richtig erkennt im Gegensatz zu einem normalen Zustand. Also korrekter Angriff + 2, korrekter normaler Zustand + 1.
-    # -> dadurch wird der Verteidiger-Agent stärker darauf trainiert Angriffe zu erkennen, was in der Praxis auch wichtiger ist.
-    # Weiterhin kann ich versuchen Belohnungen dynamisch an die Anzahl der Angriffe anpassen, sodass der Verteidiger-Agent nicht nur auf die Anzahl der Angriffe trainiert wird, sondern auch auf die Art der Angriffe.
-    # Messe ob dadurch normale Angriffe gleichbleibend erkannt werden, aber Angriffe (vor allem seltene) besser erkannt werden.
-    # Ansatz 1: Statische belohnungen (seltene Angriffe erhalten dennoch eine größere Belohnung)
-    # Ansatz 2: Proportionale belohnungen (Anzahl der Angriffe wird berücksichtigt)
-        # -> da U2R am wenigsten instanzen hat würde ich die anzahl von iterationen pro episode verkürzen auf 52 (das ist die Anzahl der U2R instanzen)
-        # ->
-        #
-
-        # blei gleichverteilten Daten scheine ich leicht bessere Ergebnisse zu erhalten (down sampling von normalen instanzen) //TODO: verifizier schaue in meine Ergebnise auf PC (evtl. 2+3 Durchlauf)
-
-        # -> 
-
-    # TODO: Add False Positive Rate for each class. (FP / (FP + TN)) -> FP = False Positives, TN = True Negatives
-    # TODO: Prediction Bias für Angriffsklassen berechnen um zu sehen ob der Verteidiger-Agent eine Verzerrung in der Vorhersage hat. Vergleich usprüngliche Verteilung der Angriffe mit der Vorhersage des Verteidiger-Agenten.
-    # TODO: Test F
-    # TODO: ich könnte anstelle der bisherigen modell ausgaben softmax nutzen, thresholds setzen und damit die vorhersage beeinflussen. -> dadurch könnte ich die FP-Rate für bestimmte Klassen reduzieren.
-    # TODO: Data-scheme erstellen. Unit tests schreiben für die Ursprünglichen Daten vs die Formatierten Daten. -> Überprüfen ob die Daten korrekt formatiert wurden. 
-        # kategorischen Wert korrekt ? nur eine 1 an der richtigen Stelle ? -> überprüfen ob die Daten korrekt formatiert wurden.
-        # Befinden sich alle numerischen Werte im bereich von 0-1 ? -> überprüfen ob die Daten korrekt formatiert wurden.
-    # TODO: Schreibe Tests um zu überprüfen ob während des Trainings NaN auftauchen für die weights und layer outputs.
-        # Überprüfe auch ob mehr als die Hälfte der Ausgaben einer Schicht != 0 sind.
-    # TODO: Plagiatsprüfungs-Tool nutzen um zu überprüfen ob die Arbeit plagiiert wurde.

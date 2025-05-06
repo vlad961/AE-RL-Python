@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import logging
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 import os
 import pandas as pd
@@ -69,18 +70,32 @@ def plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, 
     return plt
 
 def plot_attack_distributions(attacks_by_epoch, attack_names, attacks_mapped_to_att_type_list, path) -> plt.Figure:
-    bins=np.arange(len(attack_names))
+    bins=np.arange(len(attack_names) + 1 )
     # Plot attacks distribution alongside
     plt.figure(2,figsize=[12,12])
     plt.xticks([])
     plt.yticks([])
     plt.title("Attacks distribution throughout episodes")
     epochs = select_epochs_to_plot(attacks_by_epoch)
-    for indx,e in enumerate(epochs):
-        plt.subplot(3,3,indx+1)
-        plt.hist(attacks_by_epoch[e], bins=bins, width=0.9, align='left')
-        plt.xlabel("{} epoch".format(e))
-        plt.xticks(bins, attack_names, rotation=90)
+    for indx, e in enumerate(epochs):
+        plt.subplot(3, 3, indx + 1)
+
+        # Flatten falls verschachtelte Struktur
+        epoch_data = attacks_by_epoch[e]
+        flattened_epoch = [int(action[0]) if isinstance(action, (list, tuple)) else int(action)
+                           for action in epoch_data]
+
+        counts, _, bars = plt.hist(flattened_epoch, bins=bins, width=0.9, align='left', color='skyblue', edgecolor='black')
+        plt.xlabel(f"{e} epoch")
+        plt.xticks(bins[:-1], attack_names, rotation=90)
+        plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+
+        max_height = max(counts) if len(counts) > 0 else 0
+        plt.ylim(0, max_height + max_height * 0.1)
+
+        for bar, count in zip(bars, counts):
+            plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.5,
+                     f'{int(count)}', ha='center', va='bottom', fontsize=8, color='black')
 
     plt.tight_layout()
     plt.savefig(os.path.join(path, 'attacks_distribution.pdf'), format='pdf', dpi=1000)
