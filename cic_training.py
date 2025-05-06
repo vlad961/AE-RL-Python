@@ -43,6 +43,7 @@ def get_dataset_paths(dataset: DataSet):
         inter_dataset_malicious_path = CICIDS_2017_CLEAN_ALL_MALICIOUS
         is_cic_2018_trainingset = True
     return benign_path, malicious_path, inter_dataset_benign_path, inter_dataset_malicious_path, is_cic_2018_trainingset
+
 def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs_all=True, is_inter_dataset_run=True, dataset=DataSet.CICIDS_2017):
     # TensorFlow GPU configuration avoids: "W tensorflow/core/data/root_dataset.cc:167] Optimization loop failed: Cancelled: Operation was cancelled" Errors
     try:
@@ -72,7 +73,8 @@ def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs
     # TODO: 3.2: Multiple Attackers (each benign & attacktype) vs Defender, capable of classifying every class.;
     try:
         batch_size = 1 # Train batch
-        minibatch_size = 100 # batch of memory ExpRep
+        minibatch_size_attacker = 100 # batch of memory ExpRep
+        minibatch_size_defender = 100 # batch of memory ExpRep
         experience_replay = True
         iterations_episode = 100
         num_episodes = 100
@@ -108,7 +110,8 @@ def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs
         def_hidden_layers = 3
         def_learning_rate = 0.001
 
-        training_params = {"num_episodes": num_episodes, "iterations_episode": iterations_episode, "minibatch_size": minibatch_size,
+        training_params = {"num_episodes": num_episodes, "iterations_episode": iterations_episode, "minibatch_size_attacker": minibatch_size_attacker, 
+                           "minibatch_size_defender": minibatch_size_defender,
                            "total_samples": num_episodes * iterations_episode, "data_shape": data_mgr.shape}
         attacker_params = {"num_actions": len(attack_valid_actions),"gamma": att_gamma, "epsilon": att_epsilon, "hidden_size": att_hidden_size,
                            "hidden_layers": att_hidden_layers, "learning_rate": att_learning_rate }
@@ -124,7 +127,7 @@ def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs
                                         gamma=att_gamma,
                                         hidden_size=att_hidden_size,
                                         hidden_layers=att_hidden_layers,
-                                        minibatch_size=minibatch_size,
+                                        minibatch_size=minibatch_size_attacker,
                                         mem_size=1000,
                                         learning_rate=att_learning_rate,
                                         ExpRep=experience_replay,
@@ -144,7 +147,7 @@ def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs
                                         gamma=def_gamma,
                                         hidden_size=def_hidden_size,
                                         hidden_layers=def_hidden_layers,
-                                        minibatch_size=100,
+                                        minibatch_size=minibatch_size_defender,
                                         mem_size=1000,
                                         learning_rate=def_learning_rate,
                                         ExpRep=experience_replay,
@@ -212,7 +215,7 @@ def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs
                 store_experience([agent_defender], states, defender_actions, next_states, def_reward, done)
 
                 # Train network, update loss after at least minibatch_size (observations)
-                if experience_replay and episode * iterations_episode + iteration >= minibatch_size:
+                if experience_replay and episode * iterations_episode + iteration >= minibatch_size_attacker:
                     
                     def_loss, att_loss = update_models_and_statistics_cic(agent_defender, attackers[0], def_loss, att_loss,
                             def_metrics_chain, att_metrics_chain, epoch_mse_before, epoch_mae_before, sample_indices_list)
@@ -313,21 +316,37 @@ def main(attack_type=None, file_name_suffix="", multiple_attackers=False, one_vs
 if __name__ == "__main__":
     # CIC-IDS Atack Types: 'Benign', 'Botnet', '(D)DOS', 'Probe', 'Brute Force', 'Web Attack', 'Infiltration', 'Heartbleed'
     # Hint: 'Probe' and 'Heartbleed' are only in the CICIDS 2017 dataset contained. The other attacks are in both datasets.
-    #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run", dataset=DataSet.CICIDS_2017)
+    ##main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-1st-Run", dataset=DataSet.CICIDS_2017)
 
     # Hint: The given dataset corresponds to the training set. The validation set is the other dataset. In case no inter dataset run is needed, set the 'is_inter_dataset_run' parameter to False.
     main("all", file_name_suffix="-mac-cic-2017-18-multi-class-1st-run", one_vs_all=False, dataset=DataSet.CICIDS_2017)
-    main("all", file_name_suffix="-mac-cic-2018-17-multi-class-1st-run", one_vs_all=False, dataset=DataSet.CICIDS_2018)
+    #main("all", file_name_suffix="-mac-cic-2017-18-multi-class-2nd-run", one_vs_all=False, dataset=DataSet.CICIDS_2017)
+    #main("all", file_name_suffix="-mac-cic-2017-18-multi-class-3rd-run", one_vs_all=False, dataset=DataSet.CICIDS_2017)
+    #main("all", file_name_suffix="-mac-cic-2018-17-multi-class-1st-run", one_vs_all=False, dataset=DataSet.CICIDS_2018)
+    #main("all", file_name_suffix="-mac-cic-2018-17-multi-class-2nd-run", one_vs_all=False, dataset=DataSet.CICIDS_2018)
+    #main("all", file_name_suffix="-mac-cic-2018-17-multi-class-3rd-run", one_vs_all=False, dataset=DataSet.CICIDS_2018)
 
     #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-2nd-Run")
     #main("(D)DOS", file_name_suffix="-Linux-CIC-2017-18-DDOS-3rd-Run")
+    #main("(D)DOS", file_name_suffix="-Linux-CIC-2018-17-DDOS-1st-Run")
+    #main("(D)DOS", file_name_suffix="-Linux-CIC-2018-17-DDOS-2nd-Run")
+    #main("(D)DOS", file_name_suffix="-Linux-CIC-2018-17-DDOS-3rd-Run")
     #main("Probe", file_name_suffix="-Linux-CIC-2017-18-Probe-1st-Run")
     #main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-1st-Run")
     #main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-2nd-Run")
     #main("Brute Force", file_name_suffix="-Linux-CIC-2017-18-BruteForce-3rd-Run")
+    #main("Brute Force", file_name_suffix="-Linux-CIC-2018-17-BruteForce-1st-Run")
+    #main("Brute Force", file_name_suffix="-Linux-CIC-2018-17-BruteForce-2nd-Run")
+    #main("Brute Force", file_name_suffix="-Linux-CIC-2018-17-BruteForce-3rd-Run")
     #main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-1st-Run")
     #main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-2nd-Run")
     #main("Web Attack", file_name_suffix="-Linux-CIC-2017-18-WebAttack-3rd-Run")
+    #main("Web Attack", file_name_suffix="-Linux-CIC-2018-17-WebAttack-1st-Run")
+    #main("Web Attack", file_name_suffix="-Linux-CIC-2018-17-WebAttack-2nd-Run")
+    #main("Web Attack", file_name_suffix="-Linux-CIC-2018-17-WebAttack-3rd-Run")
     #main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-1st-Run")
     #main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-2nd-Run")
     #main("Infiltration", file_name_suffix="-Linux-CIC-2017-18-Infiltration-3rd-Run")
+    #main("Infiltration", file_name_suffix="-Linux-CIC-2018-17-Infiltration-1st-Run")
+    #main("Infiltration", file_name_suffix="-Linux-CIC-2018-17-Infiltration-2nd-Run")
+    #main("Infiltration", file_name_suffix="-Linux-CIC-2018-17-Infiltration-3rd-Run")
