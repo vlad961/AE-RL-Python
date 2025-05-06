@@ -1,4 +1,4 @@
-from utils.config import CWD, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
+from utils.config import CWD, NSL_KDD_FORMATTED_BALANCED_TEST_PATH, NSL_KDD_FORMATTED_BALANCED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
 from utils.helpers import download_datasets_if_missing, print_total_runtime, save_model, store_experience
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
@@ -40,14 +40,17 @@ def main(attack_type=None, file_name_suffix=""):
         minibatch_size_defender = 100 # batch of memory ExpRep
         experience_replay = True
         iterations_episode = 100
-        num_episodes = 3
+        num_episodes = 100
 
         logging.info("Creating enviroment...")
         if(attack_type is not None):
-            if attack_type == "equally_balanced_data":
+            if attack_type == "normal_and_attack_balanced":
                 # Retrieve equally balanced training data (Same amount of Attack and Normal instances).
                 data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
                 _, attack_names = data_mgr.get_balanced_samples()
+            elif attack_type == "balanced_data":
+                # Retrieve equally balanced training data (Same amount of Attack and Normal instances).
+                data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_BALANCED_TRAIN_PATH, NSL_KDD_FORMATTED_BALANCED_TEST_PATH, dataset_type='train')
             else:
                 # Retrieve training data for given attack types and existing attack instances.
                 data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
@@ -111,7 +114,7 @@ def main(attack_type=None, file_name_suffix=""):
                                         model_name='defender_model'
                                         )
         
-        if attack_type is not None: # If a specific attack is chosen, the training data is loaded with only this attack type
+        if attack_type is not None and attack_type != "balanced_data": # If a specific attack is chosen, the training data is loaded with only this attack type
             env = RLenv(data_mgr, attackers, defender_agent, batch_size=batch_size, iterations_episode=iterations_episode, specific_attack_type=attack_type, data=data_mgr, attack_names=attack_names)
         else:
             env = RLenv(data_mgr, attackers, defender_agent, batch_size=batch_size, iterations_episode=iterations_episode)
@@ -211,9 +214,12 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    main(file_name_suffix="-Lin-5L-def-3L-lr-0.001")
+    #main(file_name_suffix="-Lin-5L-def-3L-lr-0.001")
     #main("U2R", file_name_suffix="-WIN-only-DoS")
-    #main("equally_balanced_data", file_name_suffix="-Mac-equally-balanced-data")
+    #main("normal_and_attack_balanced", file_name_suffix="-balanced-data-1st")
+    main("balanced_data", file_name_suffix="-balanced-data-1st")
+    #main("balanced_data", file_name_suffix="-balanced-data-2nd")
+    #main("balanced_data", file_name_suffix="-balanced-data-3rd")
     #main(["normal", "R2L"], file_name_suffix="-Mac-normal")
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)

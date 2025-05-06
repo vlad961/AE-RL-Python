@@ -1,15 +1,32 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils.config import NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN
 
 from datetime import datetime
-import logging
 from matplotlib import pyplot as plt
 import pandas as pd
 import seaborn as sns
 
 from data.nsl_kdd_data_manager import NslKddDataManager
-from utils.helpers import logger_setup
+from utils.log_config import logger_setup
 
-test_data  = NslKddDataManager(dataset_type="test")
-training_data = NslKddDataManager(dataset_type="train")
+test_data = NslKddDataManager(
+    trainset_path=ORIGINAL_KDD_TRAIN,
+    testset_path=ORIGINAL_KDD_TEST,
+    formated_trainset_path=NSL_KDD_FORMATTED_TRAIN_PATH,
+    formated_testset_path=NSL_KDD_FORMATTED_TEST_PATH,
+    dataset_type="test"
+)
+
+training_data = NslKddDataManager(
+    trainset_path=ORIGINAL_KDD_TRAIN,
+    testset_path=ORIGINAL_KDD_TEST,
+    formated_trainset_path=NSL_KDD_FORMATTED_TRAIN_PATH,
+    formated_testset_path=NSL_KDD_FORMATTED_TEST_PATH,
+    dataset_type="train"
+)
 
 
 
@@ -84,8 +101,19 @@ def balance_r2l_and_u2r_data():
     """
     Balance R2L and U2R data and save the updated DataFrames to new CSV files
     """
-    test_data = NslKddDataManager(dataset_type="test")
-    training_data = NslKddDataManager(dataset_type="train")
+    test_data = NslKddDataManager(
+        trainset_path=ORIGINAL_KDD_TRAIN,
+        testset_path=ORIGINAL_KDD_TEST,
+        formated_trainset_path=NSL_KDD_FORMATTED_TRAIN_PATH,
+        formated_testset_path=NSL_KDD_FORMATTED_TEST_PATH,
+        dataset_type="test")
+
+    training_data = NslKddDataManager(
+        trainset_path=ORIGINAL_KDD_TRAIN,
+        testset_path=ORIGINAL_KDD_TEST,
+        formated_trainset_path=NSL_KDD_FORMATTED_TRAIN_PATH,
+        formated_testset_path=NSL_KDD_FORMATTED_TEST_PATH,
+        dataset_type="train")
     
     # Balance R2L data
     # Shuffle and extract 725 samples from warezmaster and 950 samples from guess_passwd
