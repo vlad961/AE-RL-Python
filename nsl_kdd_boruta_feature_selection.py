@@ -25,7 +25,25 @@ The original project can be found at: https://github.com/gcamfer/Anomaly-Reactio
 To be more specific, the code is based on the following file: 'NSL-KDD adaption: AE_RL_NSL-KDD.ipynb' https://github.com/gcamfer/Anomaly-ReactionRL/blob/master/Notebooks/AE_RL_NSL_KDD.ipynb
 """
 
-def main(attack_type=None, file_name_suffix=""):
+boruta_core_features = ["duration", "src_bytes", "dst_bytes", "hot", "logged_in", "is_guest_login", "count", "srv_count",
+                        "same_srv_rate", "diff_srv_rate", "srv_diff_host_rate", "dst_host_count", "dst_host_srv_count",
+                        "dst_host_same_srv_rate", "dst_host_diff_srv_rate", "dst_host_same_src_port_rate",
+                        "dst_host_srv_diff_host_rate", "tcp", "udp", "ftp_data", "http", "other", "telnet", "SF"]
+
+boruta_general_features = ["duration", "src_bytes", "dst_bytes", "wrong_fragment", "hot",
+                           "num_failed_logins", "logged_in", "is_guest_login", "count", "srv_count",
+                            "serror_rate", "rerror_rate", "same_srv_rate", "diff_srv_rate", "srv_diff_host_rate",
+                            "dst_host_count", "dst_host_srv_count", "dst_host_same_srv_rate",
+                            "dst_host_diff_srv_rate", "dst_host_same_src_port_rate", 
+                            "dst_host_srv_diff_host_rate", "icmp", "tcp", "udp", "domain_u",
+                            "eco_i", "ecr_i", "finger", "ftp", "ftp_data", 
+                            "http", "other", "private", "smtp", "telnet",
+                            "urp_i", "REJ", "RSTO", "RSTOS0", "RSTR",
+                            "SF", "SH"]
+
+
+
+def main(attack_type=None, file_name_suffix="", boruta=None):
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
     script_start_time = datetime.now()
     output_root_dir = f"{timestamp_begin}{file_name_suffix}"
@@ -40,7 +58,7 @@ def main(attack_type=None, file_name_suffix=""):
         minibatch_size_defender = 100 # batch of memory ExpRep
         experience_replay = True
         iterations_episode = 100
-        num_episodes = 3
+        num_episodes = 100
 
         logging.info("Creating enviroment...")
         if(attack_type is not None):
@@ -56,6 +74,37 @@ def main(attack_type=None, file_name_suffix=""):
             data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
             attack_names = NslKddDataManager.get_attack_names(NSL_KDD_FORMATTED_TRAIN_PATH) # Names of attacks in the dataset where at least one sample is present
         
+        if boruta == "core":
+            logging.info(f"Using Boruta feature selection with {boruta} features: \n{boruta_core_features}")
+            
+            # Filtere nur die Spalten 0-121 basierend auf boruta_core_features
+            feature_columns = [col for col in data_mgr.df.columns[:122] if col in boruta_core_features]
+            
+            # Behalte die restlichen Spalten (122 bis Ende)
+            other_columns = data_mgr.df.columns[122:]
+            
+            # Kombiniere die gefilterten Feature-Spalten mit den restlichen Spalten
+            data_mgr.df = data_mgr.df[feature_columns + list(other_columns)]
+            
+            # Aktualisiere die Shape-Informationen
+            data_mgr.shape = data_mgr.df.shape
+            data_mgr.obs_size = data_mgr.df.shape[1] - len(data_mgr.all_attack_names)
+        elif boruta == "general_features":
+            logging.info(f"Using Boruta feature selection with {boruta} features: \n{boruta_general_features}")
+            
+            # Filtere nur die Spalten 0-121 basierend auf boruta_general_features
+            feature_columns = [col for col in data_mgr.df.columns[:122] if col in boruta_general_features]
+            
+            # Behalte die restlichen Spalten (122 bis Ende)
+            other_columns = data_mgr.df.columns[122:]
+            
+            # Kombiniere die gefilterten Feature-Spalten mit den restlichen Spalten
+            data_mgr.df = data_mgr.df[feature_columns + list(other_columns)]
+            
+            # Aktualisiere die Shape-Informationen
+            data_mgr.shape = data_mgr.df.shape
+            data_mgr.obs_size = data_mgr.df.shape[1] - len(data_mgr.all_attack_names)
+
         attack_valid_actions = list(range(len(data_mgr.attack_names)))
 
         # Empirical experience shows that a greater exploration rate is better for the attacker agent.
@@ -204,6 +253,38 @@ def main(attack_type=None, file_name_suffix=""):
         plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
         test_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='test')
+        if boruta == "core":
+            logging.info(f"Preparing Boruta Test data to use feature selection with {boruta} features: \n{boruta_core_features}")
+            
+            # Filtere nur die Spalten 0-121 basierend auf boruta_core_features
+            feature_columns = [col for col in test_data.df.columns[:122] if col in boruta_core_features]
+            
+            # Behalte die restlichen Spalten (122 bis Ende)
+            other_columns = test_data.df.columns[122:]
+            
+            # Kombiniere die gefilterten Feature-Spalten mit den restlichen Spalten
+            test_data.df = test_data.df[feature_columns + list(other_columns)]
+            
+            # Aktualisiere die Shape-Informationen
+            test_data.shape = test_data.df.shape
+            test_data.obs_size = test_data.df.shape[1] - len(test_data.all_attack_names)
+
+        elif boruta == "general_features":
+            logging.info(f"Preparing Boruta Test data to use feature selection with {boruta} features: \n{boruta_general_features}")
+            
+            # Filtere nur die Spalten 0-121 basierend auf boruta_general_features
+            feature_columns = [col for col in test_data.df.columns[:122] if col in boruta_general_features]
+            
+            # Behalte die restlichen Spalten (122 bis Ende)
+            other_columns = test_data.df.columns[122:]
+            
+            # Kombiniere die gefilterten Feature-Spalten mit den restlichen Spalten
+            test_data.df = test_data.df[feature_columns + list(other_columns)]
+            
+            # Aktualisiere die Shape-Informationen
+            test_data.shape = test_data.df.shape
+            test_data.obs_size = test_data.df.shape[1] - len(test_data.all_attack_names)
+        
         test_trained_agent_quality(defender_model_path, plots_path, test_data)
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:
@@ -211,13 +292,16 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    main(file_name_suffix="-Lin-5L-def-3L-lr-0.001")
+    # Run the main function with all attack types, use only core feautures that have been selected by Boruta in all subsets (see my thesis as a reference:)
+    # boruta = "core_features" # Use only core features that have been selected by Boruta in all subsets (see my thesis as a reference:)
+    # boruta = "general_features" # Use all features that have been selected by Boruta for the "random", "stratified", "manually highly correlated filtered", and "balanced" see my thesis as a reference:)
+    #main(file_name_suffix="-Lin-5L-def-3L-boruta-core-features-1st", boruta="core")
+    #main(file_name_suffix="-Lin-5L-def-3L-boruta-core-features-2nd", boruta="core")
+    #main(file_name_suffix="-Lin-5L-def-3L-boruta-core-features-3rd", boruta="core")
+    #main(file_name_suffix="-Lin-5L-def-3L-boruta-general-features-1st", boruta="general_features")
+    #main(file_name_suffix="-Lin-5L-def-3L-boruta-general-features-2nd", boruta="general_features")
+    main(file_name_suffix="-Lin-5L-def-3L-boruta-general-features-3rd", boruta="general_features")
     #main("U2R", file_name_suffix="-WIN-only-DoS")
     #main("equally_balanced_data", file_name_suffix="-Mac-equally-balanced-data")
     #main(["normal", "R2L"], file_name_suffix="-Mac-normal")
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
-    #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
-    #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
-    #main(file_name_suffix="mac-all-attacks") # Run the main function with all attack types and save the results in a specific folder (mac-all-attacks)
-    #main("normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R)
-    #main("normal", file_name_suffix="mac-normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R) and save the results in a specific folder
