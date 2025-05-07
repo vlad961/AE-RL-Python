@@ -179,6 +179,7 @@ logs/*
 # Ignore trained models while developing //TODO: remove this line before deploying or create a final model directory
 #models/trained-models/*
 !models/trained-models/*/logs/*.log
+!models/trained-models/*/logs/debug_info.json
 data/datasets/boruta/.RData
 .gitignore
 data/datasets/boruta/.Rhistory

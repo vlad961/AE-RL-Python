@@ -213,6 +213,12 @@ if __name__ == "__main__":
     #main() # Run the AE-RL framework with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
     #main(file_name_suffix="-att-5L-def-3L-lr") # Run the AE-RL framework with all attack types and save the results in a specific folder (att-5L-def-3L-lr)
     #main(["U2R"], file_name_suffix="-WIN-only-U2R") # Run the AE-RL framework with a list of specific attack types (Possible Values: normal, DoS, Probe, R2L, U2R)
-    main(["normal", "R2L"], file_name_suffix="-normal-r2l-1st") # Run the AE-RL framework within a binary classification task (normal vs. R2L)
+    #main(["normal", "R2L"], file_name_suffix="-normal-r2l-2nd") # Run the AE-RL framework within a binary classification task (normal vs. R2L)
+    #main(["normal", "U2R"], file_name_suffix="-normal-u2r-1st")
+    #main(["normal", "U2R"], file_name_suffix="-normal-u2r-2nd")
+    #main(["normal", "Probe"], file_name_suffix="-normal-probe-1st")
+    #main(["normal", "Probe"], file_name_suffix="-normal-probe-2nd")
+    #main(["normal", "DoS"], file_name_suffix="-normal-dos-1st")
+    main(["normal", "DoS"], file_name_suffix="-normal-dos-2nd")
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main("normal_and_attack_balanced", file_name_suffix="nsl_kdd_downsampled_normal") # Run the main function on the NSL-KDD data with all attack types but use a set that has the same amount of attack and normal instances.

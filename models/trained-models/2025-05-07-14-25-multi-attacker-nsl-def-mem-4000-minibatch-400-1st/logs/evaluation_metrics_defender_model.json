@@ -1,0 +1,151 @@
+{
+    "f1_per_class": [
+        {
+            "Class": "normal",
+            "Support": 67343,
+            "Accuracy": 0.9819,
+            "Precision": 0.9976,
+            "Recall": 0.9819,
+            "F1-Score": 0.9897
+        },
+        {
+            "Class": "DoS",
+            "Support": 45927,
+            "Accuracy": 0.9976,
+            "Precision": 0.9951,
+            "Recall": 0.9976,
+            "F1-Score": 0.9964
+        },
+        {
+            "Class": "Probe",
+            "Support": 11656,
+            "Accuracy": 0.991,
+            "Precision": 0.976,
+            "Recall": 0.991,
+            "F1-Score": 0.9834
+        },
+        {
+            "Class": "R2L",
+            "Support": 995,
+            "Accuracy": 0.9628,
+            "Precision": 0.6732,
+            "Recall": 0.9628,
+            "F1-Score": 0.7924
+        },
+        {
+            "Class": "U2R",
+            "Support": 52,
+            "Accuracy": 1.0,
+            "Precision": 0.1344,
+            "Recall": 1.0,
+            "F1-Score": 0.2369
+        }
+    ],
+    "weighted_f1": 0.9896762394554371,
+    "classification_report": {
+        "normal": {
+            "precision": 0.9975861808855699,
+            "recall": 0.9819134876676121,
+            "f1-score": 0.9896877899841351,
+            "support": 67343.0
+        },
+        "DoS": {
+            "precision": 0.9951132636882913,
+            "recall": 0.9976266684085614,
+            "f1-score": 0.9963683809938023,
+            "support": 45927.0
+        },
+        "Probe": {
+            "precision": 0.9760033798056612,
+            "recall": 0.9909917638984214,
+            "f1-score": 0.983440466561662,
+            "support": 11656.0
+        },
+        "R2L": {
+            "precision": 0.6732255797610681,
+            "recall": 0.9628140703517588,
+            "f1-score": 0.7923904052936311,
+            "support": 995.0
+        },
+        "U2R": {
+            "precision": 0.1343669250645995,
+            "recall": 1.0,
+            "f1-score": 0.23690205011389523,
+            "support": 52.0
+        },
+        "accuracy": 0.9883387710064855,
+        "macro avg": {
+            "precision": 0.755259065841038,
+            "recall": 0.9866691980652706,
+            "f1-score": 0.7997578185894252,
+            "support": 125973.0
+        },
+        "weighted avg": {
+            "precision": 0.9917693074529422,
+            "recall": 0.9883387710064855,
+            "f1-score": 0.9896762394554371,
+            "support": 125973.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.056646816432476044,
+        "mse": 0.13909552991390228,
+        "mae": 0.20144586265087128
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 66125,
+            "TN": 58470,
+            "FP": 160,
+            "FN": 1218
+        },
+        "1": {
+            "TP": 45818,
+            "TN": 79821,
+            "FP": 225,
+            "FN": 109
+        },
+        "2": {
+            "TP": 11551,
+            "TN": 114033,
+            "FP": 284,
+            "FN": 105
+        },
+        "3": {
+            "TP": 958,
+            "TN": 124513,
+            "FP": 465,
+            "FN": 37
+        },
+        "4": {
+            "TP": 52,
+            "TN": 125586,
+            "FP": 335,
+            "FN": 0
+        }
+    }
+}

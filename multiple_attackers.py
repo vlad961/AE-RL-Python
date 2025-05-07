@@ -44,7 +44,10 @@ def main(attack_type=None, file_name_suffix=""):
 
     try:
         batch_size = 1 # Train batch
-        minibatch_size = 100 # batch of memory ExpRep
+        minibatch_size_attacker = 100 # batch of memory ExpRep
+        minibatch_size_defender = 400 # batch of memory ExpRep
+        mem_size_attacker = 1000 # total memory size ExpRep before overwriting first experiences
+        mem_size_defender = 4000 # total memory size ExpRep before overwriting first experiences
         experience_replay = True
         iterations_episode = 100
         multiple_attackers = True
@@ -76,7 +79,8 @@ def main(attack_type=None, file_name_suffix=""):
         def_hidden_layers = 3
         def_learning_rate = 0.001
 
-        training_params = {"num_episodes": num_episodes, "iterations_episode": iterations_episode, "minibatch_size": minibatch_size,
+        training_params = {"num_episodes": num_episodes, "iterations_episode": iterations_episode, "minibatch_size_attacker": minibatch_size_attacker,
+                           "minibatch_size_defender": minibatch_size_defender,
                            "total_samples": num_episodes * iterations_episode, "data_shape": train_data.shape}
         attacker_params = {"num_actions": len(attack_valid_actions),"gamma": att_gamma, "epsilon": att_epsilon, "hidden_size": att_hidden_size,
                            "hidden_layers": att_hidden_layers, "learning_rate": att_learning_rate }
@@ -92,8 +96,8 @@ def main(attack_type=None, file_name_suffix=""):
                                         gamma=att_gamma,
                                         hidden_size=att_hidden_size,
                                         hidden_layers=att_hidden_layers,
-                                        minibatch_size=minibatch_size,
-                                        mem_size=1000,
+                                        minibatch_size=minibatch_size_attacker,
+                                        mem_size=mem_size_attacker,
                                         learning_rate=att_learning_rate,
                                         ExpRep=experience_replay,
                                         target_model_name='attacker_target_model_dos',
@@ -107,8 +111,8 @@ def main(attack_type=None, file_name_suffix=""):
                                 gamma=att_gamma,
                                 hidden_size=att_hidden_size,
                                 hidden_layers=att_hidden_layers,
-                                minibatch_size=minibatch_size,
-                                mem_size=1000,
+                                minibatch_size=minibatch_size_attacker,
+                                mem_size=mem_size_attacker,
                                 learning_rate=att_learning_rate,
                                 ExpRep=experience_replay,
                                 target_model_name='attacker_target_model_probe',
@@ -122,8 +126,8 @@ def main(attack_type=None, file_name_suffix=""):
                 gamma=att_gamma,
                 hidden_size=att_hidden_size,
                 hidden_layers=att_hidden_layers,
-                minibatch_size=minibatch_size,
-                mem_size=1000,
+                minibatch_size=minibatch_size_attacker,
+                mem_size=mem_size_attacker,
                 learning_rate=att_learning_rate,
                 ExpRep=experience_replay,
                 target_model_name='attacker_target_model_r2l',
@@ -137,8 +141,8 @@ def main(attack_type=None, file_name_suffix=""):
                         gamma=att_gamma,
                         hidden_size=att_hidden_size,
                         hidden_layers=att_hidden_layers,
-                        minibatch_size=minibatch_size,
-                        mem_size=1000,
+                        minibatch_size=minibatch_size_attacker,
+                        mem_size=mem_size_attacker,
                         learning_rate=att_learning_rate,
                         ExpRep=experience_replay,
                         target_model_name='attacker_target_model_u2r',
@@ -154,8 +158,8 @@ def main(attack_type=None, file_name_suffix=""):
                                         gamma=def_gamma,
                                         hidden_size=def_hidden_size,
                                         hidden_layers=def_hidden_layers,
-                                        minibatch_size=400, # //TODO: auf 400 setzen, da 4 agenten?
-                                        mem_size=4000,
+                                        minibatch_size=minibatch_size_defender, # //TODO: auf 400 setzen, da 4 agenten?
+                                        mem_size=mem_size_defender,
                                         learning_rate=def_learning_rate,
                                         ExpRep=experience_replay,
                                         target_model_name='defender_target_model',
@@ -225,7 +229,7 @@ def main(attack_type=None, file_name_suffix=""):
                 store_experience([agent_defender], states, defender_actions, next_states, def_reward, done)
 
                 # Train network, update loss after at least minibatch_size (observations)
-                if experience_replay and episode * iterations_episode + iteration >= minibatch_size:
+                if experience_replay and episode * iterations_episode + iteration >= minibatch_size_attacker:
                     
                     def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss = update_models_and_statistics(
                             agent_defender, attackers, def_loss, att_loss_dos, att_loss_probe, att_loss_r2l, att_loss_u2r, agg_att_loss, def_metrics_chain, 
@@ -347,4 +351,4 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    main(file_name_suffix="-mac-multiple-attackers-original-dataprocessing")
+    main(file_name_suffix="-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd")
