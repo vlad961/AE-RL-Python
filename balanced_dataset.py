@@ -1,4 +1,4 @@
-from utils.config import CWD, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
+from utils.config import CWD, NSL_KDD_FORMATTED_BALANCED_TEST_PATH, NSL_KDD_FORMATTED_BALANCED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN, TRAINED_MODELS_DIR
 from utils.helpers import download_datasets_if_missing, print_total_runtime, save_model, store_experience
 from models.rl_env import RLenv
 from models.defender_agent import DefenderAgent
@@ -48,6 +48,9 @@ def main(attack_type=None, file_name_suffix=""):
                 # Retrieve equally balanced training data (Same amount of Attack and Normal instances).
                 data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
                 _, attack_names = data_mgr.get_balanced_samples()
+            elif attack_type == "balanced_data":
+                # Retrieve equally balanced training data (Same amount of Attack and Normal instances).
+                data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_BALANCED_TRAIN_PATH, NSL_KDD_FORMATTED_BALANCED_TEST_PATH, dataset_type='train')
             else:
                 # Retrieve training data for given attack types and existing attack instances.
                 data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
@@ -203,7 +206,7 @@ def main(attack_type=None, file_name_suffix=""):
         logging.info(f"Trying to save summary plots under: {plots_path}")
         plot_rewards_and_losses_during_training(def_reward_chain, att_reward_chain, def_loss_chain, att_loss_chain, plots_path)
         plot_attack_distributions(attacks_by_epoch, env.attack_names, attack_labels_list, plots_path)
-        test_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='test')
+        test_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_BALANCED_TRAIN_PATH, NSL_KDD_FORMATTED_BALANCED_TEST_PATH, dataset_type='test')
         test_trained_agent_quality(defender_model_path, plots_path, test_data)
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:
@@ -215,8 +218,8 @@ if __name__ == "__main__":
     #main("U2R", file_name_suffix="-WIN-only-DoS")
     #main("normal_and_attack_balanced", file_name_suffix="-balanced-data-1st")
     #main("balanced_data", file_name_suffix="-balanced-data-1st")
-    main("balanced_data", file_name_suffix="-balanced-data-2nd")
-    #main("balanced_data", file_name_suffix="-balanced-data-3rd")
+    #main("balanced_data", file_name_suffix="-balanced-data-2nd")
+    main("balanced_data", file_name_suffix="-balanced-data-3rd")
     #main(["normal", "R2L"], file_name_suffix="-Mac-normal")
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
     #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
