@@ -344,7 +344,8 @@ def main(attack_type=None, file_name_suffix=""):
         plot_training_error(mse_before_history, mae_before_history, save_path=plots_path)
         
         defender_model_path = os.path.join(TRAINED_MODELS_DIR, f"{output_root_dir}/defender_model.keras")
-        test_trained_agent_quality_on_intra_set(defender_model_path, train_data, plots_path)
+        test_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, normalization='linear', multiple_attackers=multiple_attackers, dataset_type="test")
+        test_trained_agent_quality_on_intra_set(defender_model_path, test_data, plots_path)
         move_log_files(current_log_path, destination_log_path)
     except Exception as e:
         logging.error(f"Error occurred\n:{e}", exc_info=True)

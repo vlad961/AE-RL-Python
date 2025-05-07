@@ -1,16 +1,16 @@
 import os,sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from utils.config import CWD
+from utils.config import CWD, NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN
 from utils.log_config import load_debug_info, logger_setup
 from utils.helpers import create_attack_id_to_index_mapping, transform_attacks_by_epoch
 from utils.plotting_multiple_agents import plot_attack_distribution_for_each_attacker, plot_attack_distributions_multiple_agents, plot_rewards_and_losses_during_training_multiple_agents, plot_rewards_losses_boxplot, plot_training_error, plot_trend_lines_multiple_agents
 from test_multiple_agents import test_trained_agent_quality_on_intra_set
 from datetime import datetime
-from data.nsl_kdd_data_manager import nsl_kdd_attack_map
+from data.nsl_kdd_data_manager import NslKddDataManager, nsl_kdd_attack_map
 
-defender_model_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/defender_model.keras")
-plots_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/plots/")
-destination_log_path = os.path.join(CWD, "models/trained-models/2025-04-08-10-55-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/logs/")
+defender_model_path = os.path.join(CWD, "models/trained-models/2025-05-07-14-25-multi-attacker-nsl-def-mem-4000-minibatch-400-1st/defender_model.keras")
+plots_path = os.path.join(CWD, "models/trained-models/2025-05-07-14-25-multi-attacker-nsl-def-mem-4000-minibatch-400-1st/plots/")
+destination_log_path = os.path.join(CWD, "models/trained-models/2025-05-07-14-25-multi-attacker-nsl-def-mem-4000-minibatch-400-1st/logs/")
 
 if __name__ == "__main__":
     timestamp_begin = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -43,15 +43,15 @@ if __name__ == "__main__":
     # Test- und Visualisierungs-Code ausführen
     plot_rewards_and_losses_during_training_multiple_agents(
         rewards["defender"], 
-        [rewards["dos"], rewards["probe"], rewards["r2l"], rewards["u2r"]], 
+        rewards["aggregated_attacker"], 
         losses["defender"], 
-        [losses["dos"], losses["probe"], losses["r2l"], losses["u2r"]], 
+        losses["aggregated_attacker"], 
         plots_path
     )
 
     plot_attack_distributions_multiple_agents(
         attack_indices_per_episode, 
-        attack_id_to_type, 
+        nsl_kdd_attack_map, 
         attack_names, 
         attacks_mapped_to_att_type_list, 
         plots_path
@@ -74,5 +74,5 @@ if __name__ == "__main__":
         save_path=plots_path
     )
 
-
-    test_trained_agent_quality_on_intra_set(defender_model_path, plots_path)
+    test_data = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, normalization='linear', multiple_attackers=True, dataset_type="test")
+    test_trained_agent_quality_on_intra_set(defender_model_path, test_data, plots_path)

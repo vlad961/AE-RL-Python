@@ -2,95 +2,95 @@
     "f1_per_class": [
         {
             "Class": "normal",
-            "Support": 67343,
-            "Accuracy": 0.9842,
-            "Precision": 0.9984,
-            "Recall": 0.9842,
-            "F1-Score": 0.9912
+            "Support": 9711,
+            "Accuracy": 0.9562,
+            "Precision": 0.7469,
+            "Recall": 0.9562,
+            "F1-Score": 0.8387
         },
         {
             "Class": "DoS",
-            "Support": 45927,
-            "Accuracy": 0.9996,
-            "Precision": 0.9961,
-            "Recall": 0.9996,
-            "F1-Score": 0.9979
+            "Support": 7458,
+            "Accuracy": 0.8166,
+            "Precision": 0.9382,
+            "Recall": 0.8166,
+            "F1-Score": 0.8732
         },
         {
             "Class": "Probe",
-            "Support": 11656,
-            "Accuracy": 0.9888,
-            "Precision": 0.9831,
-            "Recall": 0.9888,
-            "F1-Score": 0.9859
+            "Support": 2421,
+            "Accuracy": 0.7142,
+            "Precision": 0.7891,
+            "Recall": 0.7142,
+            "F1-Score": 0.7498
         },
         {
             "Class": "R2L",
-            "Support": 995,
-            "Accuracy": 0.9678,
-            "Precision": 0.6369,
-            "Recall": 0.9678,
-            "F1-Score": 0.7682
+            "Support": 2754,
+            "Accuracy": 0.2807,
+            "Precision": 0.6305,
+            "Recall": 0.2807,
+            "F1-Score": 0.3884
         },
         {
             "Class": "U2R",
-            "Support": 52,
-            "Accuracy": 1.0,
-            "Precision": 0.197,
-            "Recall": 1.0,
-            "F1-Score": 0.3291
+            "Support": 200,
+            "Accuracy": 0.21,
+            "Precision": 0.2069,
+            "Recall": 0.21,
+            "F1-Score": 0.2084
         }
     ],
-    "weighted_f1": 0.991128785203417,
+    "weighted_f1": 0.7799594185552815,
     "classification_report": {
         "normal": {
-            "precision": 0.998373150965565,
-            "recall": 0.9841854387241435,
-            "f1-score": 0.9912285293391859,
-            "support": 67343.0
+            "precision": 0.7468832944582965,
+            "recall": 0.9562351971990526,
+            "f1-score": 0.838692196531792,
+            "support": 9711.0
         },
         "DoS": {
-            "precision": 0.9961378232945669,
-            "recall": 0.9996298473664729,
-            "f1-score": 0.9978807803075586,
-            "support": 45927.0
+            "precision": 0.938222153751348,
+            "recall": 0.8165728077232502,
+            "f1-score": 0.8731808731808732,
+            "support": 7458.0
         },
         "Probe": {
-            "precision": 0.9831101253945236,
-            "recall": 0.988761153054221,
-            "f1-score": 0.985927541811027,
-            "support": 11656.0
+            "precision": 0.7891373801916933,
+            "recall": 0.7141676992978109,
+            "f1-score": 0.7497831743278404,
+            "support": 2421.0
         },
         "R2L": {
-            "precision": 0.6369047619047619,
-            "recall": 0.9678391959798995,
-            "f1-score": 0.7682489030714,
-            "support": 995.0
+            "precision": 0.6305057096247961,
+            "recall": 0.28068264342774146,
+            "f1-score": 0.3884422110552764,
+            "support": 2754.0
         },
         "U2R": {
-            "precision": 0.19696969696969696,
-            "recall": 1.0,
-            "f1-score": 0.3291139240506329,
-            "support": 52.0
+            "precision": 0.20689655172413793,
+            "recall": 0.21,
+            "f1-score": 0.20843672456575682,
+            "support": 200.0
         },
-        "accuracy": 0.9901169298182944,
+        "accuracy": 0.794889992902768,
         "macro avg": {
-            "precision": 0.7622991117058228,
-            "recall": 0.9880831270249473,
-            "f1-score": 0.8144799357159609,
-            "support": 125973.0
+            "precision": 0.6623290179500544,
+            "recall": 0.595531669529571,
+            "f1-score": 0.6117070359323078,
+            "support": 22544.0
         },
         "weighted avg": {
-            "precision": 0.9929600723953533,
-            "recall": 0.9901169298182944,
-            "f1-score": 0.991128785203417,
-            "support": 125973.0
+            "precision": 0.7957123015994355,
+            "recall": 0.794889992902768,
+            "f1-score": 0.7799594185552815,
+            "support": 22544.0
         }
     },
     "model_eval": {
-        "loss": 0.02131795510649681,
-        "mse": 0.04343699663877487,
-        "mae": 0.13366690278053284
+        "loss": 0.06382032483816147,
+        "mse": 0.13128580152988434,
+        "mae": 0.2232305407524109
     },
     "optimizer": {
         "name": "Adam",
@@ -101,7 +101,7 @@
         "use_ema": false,
         "ema_momentum": 0.99,
         "ema_overwrite_frequency": null,
-        "jit_compile": true,
+        "jit_compile": false,
         "is_legacy_optimizer": false,
         "learning_rate": 0.0010000000474974513,
         "beta_1": 0.9,
@@ -118,34 +118,34 @@
     ],
     "metrics": {
         "0": {
-            "TP": 66278,
-            "TN": 58522,
-            "FP": 108,
-            "FN": 1065
+            "TP": 9286,
+            "TN": 9686,
+            "FP": 3147,
+            "FN": 425
         },
         "1": {
-            "TP": 45910,
-            "TN": 79868,
-            "FP": 178,
-            "FN": 17
+            "TP": 6090,
+            "TN": 14685,
+            "FP": 401,
+            "FN": 1368
         },
         "2": {
-            "TP": 11525,
-            "TN": 114119,
-            "FP": 198,
-            "FN": 131
+            "TP": 1729,
+            "TN": 19661,
+            "FP": 462,
+            "FN": 692
         },
         "3": {
-            "TP": 963,
-            "TN": 124429,
-            "FP": 549,
-            "FN": 32
+            "TP": 773,
+            "TN": 19337,
+            "FP": 453,
+            "FN": 1981
         },
         "4": {
-            "TP": 52,
-            "TN": 125709,
-            "FP": 212,
-            "FN": 0
+            "TP": 42,
+            "TN": 22183,
+            "FP": 161,
+            "FN": 158
         }
     }
 }

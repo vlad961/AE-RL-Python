@@ -6,7 +6,7 @@ import tensorflow as tf
 import time
 
 from data.nsl_kdd_data_manager import NslKddDataManager
-from utils.helpers import calculate_f1_scores_per_class_dynamically, calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_aggregated_performance_measures
+from utils.helpers import calculate_f1_scores_per_class_dynamically, calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, calculate_f1_scores_per_class, get_cf_matrix, get_model_summary, print_averaged_performance_metrics
 from utils.plotting import plot_confusion_matrix, plot_roc_curve
 
 def test_trained_agent_quality(path_to_model, plots_path, test_data: NslKddDataManager):
@@ -54,7 +54,7 @@ def test_trained_agent_quality(path_to_model, plots_path, test_data: NslKddDataM
     logging.info(f"Overall overview per attack type\n{outputs_df}")
 
     aggregated_data_test = np.array(true_attack_type_indices)
-    print_aggregated_performance_measures(actions, aggregated_data_test)
+    print_averaged_performance_metrics(actions, aggregated_data_test)
 
     np.set_printoptions(precision=2)
     plot_confusion_matrix(get_cf_matrix(aggregated_data_test, actions), classes=test_data.attack_types, path=plots_path, normalize=True,

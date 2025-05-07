@@ -10,10 +10,8 @@ import time
 
 from data.cic_data_manager import CICDataManager
 from data.nsl_kdd_data_manager import NslKddDataManager
-from utils.config import NSL_KDD_FORMATTED_TEST_PATH, NSL_KDD_FORMATTED_TRAIN_PATH, ORIGINAL_KDD_TEST, ORIGINAL_KDD_TRAIN
-from utils.helpers import calculate_f1_scores_per_class_dynamically, calculate_general_overview_per_attack_type, calculate_one_vs_all_metrics, get_cf_matrix, get_model_summary
-from utils.plotting import plot_confusion_matrix, plot_roc_curve
-from utils.plotting_multiple_agents import visualize_q_value_errors
+from utils.helpers import calculate_f1_scores_per_class_dynamically, calculate_general_overview_per_attack_type, get_cf_matrix, get_model_summary
+from utils.plotting import plot_confusion_matrix
 
 def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKddDataManager | CICDataManager], plots_path, **kwargs):
     one_vs_all = kwargs.get('one_vs_all', False)
@@ -33,7 +31,10 @@ def test_trained_agent_quality_on_intra_set(path_to_model, data_mgr: Union[NslKd
     true_attack_type_indices = (get_cic_true_attack_type_indices(labels, data_mgr, one_vs_all)
                             if isinstance(data_mgr, CICDataManager)
                             else get_nsl_kdd_true_attack_type_indices(labels, data_mgr))
-    dataset_name = "CIC-IDS-2018" if data_mgr.is_cic_2018_training_set else "CIC-IDS-2017"
+    if isinstance(data_mgr, CICDataManager):
+        dataset_name = "CIC-IDS-2018" if data_mgr.is_cic_2018_training_set else "CIC-IDS-2017"
+    else:
+        dataset_name = "NSL-KDD"
     title = f"Model trained on {dataset_name} (Intra-Set)"
     plot_confusion_matrix(get_cf_matrix(true_attack_type_indices, actions), 
                         classes=data_mgr.attack_types, path=os.path.join(plots_path, 'intraset/'), normalize=True,
@@ -185,6 +186,8 @@ def test_trained_agent_quality_on_inter_set(path_to_model: str,
     metrics_json["optimizer"] = model.optimizer.get_config()
     metrics_json["attack_types"] = attack_types or ["Benign", "Attack"]
 
+    metrics = calculate_tp_tn_fp_fn(true_labels, predictions, len(attack_types))
+    metrics_json['metrics'] = metrics
     # Export JSON
     json_path = os.path.join(os.path.dirname(path_to_model), "logs", f"evaluation_metrics_cross_{model.name}.json")
     os.makedirs(os.path.dirname(json_path), exist_ok=True)
