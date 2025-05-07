@@ -1,0 +1,1123 @@
+05/07/2025 19:00:11 - INFO - Started script at: 2025-05-07-19-00
+Current working dir: /workspace
+Used data files: 
+/workspace/data/datasets/origin-kaggle-com/nsl-kdd/KDDTrain+.txt,
+/workspace/data/datasets/origin-kaggle-com/nsl-kdd/KDDTest+.txt
+05/07/2025 19:00:11 - INFO - Setting up Attacker and Defender Agents...
+05/07/2025 19:00:11 - INFO - Reading formated train data from: /workspace/data/datasets/formated/formated_training_data.csv
+05/07/2025 19:00:11 - INFO - Reading formated test data from: /workspace/data/datasets/formated/formated_test_data.csv
+05/07/2025 19:00:12 - INFO - Initializing Attacker:DoS's ReplayMemory with observation_size=122 and max_size=1000
+05/07/2025 19:00:12 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+05/07/2025 19:00:12 - INFO - Initializing Attacker:Probe's ReplayMemory with observation_size=122 and max_size=1000
+05/07/2025 19:00:12 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+05/07/2025 19:00:12 - INFO - Initializing Attacker:R2L's ReplayMemory with observation_size=122 and max_size=1000
+05/07/2025 19:00:12 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+05/07/2025 19:00:12 - INFO - Initializing Attacker:U2R's ReplayMemory with observation_size=122 and max_size=1000
+05/07/2025 19:00:12 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+05/07/2025 19:00:12 - INFO - Initializing Defender's ReplayMemory with observation_size=122 and max_size=4000
+05/07/2025 19:00:12 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 17 variables whereas the saved optimizer has 1 variables. 
+05/07/2025 19:00:12 - INFO - Creating environment...
+05/07/2025 19:00:12 - INFO - Start Training with the following parameters:
+-----------------------------------------------------------------------------------------------------------------------
+Total episodes: 100 | Iterations in episode: 100 | <Attacker> Minibatch from mem size: 100 | Total Samples: 10000 | <Defender> Minibatch from mem size: 400 | Data shape: (125973, 162)
+-----------------------------------------------------------------------------------------------------------------------
+Attacker<Attack-Type>: Num_actions=23 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=5 | Learning rate=0.001
+-----------------------------------------------------------------------------------------------------------------------
+Defender: Num_actions=5 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=3 | Learning rate=0.001
+-----------------------------------------------------------------------------------------------------------------------
+Used Attack types: 'all: Normal, DoS, Probe, R2L, U2R' | Attack name(s): ['normal', 'back', 'land', 'neptune', 'pod', 'smurf', 'teardrop', 'ipsweep', 'nmap', 'portsweep', 'satan', 'ftp_write', 'guess_passwd', 'imap', 'multihop', 'phf', 'spy', 'warezclient', 'warezmaster', 'buffer_overflow', 'loadmodule', 'perl', 'rootkit']
+-----------------------------------------------------------------------------------------------------------------------
+
+05/07/2025 19:00:18 - INFO - End of Episode.
+|Episode 000/100| time: 5.74|
+|Def Loss 0.0000 | Def Reward in ep 088|
+|Att Loss Dos 0.0000 | Att Reward in ep 074|
+|Att Loss Probe 0.0000 | Att Reward in ep 068|
+|Att Loss R2L 0.0000 | Att Reward in ep 084|
+|Att Loss U2R 0.0000 | Att Reward in ep 086|
+|Def Estimated: [ 32  84 124  86  74]| Att Labels: [71 86 81 89 73]|
+|Def Amount of true predicted attacks: [ 5 23 32 16 12]|
+05/07/2025 19:00:18 - WARNING - 5 out of the last 247 calls to <function QNetwork.predict at 0x7ec54e12a8e0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+05/07/2025 19:00:19 - WARNING - 6 out of the last 253 calls to <function QNetwork.predict at 0x7ec54e006340> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+05/07/2025 19:00:23 - WARNING - 5 out of the last 5 calls to <function Model.make_train_function.<locals>.train_function at 0x7ec53feb2340> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+05/07/2025 19:00:54 - INFO - End of Episode.
+|Episode 001/100| time: 36.14|
+|Def Loss 0.4804 | Def Reward in ep 288|
+|Att Loss Dos 1.2701 | Att Reward in ep 029|
+|Att Loss Probe 1.7579 | Att Reward in ep 021|
+|Att Loss R2L 1.3073 | Att Reward in ep 027|
+|Att Loss U2R 1.8185 | Att Reward in ep 035|
+|Def Estimated: [ 92  72  71 102  63]| Att Labels: [82 86 72 82 78]|
+|Def Amount of true predicted attacks: [58 62 59 63 46]|
+05/07/2025 19:01:26 - INFO - End of Episode.
+|Episode 002/100| time: 31.51|
+|Def Loss 0.1758 | Def Reward in ep 354|
+|Att Loss Dos 1.0361 | Att Reward in ep 016|
+|Att Loss Probe 1.4016 | Att Reward in ep 007|
+|Att Loss R2L 1.0869 | Att Reward in ep 009|
+|Att Loss U2R 1.9216 | Att Reward in ep 014|
+|Def Estimated: [68 80 84 93 75]| Att Labels: [68 90 79 87 76]|
+|Def Amount of true predicted attacks: [54 76 76 80 68]|
+05/07/2025 19:01:59 - INFO - End of Episode.
+|Episode 003/100| time: 32.26|
+|Def Loss 0.1542 | Def Reward in ep 369|
+|Att Loss Dos 0.9677 | Att Reward in ep 008|
+|Att Loss Probe 1.3024 | Att Reward in ep 004|
+|Att Loss R2L 0.9387 | Att Reward in ep 008|
+|Att Loss U2R 1.8370 | Att Reward in ep 011|
+|Def Estimated: [78 85 82 86 69]| Att Labels: [81 86 77 82 74]|
+|Def Amount of true predicted attacks: [71 80 77 77 64]|
+05/07/2025 19:02:32 - INFO - End of Episode.
+|Episode 004/100| time: 32.77|
+|Def Loss 0.1606 | Def Reward in ep 372|
+|Att Loss Dos 0.9042 | Att Reward in ep 007|
+|Att Loss Probe 1.0643 | Att Reward in ep 001|
+|Att Loss R2L 0.8498 | Att Reward in ep 008|
+|Att Loss U2R 1.6582 | Att Reward in ep 012|
+|Def Estimated: [85 77 81 82 75]| Att Labels: [92 79 72 78 79]|
+|Def Amount of true predicted attacks: [83 74 71 73 71]|
+05/07/2025 19:03:05 - INFO - End of Episode.
+|Episode 005/100| time: 32.67|
+|Def Loss 0.1397 | Def Reward in ep 375|
+|Att Loss Dos 0.8074 | Att Reward in ep 004|
+|Att Loss Probe 0.9193 | Att Reward in ep 004|
+|Att Loss R2L 0.7724 | Att Reward in ep 009|
+|Att Loss U2R 1.5109 | Att Reward in ep 008|
+|Def Estimated: [74 88 72 83 83]| Att Labels: [87 84 71 80 78]|
+|Def Amount of true predicted attacks: [73 82 69 77 74]|
+05/07/2025 19:03:38 - INFO - End of Episode.
+|Episode 006/100| time: 32.56|
+|Def Loss 0.1349 | Def Reward in ep 387|
+|Att Loss Dos 0.7868 | Att Reward in ep 004|
+|Att Loss Probe 0.8004 | Att Reward in ep 001|
+|Att Loss R2L 0.7136 | Att Reward in ep 001|
+|Att Loss U2R 1.4388 | Att Reward in ep 007|
+|Def Estimated: [89 78 75 87 71]| Att Labels: [95 79 73 81 72]|
+|Def Amount of true predicted attacks: [88 77 73 81 68]|
+05/07/2025 19:04:11 - INFO - End of Episode.
+|Episode 007/100| time: 32.02|
+|Def Loss 0.1084 | Def Reward in ep 379|
+|Att Loss Dos 0.7042 | Att Reward in ep 004|
+|Att Loss Probe 0.7626 | Att Reward in ep 005|
+|Att Loss R2L 0.6512 | Att Reward in ep 009|
+|Att Loss U2R 1.2797 | Att Reward in ep 003|
+|Def Estimated: [74 88 80 79 79]| Att Labels: [77 83 83 82 75]|
+|Def Amount of true predicted attacks: [72 82 79 73 73]|
+05/07/2025 19:04:44 - INFO - End of Episode.
+|Episode 008/100| time: 32.35|
+|Def Loss 0.1126 | Def Reward in ep 387|
+|Att Loss Dos 0.6306 | Att Reward in ep 003|
+|Att Loss Probe 0.6897 | Att Reward in ep 005|
+|Att Loss R2L 0.6289 | Att Reward in ep 002|
+|Att Loss U2R 1.2505 | Att Reward in ep 003|
+|Def Estimated: [78 83 76 86 77]| Att Labels: [87 81 77 83 72]|
+|Def Amount of true predicted attacks: [78 81 76 82 70]|
+05/07/2025 19:05:17 - INFO - End of Episode.
+|Episode 009/100| time: 32.57|
+|Def Loss 0.0900 | Def Reward in ep 387|
+|Att Loss Dos 0.5769 | Att Reward in ep 003|
+|Att Loss Probe 0.6484 | Att Reward in ep 002|
+|Att Loss R2L 0.6172 | Att Reward in ep 005|
+|Att Loss U2R 1.1518 | Att Reward in ep 003|
+|Def Estimated: [90 78 77 79 76]| Att Labels: [91 77 79 80 73]|
+|Def Amount of true predicted attacks: [88 75 77 76 71]|
+05/07/2025 19:05:50 - INFO - End of Episode.
+|Episode 010/100| time: 32.17|
+|Def Loss 0.0872 | Def Reward in ep 388|
+|Att Loss Dos 0.4437 | Att Reward in ep 002|
+|Att Loss Probe 0.4382 | Att Reward in ep 005|
+|Att Loss R2L 0.4106 | Att Reward in ep 004|
+|Att Loss U2R 0.9135 | Att Reward in ep 001|
+|Def Estimated: [75 77 77 87 84]| Att Labels: [72 78 81 88 81]|
+|Def Amount of true predicted attacks: [71 76 76 84 81]|
+05/07/2025 19:06:25 - INFO - End of Episode.
+|Episode 011/100| time: 33.30|
+|Def Loss 0.0934 | Def Reward in ep 380|
+|Att Loss Dos 0.1966 | Att Reward in ep 000|
+|Att Loss Probe 0.1344 | Att Reward in ep 002|
+|Att Loss R2L 0.1885 | Att Reward in ep 010|
+|Att Loss U2R 0.3978 | Att Reward in ep 008|
+|Def Estimated: [87 78 79 79 77]| Att Labels: [94 75 77 79 75]|
+|Def Amount of true predicted attacks: [87 75 77 72 69]|
+05/07/2025 19:06:59 - INFO - End of Episode.
+|Episode 012/100| time: 33.07|
+|Def Loss 0.0983 | Def Reward in ep 377|
+|Att Loss Dos 0.1159 | Att Reward in ep 003|
+|Att Loss Probe 0.1035 | Att Reward in ep 003|
+|Att Loss R2L 0.1456 | Att Reward in ep 011|
+|Att Loss U2R 0.2584 | Att Reward in ep 006|
+|Def Estimated: [72 85 82 81 80]| Att Labels: [76 83 81 82 78]|
+|Def Amount of true predicted attacks: [70 81 79 73 74]|
+05/07/2025 19:07:34 - INFO - End of Episode.
+|Episode 013/100| time: 33.99|
+|Def Loss 0.0972 | Def Reward in ep 387|
+|Att Loss Dos 0.0831 | Att Reward in ep 001|
+|Att Loss Probe 0.0822 | Att Reward in ep 002|
+|Att Loss R2L 0.1306 | Att Reward in ep 008|
+|Att Loss U2R 0.2357 | Att Reward in ep 002|
+|Def Estimated: [92 78 86 75 69]| Att Labels: [90 78 85 80 67]|
+|Def Amount of true predicted attacks: [87 77 84 73 66]|
+05/07/2025 19:08:09 - INFO - End of Episode.
+|Episode 014/100| time: 33.80|
+|Def Loss 0.0880 | Def Reward in ep 388|
+|Att Loss Dos 0.0750 | Att Reward in ep 001|
+|Att Loss Probe 0.0885 | Att Reward in ep 005|
+|Att Loss R2L 0.1244 | Att Reward in ep 003|
+|Att Loss U2R 0.2033 | Att Reward in ep 003|
+|Def Estimated: [73 81 79 90 77]| Att Labels: [78 80 77 88 77]|
+|Def Amount of true predicted attacks: [72 79 76 86 75]|
+05/07/2025 19:08:44 - INFO - End of Episode.
+|Episode 015/100| time: 33.92|
+|Def Loss 0.0970 | Def Reward in ep 387|
+|Att Loss Dos 0.0644 | Att Reward in ep 001|
+|Att Loss Probe 0.0841 | Att Reward in ep 003|
+|Att Loss R2L 0.1006 | Att Reward in ep 007|
+|Att Loss U2R 0.1810 | Att Reward in ep 002|
+|Def Estimated: [71 84 82 82 81]| Att Labels: [71 84 80 87 78]|
+|Def Amount of true predicted attacks: [69 83 79 80 76]|
+05/07/2025 19:09:19 - INFO - End of Episode.
+|Episode 016/100| time: 34.41|
+|Def Loss 0.0894 | Def Reward in ep 388|
+|Att Loss Dos 0.0652 | Att Reward in ep 001|
+|Att Loss Probe 0.0879 | Att Reward in ep 003|
+|Att Loss R2L 0.0867 | Att Reward in ep 006|
+|Att Loss U2R 0.1710 | Att Reward in ep 002|
+|Def Estimated: [71 82 84 87 76]| Att Labels: [73 79 84 90 74]|
+|Def Amount of true predicted attacks: [70 79 82 85 72]|
+05/07/2025 19:09:56 - INFO - End of Episode.
+|Episode 017/100| time: 35.40|
+|Def Loss 0.0947 | Def Reward in ep 392|
+|Att Loss Dos 0.0610 | Att Reward in ep 001|
+|Att Loss Probe 0.0687 | Att Reward in ep 001|
+|Att Loss R2L 0.0824 | Att Reward in ep 003|
+|Att Loss U2R 0.1568 | Att Reward in ep 003|
+|Def Estimated: [86 79 81 83 71]| Att Labels: [88 78 81 83 70]|
+|Def Amount of true predicted attacks: [86 77 81 80 68]|
+05/07/2025 19:10:32 - INFO - End of Episode.
+|Episode 018/100| time: 35.17|
+|Def Loss 0.0878 | Def Reward in ep 392|
+|Att Loss Dos 0.0759 | Att Reward in ep 003|
+|Att Loss Probe 0.0597 | Att Reward in ep 000|
+|Att Loss R2L 0.0827 | Att Reward in ep 003|
+|Att Loss U2R 0.1388 | Att Reward in ep 002|
+|Def Estimated: [70 84 83 85 78]| Att Labels: [70 87 83 87 73]|
+|Def Amount of true predicted attacks: [68 84 83 84 73]|
+05/07/2025 19:11:09 - INFO - End of Episode.
+|Episode 019/100| time: 35.73|
+|Def Loss 0.0745 | Def Reward in ep 393|
+|Att Loss Dos 0.0627 | Att Reward in ep 001|
+|Att Loss Probe 0.0555 | Att Reward in ep 005|
+|Att Loss R2L 0.0820 | Att Reward in ep 001|
+|Att Loss U2R 0.1565 | Att Reward in ep 000|
+|Def Estimated: [78 84 77 88 73]| Att Labels: [78 82 79 88 73]|
+|Def Amount of true predicted attacks: [76 81 76 87 73]|
+05/07/2025 19:11:47 - INFO - End of Episode.
+|Episode 020/100| time: 35.92|
+|Def Loss 0.0732 | Def Reward in ep 383|
+|Att Loss Dos 0.0497 | Att Reward in ep 001|
+|Att Loss Probe 0.0874 | Att Reward in ep 006|
+|Att Loss R2L 0.0835 | Att Reward in ep 008|
+|Att Loss U2R 0.1306 | Att Reward in ep 002|
+|Def Estimated: [80 86 72 80 82]| Att Labels: [75 86 76 85 78]|
+|Def Amount of true predicted attacks: [73 85 71 77 77]|
+05/07/2025 19:12:24 - INFO - End of Episode.
+|Episode 021/100| time: 36.39|
+|Def Loss 0.0777 | Def Reward in ep 389|
+|Att Loss Dos 0.0606 | Att Reward in ep 000|
+|Att Loss Probe 0.0799 | Att Reward in ep 001|
+|Att Loss R2L 0.1016 | Att Reward in ep 006|
+|Att Loss U2R 0.1451 | Att Reward in ep 004|
+|Def Estimated: [86 82 75 82 75]| Att Labels: [88 81 75 87 69]|
+|Def Amount of true predicted attacks: [84 81 75 81 68]|
+05/07/2025 19:13:03 - INFO - End of Episode.
+|Episode 022/100| time: 36.87|
+|Def Loss 0.0786 | Def Reward in ep 389|
+|Att Loss Dos 0.0370 | Att Reward in ep 002|
+|Att Loss Probe 0.0837 | Att Reward in ep 004|
+|Att Loss R2L 0.1038 | Att Reward in ep 005|
+|Att Loss U2R 0.1283 | Att Reward in ep 000|
+|Def Estimated: [90 83 72 80 75]| Att Labels: [94 82 73 80 71]|
+|Def Amount of true predicted attacks: [88 82 71 77 71]|
+05/07/2025 19:13:41 - INFO - End of Episode.
+|Episode 023/100| time: 36.39|
+|Def Loss 0.0699 | Def Reward in ep 388|
+|Att Loss Dos 0.0348 | Att Reward in ep 000|
+|Att Loss Probe 0.0984 | Att Reward in ep 004|
+|Att Loss R2L 0.0843 | Att Reward in ep 008|
+|Att Loss U2R 0.1144 | Att Reward in ep 000|
+|Def Estimated: [79 86 72 81 82]| Att Labels: [79 85 74 88 74]|
+|Def Amount of true predicted attacks: [77 85 71 81 74]|
+05/07/2025 19:14:19 - INFO - End of Episode.
+|Episode 024/100| time: 36.34|
+|Def Loss 0.0711 | Def Reward in ep 387|
+|Att Loss Dos 0.0360 | Att Reward in ep 005|
+|Att Loss Probe 0.1191 | Att Reward in ep 001|
+|Att Loss R2L 0.0824 | Att Reward in ep 005|
+|Att Loss U2R 0.1004 | Att Reward in ep 002|
+|Def Estimated: [75 82 81 84 78]| Att Labels: [73 85 80 88 74]|
+|Def Amount of true predicted attacks: [71 81 79 83 73]|
+05/07/2025 19:14:57 - INFO - End of Episode.
+|Episode 025/100| time: 36.86|
+|Def Loss 0.0658 | Def Reward in ep 395|
+|Att Loss Dos 0.0613 | Att Reward in ep 000|
+|Att Loss Probe 0.1267 | Att Reward in ep 000|
+|Att Loss R2L 0.0835 | Att Reward in ep 003|
+|Att Loss U2R 0.1020 | Att Reward in ep 002|
+|Def Estimated: [84 80 71 83 82]| Att Labels: [83 80 70 85 82]|
+|Def Amount of true predicted attacks: [82 80 70 82 81]|
+05/07/2025 19:15:36 - INFO - End of Episode.
+|Episode 026/100| time: 37.38|
+|Def Loss 0.0695 | Def Reward in ep 389|
+|Att Loss Dos 0.0716 | Att Reward in ep 003|
+|Att Loss Probe 0.0934 | Att Reward in ep 000|
+|Att Loss R2L 0.0830 | Att Reward in ep 006|
+|Att Loss U2R 0.0912 | Att Reward in ep 002|
+|Def Estimated: [89 82 77 74 78]| Att Labels: [90 82 77 78 73]|
+|Def Amount of true predicted attacks: [87 81 77 72 72]|
+05/07/2025 19:16:15 - INFO - End of Episode.
+|Episode 027/100| time: 37.12|
+|Def Loss 0.0707 | Def Reward in ep 386|
+|Att Loss Dos 0.0921 | Att Reward in ep 003|
+|Att Loss Probe 0.0912 | Att Reward in ep 002|
+|Att Loss R2L 0.0770 | Att Reward in ep 006|
+|Att Loss U2R 0.0715 | Att Reward in ep 003|
+|Def Estimated: [76 84 82 80 78]| Att Labels: [79 85 82 83 71]|
+|Def Amount of true predicted attacks: [75 83 80 77 71]|
+05/07/2025 19:16:54 - INFO - End of Episode.
+|Episode 028/100| time: 37.01|
+|Def Loss 0.0712 | Def Reward in ep 389|
+|Att Loss Dos 0.0783 | Att Reward in ep 000|
+|Att Loss Probe 0.1389 | Att Reward in ep 003|
+|Att Loss R2L 0.0708 | Att Reward in ep 005|
+|Att Loss U2R 0.0832 | Att Reward in ep 003|
+|Def Estimated: [74 85 82 86 73]| Att Labels: [77 82 83 87 71]|
+|Def Amount of true predicted attacks: [72 82 80 85 70]|
+05/07/2025 19:17:33 - INFO - End of Episode.
+|Episode 029/100| time: 37.49|
+|Def Loss 0.0698 | Def Reward in ep 389|
+|Att Loss Dos 0.0661 | Att Reward in ep 002|
+|Att Loss Probe 0.1050 | Att Reward in ep 002|
+|Att Loss R2L 0.0751 | Att Reward in ep 004|
+|Att Loss U2R 0.1052 | Att Reward in ep 003|
+|Def Estimated: [88 83 77 83 69]| Att Labels: [89 85 77 80 69]|
+|Def Amount of true predicted attacks: [86 83 76 78 66]|
+05/07/2025 19:18:12 - INFO - End of Episode.
+|Episode 030/100| time: 37.47|
+|Def Loss 0.0713 | Def Reward in ep 387|
+|Att Loss Dos 0.0889 | Att Reward in ep 003|
+|Att Loss Probe 0.1026 | Att Reward in ep 003|
+|Att Loss R2L 0.0740 | Att Reward in ep 006|
+|Att Loss U2R 0.0781 | Att Reward in ep 001|
+|Def Estimated: [80 84 82 78 76]| Att Labels: [78 83 81 83 75]|
+|Def Amount of true predicted attacks: [75 81 80 77 74]|
+05/07/2025 19:18:52 - INFO - End of Episode.
+|Episode 031/100| time: 37.44|
+|Def Loss 0.0680 | Def Reward in ep 390|
+|Att Loss Dos 0.0801 | Att Reward in ep 002|
+|Att Loss Probe 0.1047 | Att Reward in ep 003|
+|Att Loss R2L 0.0663 | Att Reward in ep 003|
+|Att Loss U2R 0.0764 | Att Reward in ep 002|
+|Def Estimated: [81 86 75 79 79]| Att Labels: [80 87 77 80 76]|
+|Def Amount of true predicted attacks: [79 86 74 77 74]|
+05/07/2025 19:19:31 - INFO - End of Episode.
+|Episode 032/100| time: 37.77|
+|Def Loss 0.0641 | Def Reward in ep 386|
+|Att Loss Dos 0.0949 | Att Reward in ep 005|
+|Att Loss Probe 0.1100 | Att Reward in ep 002|
+|Att Loss R2L 0.0571 | Att Reward in ep 003|
+|Att Loss U2R 0.0914 | Att Reward in ep 004|
+|Def Estimated: [84 82 71 91 72]| Att Labels: [86 82 70 91 71]|
+|Def Amount of true predicted attacks: [81 79 70 88 68]|
+05/07/2025 19:20:11 - INFO - End of Episode.
+|Episode 033/100| time: 38.14|
+|Def Loss 0.0656 | Def Reward in ep 392|
+|Att Loss Dos 0.0921 | Att Reward in ep 000|
+|Att Loss Probe 0.0840 | Att Reward in ep 004|
+|Att Loss R2L 0.0631 | Att Reward in ep 003|
+|Att Loss U2R 0.0934 | Att Reward in ep 001|
+|Def Estimated: [94 87 71 83 65]| Att Labels: [97 84 73 82 64]|
+|Def Amount of true predicted attacks: [94 84 71 80 63]|
+05/07/2025 19:20:51 - INFO - End of Episode.
+|Episode 034/100| time: 37.51|
+|Def Loss 0.0517 | Def Reward in ep 393|
+|Att Loss Dos 0.0901 | Att Reward in ep 000|
+|Att Loss Probe 0.0697 | Att Reward in ep 001|
+|Att Loss R2L 0.0671 | Att Reward in ep 004|
+|Att Loss U2R 0.1146 | Att Reward in ep 002|
+|Def Estimated: [80 84 74 79 83]| Att Labels: [78 83 75 83 81]|
+|Def Amount of true predicted attacks: [77 83 74 79 80]|
+05/07/2025 19:21:31 - INFO - End of Episode.
+|Episode 035/100| time: 38.00|
+|Def Loss 0.0521 | Def Reward in ep 393|
+|Att Loss Dos 0.0640 | Att Reward in ep 002|
+|Att Loss Probe 0.0709 | Att Reward in ep 001|
+|Att Loss R2L 0.0696 | Att Reward in ep 002|
+|Att Loss U2R 0.1198 | Att Reward in ep 002|
+|Def Estimated: [85 74 83 82 76]| Att Labels: [89 73 82 81 75]|
+|Def Amount of true predicted attacks: [84 73 82 80 74]|
+05/07/2025 19:22:11 - INFO - End of Episode.
+|Episode 036/100| time: 37.83|
+|Def Loss 0.0498 | Def Reward in ep 393|
+|Att Loss Dos 0.0764 | Att Reward in ep 002|
+|Att Loss Probe 0.0660 | Att Reward in ep 002|
+|Att Loss R2L 0.0484 | Att Reward in ep 002|
+|Att Loss U2R 0.1279 | Att Reward in ep 001|
+|Def Estimated: [80 80 72 84 84]| Att Labels: [79 81 73 85 82]|
+|Def Amount of true predicted attacks: [78 80 71 83 81]|
+05/07/2025 19:22:51 - INFO - End of Episode.
+|Episode 037/100| time: 37.91|
+|Def Loss 0.0454 | Def Reward in ep 391|
+|Att Loss Dos 0.0478 | Att Reward in ep 002|
+|Att Loss Probe 0.0722 | Att Reward in ep 004|
+|Att Loss R2L 0.0517 | Att Reward in ep 001|
+|Att Loss U2R 0.1277 | Att Reward in ep 002|
+|Def Estimated: [81 80 84 88 67]| Att Labels: [82 82 87 87 62]|
+|Def Amount of true predicted attacks: [79 80 84 86 62]|
+05/07/2025 19:23:31 - INFO - End of Episode.
+|Episode 038/100| time: 38.07|
+|Def Loss 0.0486 | Def Reward in ep 390|
+|Att Loss Dos 0.0592 | Att Reward in ep 001|
+|Att Loss Probe 0.0615 | Att Reward in ep 001|
+|Att Loss R2L 0.0563 | Att Reward in ep 005|
+|Att Loss U2R 0.1267 | Att Reward in ep 003|
+|Def Estimated: [80 80 84 85 71]| Att Labels: [83 80 84 84 69]|
+|Def Amount of true predicted attacks: [79 79 83 81 68]|
+05/07/2025 19:24:11 - INFO - End of Episode.
+|Episode 039/100| time: 38.25|
+|Def Loss 0.0431 | Def Reward in ep 393|
+|Att Loss Dos 0.0660 | Att Reward in ep 001|
+|Att Loss Probe 0.0803 | Att Reward in ep 003|
+|Att Loss R2L 0.0498 | Att Reward in ep 002|
+|Att Loss U2R 0.1352 | Att Reward in ep 001|
+|Def Estimated: [85 84 78 82 71]| Att Labels: [85 84 80 81 70]|
+|Def Amount of true predicted attacks: [83 83 77 80 70]|
+05/07/2025 19:24:52 - INFO - End of Episode.
+|Episode 040/100| time: 38.56|
+|Def Loss 0.0408 | Def Reward in ep 395|
+|Att Loss Dos 0.0562 | Att Reward in ep 000|
+|Att Loss Probe 0.0931 | Att Reward in ep 001|
+|Att Loss R2L 0.0437 | Att Reward in ep 003|
+|Att Loss U2R 0.1133 | Att Reward in ep 001|
+|Def Estimated: [87 91 78 73 71]| Att Labels: [90 89 78 74 69]|
+|Def Amount of true predicted attacks: [87 89 78 72 69]|
+05/07/2025 19:25:33 - INFO - End of Episode.
+|Episode 041/100| time: 38.48|
+|Def Loss 0.0368 | Def Reward in ep 392|
+|Att Loss Dos 0.0637 | Att Reward in ep 002|
+|Att Loss Probe 0.0729 | Att Reward in ep 000|
+|Att Loss R2L 0.0544 | Att Reward in ep 005|
+|Att Loss U2R 0.1156 | Att Reward in ep 001|
+|Def Estimated: [85 82 81 77 75]| Att Labels: [88 81 78 80 73]|
+|Def Amount of true predicted attacks: [85 81 78 76 72]|
+05/07/2025 19:26:13 - INFO - End of Episode.
+|Episode 042/100| time: 38.00|
+|Def Loss 0.0419 | Def Reward in ep 388|
+|Att Loss Dos 0.0357 | Att Reward in ep 001|
+|Att Loss Probe 0.0687 | Att Reward in ep 001|
+|Att Loss R2L 0.0650 | Att Reward in ep 009|
+|Att Loss U2R 0.0875 | Att Reward in ep 001|
+|Def Estimated: [77 85 80 77 81]| Att Labels: [74 85 80 84 77]|
+|Def Amount of true predicted attacks: [72 84 80 75 77]|
+05/07/2025 19:26:54 - INFO - End of Episode.
+|Episode 043/100| time: 38.28|
+|Def Loss 0.0425 | Def Reward in ep 390|
+|Att Loss Dos 0.0408 | Att Reward in ep 005|
+|Att Loss Probe 0.0567 | Att Reward in ep 002|
+|Att Loss R2L 0.0745 | Att Reward in ep 002|
+|Att Loss U2R 0.0969 | Att Reward in ep 001|
+|Def Estimated: [81 78 80 84 77]| Att Labels: [83 79 79 84 75]|
+|Def Amount of true predicted attacks: [80 76 78 82 74]|
+05/07/2025 19:27:34 - INFO - End of Episode.
+|Episode 044/100| time: 38.50|
+|Def Loss 0.0432 | Def Reward in ep 392|
+|Att Loss Dos 0.0600 | Att Reward in ep 001|
+|Att Loss Probe 0.0681 | Att Reward in ep 002|
+|Att Loss R2L 0.0596 | Att Reward in ep 002|
+|Att Loss U2R 0.0908 | Att Reward in ep 003|
+|Def Estimated: [84 80 76 87 73]| Att Labels: [84 79 77 87 73]|
+|Def Amount of true predicted attacks: [82 78 76 85 71]|
+05/07/2025 19:28:16 - INFO - End of Episode.
+|Episode 045/100| time: 38.78|
+|Def Loss 0.0476 | Def Reward in ep 393|
+|Att Loss Dos 0.0656 | Att Reward in ep 001|
+|Att Loss Probe 0.0768 | Att Reward in ep 002|
+|Att Loss R2L 0.0558 | Att Reward in ep 002|
+|Att Loss U2R 0.0859 | Att Reward in ep 002|
+|Def Estimated: [86 79 73 85 77]| Att Labels: [88 78 74 85 75]|
+|Def Amount of true predicted attacks: [86 77 73 83 74]|
+05/07/2025 19:28:57 - INFO - End of Episode.
+|Episode 046/100| time: 38.63|
+|Def Loss 0.0477 | Def Reward in ep 390|
+|Att Loss Dos 0.0617 | Att Reward in ep 000|
+|Att Loss Probe 0.0733 | Att Reward in ep 003|
+|Att Loss R2L 0.0737 | Att Reward in ep 004|
+|Att Loss U2R 0.0979 | Att Reward in ep 003|
+|Def Estimated: [81 84 80 81 74]| Att Labels: [83 84 80 80 73]|
+|Def Amount of true predicted attacks: [78 84 79 77 72]|
+05/07/2025 19:29:38 - INFO - End of Episode.
+|Episode 047/100| time: 38.59|
+|Def Loss 0.0579 | Def Reward in ep 389|
+|Att Loss Dos 0.0673 | Att Reward in ep 000|
+|Att Loss Probe 0.0498 | Att Reward in ep 002|
+|Att Loss R2L 0.0710 | Att Reward in ep 003|
+|Att Loss U2R 0.0984 | Att Reward in ep 006|
+|Def Estimated: [81 87 80 83 69]| Att Labels: [82 84 80 84 70]|
+|Def Amount of true predicted attacks: [78 84 79 81 67]|
+05/07/2025 19:30:19 - INFO - End of Episode.
+|Episode 048/100| time: 39.05|
+|Def Loss 0.0491 | Def Reward in ep 389|
+|Att Loss Dos 0.0491 | Att Reward in ep 001|
+|Att Loss Probe 0.0592 | Att Reward in ep 004|
+|Att Loss R2L 0.0802 | Att Reward in ep 005|
+|Att Loss U2R 0.1339 | Att Reward in ep 001|
+|Def Estimated: [93 88 70 77 72]| Att Labels: [93 86 71 82 68]|
+|Def Amount of true predicted attacks: [91 85 68 77 68]|
+05/07/2025 19:31:01 - INFO - End of Episode.
+|Episode 049/100| time: 38.90|
+|Def Loss 0.0521 | Def Reward in ep 393|
+|Att Loss Dos 0.0486 | Att Reward in ep 000|
+|Att Loss Probe 0.0544 | Att Reward in ep 002|
+|Att Loss R2L 0.0922 | Att Reward in ep 003|
+|Att Loss U2R 0.1209 | Att Reward in ep 002|
+|Def Estimated: [84 87 76 82 71]| Att Labels: [85 87 77 82 69]|
+|Def Amount of true predicted attacks: [84 87 76 79 67]|
+05/07/2025 19:31:43 - INFO - End of Episode.
+|Episode 050/100| time: 39.48|
+|Def Loss 0.0559 | Def Reward in ep 390|
+|Att Loss Dos 0.0518 | Att Reward in ep 003|
+|Att Loss Probe 0.0658 | Att Reward in ep 001|
+|Att Loss R2L 0.0800 | Att Reward in ep 005|
+|Att Loss U2R 0.1425 | Att Reward in ep 001|
+|Def Estimated: [97 85 75 75 68]| Att Labels: [99 87 73 77 64]|
+|Def Amount of true predicted attacks: [96 84 73 73 64]|
+05/07/2025 19:32:24 - INFO - End of Episode.
+|Episode 051/100| time: 38.61|
+|Def Loss 0.0539 | Def Reward in ep 395|
+|Att Loss Dos 0.0485 | Att Reward in ep 000|
+|Att Loss Probe 0.0540 | Att Reward in ep 003|
+|Att Loss R2L 0.0774 | Att Reward in ep 002|
+|Att Loss U2R 0.1353 | Att Reward in ep 000|
+|Def Estimated: [76 90 71 80 83]| Att Labels: [75 90 73 81 81]|
+|Def Amount of true predicted attacks: [74 90 71 79 81]|
+05/07/2025 19:33:05 - INFO - End of Episode.
+|Episode 052/100| time: 38.86|
+|Def Loss 0.0551 | Def Reward in ep 393|
+|Att Loss Dos 0.0520 | Att Reward in ep 000|
+|Att Loss Probe 0.0961 | Att Reward in ep 001|
+|Att Loss R2L 0.0654 | Att Reward in ep 004|
+|Att Loss U2R 0.1147 | Att Reward in ep 002|
+|Def Estimated: [79 90 73 83 75]| Att Labels: [81 89 69 86 75]|
+|Def Amount of true predicted attacks: [79 89 69 82 74]|
+05/07/2025 19:33:46 - INFO - End of Episode.
+|Episode 053/100| time: 38.47|
+|Def Loss 0.0566 | Def Reward in ep 386|
+|Att Loss Dos 0.0437 | Att Reward in ep 000|
+|Att Loss Probe 0.1022 | Att Reward in ep 003|
+|Att Loss R2L 0.0711 | Att Reward in ep 007|
+|Att Loss U2R 0.1304 | Att Reward in ep 004|
+|Def Estimated: [69 97 71 81 82]| Att Labels: [67 95 73 84 81]|
+|Def Amount of true predicted attacks: [66 95 71 77 77]|
+05/07/2025 19:34:28 - INFO - End of Episode.
+|Episode 054/100| time: 38.83|
+|Def Loss 0.0487 | Def Reward in ep 389|
+|Att Loss Dos 0.0292 | Att Reward in ep 001|
+|Att Loss Probe 0.0809 | Att Reward in ep 003|
+|Att Loss R2L 0.0735 | Att Reward in ep 006|
+|Att Loss U2R 0.1291 | Att Reward in ep 001|
+|Def Estimated: [68 94 72 80 86]| Att Labels: [70 93 73 83 81]|
+|Def Amount of true predicted attacks: [67 92 72 78 80]|
+05/07/2025 19:35:10 - INFO - End of Episode.
+|Episode 055/100| time: 39.54|
+|Def Loss 0.0473 | Def Reward in ep 392|
+|Att Loss Dos 0.0376 | Att Reward in ep 001|
+|Att Loss Probe 0.0702 | Att Reward in ep 002|
+|Att Loss R2L 0.0815 | Att Reward in ep 004|
+|Att Loss U2R 0.1348 | Att Reward in ep 001|
+|Def Estimated: [72 93 74 85 76]| Att Labels: [73 94 72 87 74]|
+|Def Amount of true predicted attacks: [70 93 72 84 73]|
+05/07/2025 19:35:52 - INFO - End of Episode.
+|Episode 056/100| time: 39.28|
+|Def Loss 0.0465 | Def Reward in ep 389|
+|Att Loss Dos 0.0291 | Att Reward in ep 001|
+|Att Loss Probe 0.0948 | Att Reward in ep 003|
+|Att Loss R2L 0.0811 | Att Reward in ep 004|
+|Att Loss U2R 0.1231 | Att Reward in ep 003|
+|Def Estimated: [79 89 71 86 75]| Att Labels: [79 88 72 86 75]|
+|Def Amount of true predicted attacks: [77 87 70 82 73]|
+05/07/2025 19:36:34 - INFO - End of Episode.
+|Episode 057/100| time: 39.19|
+|Def Loss 0.0425 | Def Reward in ep 394|
+|Att Loss Dos 0.0375 | Att Reward in ep 001|
+|Att Loss Probe 0.1064 | Att Reward in ep 001|
+|Att Loss R2L 0.0880 | Att Reward in ep 002|
+|Att Loss U2R 0.1212 | Att Reward in ep 002|
+|Def Estimated: [79 84 77 89 71]| Att Labels: [82 84 77 88 69]|
+|Def Amount of true predicted attacks: [78 84 77 86 69]|
+05/07/2025 19:37:16 - INFO - End of Episode.
+|Episode 058/100| time: 39.42|
+|Def Loss 0.0377 | Def Reward in ep 394|
+|Att Loss Dos 0.0373 | Att Reward in ep 003|
+|Att Loss Probe 0.0934 | Att Reward in ep 000|
+|Att Loss R2L 0.0693 | Att Reward in ep 002|
+|Att Loss U2R 0.1104 | Att Reward in ep 001|
+|Def Estimated: [85 84 74 83 74]| Att Labels: [84 86 74 84 72]|
+|Def Amount of true predicted attacks: [84 83 74 82 71]|
+05/07/2025 19:37:58 - INFO - End of Episode.
+|Episode 059/100| time: 38.80|
+|Def Loss 0.0455 | Def Reward in ep 396|
+|Att Loss Dos 0.0566 | Att Reward in ep 000|
+|Att Loss Probe 0.0819 | Att Reward in ep 002|
+|Att Loss R2L 0.0643 | Att Reward in ep 002|
+|Att Loss U2R 0.1107 | Att Reward in ep 000|
+|Def Estimated: [66 94 78 80 82]| Att Labels: [66 93 79 82 80]|
+|Def Amount of true predicted attacks: [65 93 78 80 80]|
+05/07/2025 19:38:40 - INFO - End of Episode.
+|Episode 060/100| time: 39.04|
+|Def Loss 0.0390 | Def Reward in ep 392|
+|Att Loss Dos 0.0464 | Att Reward in ep 001|
+|Att Loss Probe 0.0608 | Att Reward in ep 000|
+|Att Loss R2L 0.0773 | Att Reward in ep 003|
+|Att Loss U2R 0.0995 | Att Reward in ep 004|
+|Def Estimated: [71 86 81 90 72]| Att Labels: [72 85 81 89 73]|
+|Def Amount of true predicted attacks: [71 84 81 86 70]|
+05/07/2025 19:39:22 - INFO - End of Episode.
+|Episode 061/100| time: 38.98|
+|Def Loss 0.0464 | Def Reward in ep 393|
+|Att Loss Dos 0.0544 | Att Reward in ep 002|
+|Att Loss Probe 0.0686 | Att Reward in ep 001|
+|Att Loss R2L 0.0683 | Att Reward in ep 002|
+|Att Loss U2R 0.1196 | Att Reward in ep 002|
+|Def Estimated: [70 91 78 88 73]| Att Labels: [71 92 75 89 73]|
+|Def Amount of true predicted attacks: [70 90 75 87 71]|
+05/07/2025 19:40:04 - INFO - End of Episode.
+|Episode 062/100| time: 39.51|
+|Def Loss 0.0396 | Def Reward in ep 393|
+|Att Loss Dos 0.0572 | Att Reward in ep 002|
+|Att Loss Probe 0.0576 | Att Reward in ep 000|
+|Att Loss R2L 0.0826 | Att Reward in ep 004|
+|Att Loss U2R 0.1435 | Att Reward in ep 001|
+|Def Estimated: [74 90 72 79 85]| Att Labels: [76 91 69 82 82]|
+|Def Amount of true predicted attacks: [74 89 69 79 82]|
+05/07/2025 19:40:47 - INFO - End of Episode.
+|Episode 063/100| time: 39.36|
+|Def Loss 0.0377 | Def Reward in ep 392|
+|Att Loss Dos 0.0545 | Att Reward in ep 000|
+|Att Loss Probe 0.0661 | Att Reward in ep 003|
+|Att Loss R2L 0.0655 | Att Reward in ep 004|
+|Att Loss U2R 0.1318 | Att Reward in ep 001|
+|Def Estimated: [78 87 76 88 71]| Att Labels: [79 85 77 91 68]|
+|Def Amount of true predicted attacks: [76 85 75 88 68]|
+05/07/2025 19:41:29 - INFO - End of Episode.
+|Episode 064/100| time: 39.43|
+|Def Loss 0.0283 | Def Reward in ep 396|
+|Att Loss Dos 0.0650 | Att Reward in ep 001|
+|Att Loss Probe 0.0675 | Att Reward in ep 001|
+|Att Loss R2L 0.0681 | Att Reward in ep 002|
+|Att Loss U2R 0.0927 | Att Reward in ep 000|
+|Def Estimated: [77 87 76 79 81]| Att Labels: [76 87 77 81 79]|
+|Def Amount of true predicted attacks: [75 87 76 79 79]|
+05/07/2025 19:42:12 - INFO - End of Episode.
+|Episode 065/100| time: 39.71|
+|Def Loss 0.0247 | Def Reward in ep 394|
+|Att Loss Dos 0.0618 | Att Reward in ep 001|
+|Att Loss Probe 0.0589 | Att Reward in ep 001|
+|Att Loss R2L 0.0617 | Att Reward in ep 003|
+|Att Loss U2R 0.0997 | Att Reward in ep 001|
+|Def Estimated: [90 78 75 86 71]| Att Labels: [89 78 76 87 70]|
+|Def Amount of true predicted attacks: [88 77 75 85 69]|
+05/07/2025 19:42:54 - INFO - End of Episode.
+|Episode 066/100| time: 39.41|
+|Def Loss 0.0324 | Def Reward in ep 390|
+|Att Loss Dos 0.0799 | Att Reward in ep 002|
+|Att Loss Probe 0.0440 | Att Reward in ep 002|
+|Att Loss R2L 0.0583 | Att Reward in ep 004|
+|Att Loss U2R 0.0989 | Att Reward in ep 002|
+|Def Estimated: [76 89 77 84 74]| Att Labels: [77 89 77 87 70]|
+|Def Amount of true predicted attacks: [74 88 75 83 70]|
+05/07/2025 19:43:37 - INFO - End of Episode.
+|Episode 067/100| time: 39.80|
+|Def Loss 0.0316 | Def Reward in ep 391|
+|Att Loss Dos 0.0750 | Att Reward in ep 002|
+|Att Loss Probe 0.0405 | Att Reward in ep 000|
+|Att Loss R2L 0.0527 | Att Reward in ep 006|
+|Att Loss U2R 0.0961 | Att Reward in ep 001|
+|Def Estimated: [86 77 79 81 77]| Att Labels: [85 78 79 87 71]|
+|Def Amount of true predicted attacks: [84 77 79 81 70]|
+05/07/2025 19:44:20 - INFO - End of Episode.
+|Episode 068/100| time: 39.48|
+|Def Loss 0.0352 | Def Reward in ep 391|
+|Att Loss Dos 0.0559 | Att Reward in ep 000|
+|Att Loss Probe 0.0435 | Att Reward in ep 001|
+|Att Loss R2L 0.0813 | Att Reward in ep 007|
+|Att Loss U2R 0.1062 | Att Reward in ep 001|
+|Def Estimated: [71 87 79 82 81]| Att Labels: [74 86 78 84 78]|
+|Def Amount of true predicted attacks: [70 86 77 80 78]|
+05/07/2025 19:45:03 - INFO - End of Episode.
+|Episode 069/100| time: 40.02|
+|Def Loss 0.0351 | Def Reward in ep 393|
+|Att Loss Dos 0.0509 | Att Reward in ep 000|
+|Att Loss Probe 0.0490 | Att Reward in ep 002|
+|Att Loss R2L 0.0744 | Att Reward in ep 003|
+|Att Loss U2R 0.1104 | Att Reward in ep 002|
+|Def Estimated: [87 85 65 80 83]| Att Labels: [87 84 66 81 82]|
+|Def Amount of true predicted attacks: [86 84 65 78 80]|
+05/07/2025 19:45:46 - INFO - End of Episode.
+|Episode 070/100| time: 40.20|
+|Def Loss 0.0399 | Def Reward in ep 395|
+|Att Loss Dos 0.0450 | Att Reward in ep 000|
+|Att Loss Probe 0.0373 | Att Reward in ep 000|
+|Att Loss R2L 0.0732 | Att Reward in ep 002|
+|Att Loss U2R 0.1063 | Att Reward in ep 003|
+|Def Estimated: [90 84 68 83 75]| Att Labels: [92 84 67 83 74]|
+|Def Amount of true predicted attacks: [90 84 67 81 73]|
+05/07/2025 19:46:29 - INFO - End of Episode.
+|Episode 071/100| time: 40.01|
+|Def Loss 0.0401 | Def Reward in ep 392|
+|Att Loss Dos 0.0419 | Att Reward in ep 003|
+|Att Loss Probe 0.0479 | Att Reward in ep 000|
+|Att Loss R2L 0.0761 | Att Reward in ep 004|
+|Att Loss U2R 0.0744 | Att Reward in ep 001|
+|Def Estimated: [80 86 70 85 79]| Att Labels: [82 86 69 88 75]|
+|Def Amount of true predicted attacks: [80 85 69 84 74]|
+05/07/2025 19:47:12 - INFO - End of Episode.
+|Episode 072/100| time: 39.76|
+|Def Loss 0.0381 | Def Reward in ep 388|
+|Att Loss Dos 0.0427 | Att Reward in ep 003|
+|Att Loss Probe 0.0385 | Att Reward in ep 002|
+|Att Loss R2L 0.0723 | Att Reward in ep 003|
+|Att Loss U2R 0.1067 | Att Reward in ep 004|
+|Def Estimated: [78 84 78 84 76]| Att Labels: [73 86 79 85 77]|
+|Def Amount of true predicted attacks: [73 83 77 82 73]|
+05/07/2025 19:47:56 - INFO - End of Episode.
+|Episode 073/100| time: 39.88|
+|Def Loss 0.0371 | Def Reward in ep 394|
+|Att Loss Dos 0.0454 | Att Reward in ep 000|
+|Att Loss Probe 0.0514 | Att Reward in ep 004|
+|Att Loss R2L 0.0697 | Att Reward in ep 001|
+|Att Loss U2R 0.1203 | Att Reward in ep 001|
+|Def Estimated: [77 91 71 86 75]| Att Labels: [78 88 74 85 75]|
+|Def Amount of true predicted attacks: [76 88 71 85 74]|
+05/07/2025 19:48:39 - INFO - End of Episode.
+|Episode 074/100| time: 39.99|
+|Def Loss 0.0487 | Def Reward in ep 394|
+|Att Loss Dos 0.0455 | Att Reward in ep 000|
+|Att Loss Probe 0.0459 | Att Reward in ep 000|
+|Att Loss R2L 0.0739 | Att Reward in ep 004|
+|Att Loss U2R 0.1346 | Att Reward in ep 002|
+|Def Estimated: [80 89 76 83 72]| Att Labels: [80 89 75 84 72]|
+|Def Amount of true predicted attacks: [79 89 75 81 70]|
+05/07/2025 19:49:22 - INFO - End of Episode.
+|Episode 075/100| time: 40.27|
+|Def Loss 0.0485 | Def Reward in ep 391|
+|Att Loss Dos 0.0411 | Att Reward in ep 000|
+|Att Loss Probe 0.0424 | Att Reward in ep 003|
+|Att Loss R2L 0.0702 | Att Reward in ep 003|
+|Att Loss U2R 0.1582 | Att Reward in ep 003|
+|Def Estimated: [81 94 70 87 68]| Att Labels: [83 92 72 85 68]|
+|Def Amount of true predicted attacks: [81 92 70 83 65]|
+05/07/2025 19:50:05 - INFO - End of Episode.
+|Episode 076/100| time: 39.64|
+|Def Loss 0.0492 | Def Reward in ep 390|
+|Att Loss Dos 0.0252 | Att Reward in ep 001|
+|Att Loss Probe 0.0602 | Att Reward in ep 003|
+|Att Loss R2L 0.0761 | Att Reward in ep 003|
+|Att Loss U2R 0.1411 | Att Reward in ep 003|
+|Def Estimated: [72 86 76 92 74]| Att Labels: [68 87 79 93 73]|
+|Def Amount of true predicted attacks: [67 86 76 90 71]|
+05/07/2025 19:50:49 - INFO - End of Episode.
+|Episode 077/100| time: 40.02|
+|Def Loss 0.0462 | Def Reward in ep 392|
+|Att Loss Dos 0.0293 | Att Reward in ep 001|
+|Att Loss Probe 0.0660 | Att Reward in ep 000|
+|Att Loss R2L 0.0781 | Att Reward in ep 006|
+|Att Loss U2R 0.1585 | Att Reward in ep 001|
+|Def Estimated: [78 91 71 86 74]| Att Labels: [78 90 71 90 71]|
+|Def Amount of true predicted attacks: [77 90 71 84 70]|
+05/07/2025 19:51:32 - INFO - End of Episode.
+|Episode 078/100| time: 40.03|
+|Def Loss 0.0508 | Def Reward in ep 396|
+|Att Loss Dos 0.0279 | Att Reward in ep 000|
+|Att Loss Probe 0.0763 | Att Reward in ep 002|
+|Att Loss R2L 0.0829 | Att Reward in ep 001|
+|Att Loss U2R 0.1531 | Att Reward in ep 001|
+|Def Estimated: [75 95 71 87 72]| Att Labels: [77 92 72 88 71]|
+|Def Amount of true predicted attacks: [75 92 71 87 71]|
+05/07/2025 19:52:16 - INFO - End of Episode.
+|Episode 079/100| time: 40.04|
+|Def Loss 0.0439 | Def Reward in ep 392|
+|Att Loss Dos 0.0230 | Att Reward in ep 001|
+|Att Loss Probe 0.0752 | Att Reward in ep 001|
+|Att Loss R2L 0.0675 | Att Reward in ep 005|
+|Att Loss U2R 0.1640 | Att Reward in ep 001|
+|Def Estimated: [71 89 78 85 77]| Att Labels: [73 88 78 87 74]|
+|Def Amount of true predicted attacks: [70 88 77 83 74]|
+05/07/2025 19:53:00 - INFO - End of Episode.
+|Episode 080/100| time: 40.34|
+|Def Loss 0.0451 | Def Reward in ep 393|
+|Att Loss Dos 0.0172 | Att Reward in ep 000|
+|Att Loss Probe 0.0680 | Att Reward in ep 001|
+|Att Loss R2L 0.0713 | Att Reward in ep 004|
+|Att Loss U2R 0.1176 | Att Reward in ep 002|
+|Def Estimated: [84 88 68 82 78]| Att Labels: [83 88 69 85 75]|
+|Def Amount of true predicted attacks: [82 88 68 81 74]|
+05/07/2025 19:53:43 - INFO - End of Episode.
+|Episode 081/100| time: 39.95|
+|Def Loss 0.0388 | Def Reward in ep 386|
+|Att Loss Dos 0.0265 | Att Reward in ep 003|
+|Att Loss Probe 0.0836 | Att Reward in ep 003|
+|Att Loss R2L 0.0978 | Att Reward in ep 003|
+|Att Loss U2R 0.1581 | Att Reward in ep 005|
+|Def Estimated: [72 94 68 85 81]| Att Labels: [74 92 68 85 81]|
+|Def Amount of true predicted attacks: [68 91 67 82 78]|
+05/07/2025 19:54:27 - INFO - End of Episode.
+|Episode 082/100| time: 40.70|
+|Def Loss 0.0362 | Def Reward in ep 395|
+|Att Loss Dos 0.0249 | Att Reward in ep 001|
+|Att Loss Probe 0.1131 | Att Reward in ep 003|
+|Att Loss R2L 0.0895 | Att Reward in ep 001|
+|Att Loss U2R 0.1168 | Att Reward in ep 000|
+|Def Estimated: [88 90 67 87 68]| Att Labels: [87 89 68 88 68]|
+|Def Amount of true predicted attacks: [86 88 66 87 68]|
+05/07/2025 19:55:11 - INFO - End of Episode.
+|Episode 083/100| time: 40.34|
+|Def Loss 0.0350 | Def Reward in ep 389|
+|Att Loss Dos 0.0323 | Att Reward in ep 001|
+|Att Loss Probe 0.0992 | Att Reward in ep 001|
+|Att Loss R2L 0.0893 | Att Reward in ep 006|
+|Att Loss U2R 0.0976 | Att Reward in ep 003|
+|Def Estimated: [80 86 74 88 72]| Att Labels: [79 87 74 90 70]|
+|Def Amount of true predicted attacks: [78 86 74 84 67]|
+05/07/2025 19:55:56 - INFO - End of Episode.
+|Episode 084/100| time: 40.57|
+|Def Loss 0.0336 | Def Reward in ep 392|
+|Att Loss Dos 0.0220 | Att Reward in ep 000|
+|Att Loss Probe 0.0977 | Att Reward in ep 003|
+|Att Loss R2L 0.0804 | Att Reward in ep 004|
+|Att Loss U2R 0.1407 | Att Reward in ep 001|
+|Def Estimated: [86 83 69 86 76]| Att Labels: [85 83 67 90 75]|
+|Def Amount of true predicted attacks: [83 83 66 86 74]|
+05/07/2025 19:56:39 - INFO - End of Episode.
+|Episode 085/100| time: 39.87|
+|Def Loss 0.0337 | Def Reward in ep 388|
+|Att Loss Dos 0.0356 | Att Reward in ep 004|
+|Att Loss Probe 0.1107 | Att Reward in ep 003|
+|Att Loss R2L 0.0804 | Att Reward in ep 003|
+|Att Loss U2R 0.1194 | Att Reward in ep 002|
+|Def Estimated: [65 88 78 88 81]| Att Labels: [67 88 81 88 76]|
+|Def Amount of true predicted attacks: [64 85 78 85 76]|
+05/07/2025 19:57:23 - INFO - End of Episode.
+|Episode 086/100| time: 40.46|
+|Def Loss 0.0331 | Def Reward in ep 395|
+|Att Loss Dos 0.0372 | Att Reward in ep 000|
+|Att Loss Probe 0.0794 | Att Reward in ep 002|
+|Att Loss R2L 0.0786 | Att Reward in ep 002|
+|Att Loss U2R 0.1211 | Att Reward in ep 001|
+|Def Estimated: [79 90 72 87 72]| Att Labels: [80 90 73 87 70]|
+|Def Amount of true predicted attacks: [78 90 72 86 69]|
+05/07/2025 19:58:07 - INFO - End of Episode.
+|Episode 087/100| time: 40.24|
+|Def Loss 0.0313 | Def Reward in ep 391|
+|Att Loss Dos 0.0382 | Att Reward in ep 001|
+|Att Loss Probe 0.0888 | Att Reward in ep 001|
+|Att Loss R2L 0.0865 | Att Reward in ep 005|
+|Att Loss U2R 0.1253 | Att Reward in ep 002|
+|Def Estimated: [77 83 74 85 81]| Att Labels: [77 84 73 85 81]|
+|Def Amount of true predicted attacks: [74 83 73 82 79]|
+05/07/2025 19:58:52 - INFO - End of Episode.
+|Episode 088/100| time: 40.79|
+|Def Loss 0.0296 | Def Reward in ep 389|
+|Att Loss Dos 0.0387 | Att Reward in ep 002|
+|Att Loss Probe 0.1139 | Att Reward in ep 005|
+|Att Loss R2L 0.0800 | Att Reward in ep 000|
+|Att Loss U2R 0.1216 | Att Reward in ep 004|
+|Def Estimated: [84 87 71 91 67]| Att Labels: [89 84 72 88 67]|
+|Def Amount of true predicted attacks: [82 83 69 88 67]|
+05/07/2025 19:59:36 - INFO - End of Episode.
+|Episode 089/100| time: 40.54|
+|Def Loss 0.0265 | Def Reward in ep 394|
+|Att Loss Dos 0.0449 | Att Reward in ep 000|
+|Att Loss Probe 0.1039 | Att Reward in ep 002|
+|Att Loss R2L 0.0672 | Att Reward in ep 003|
+|Att Loss U2R 0.1201 | Att Reward in ep 001|
+|Def Estimated: [87 82 73 83 75]| Att Labels: [87 81 74 85 73]|
+|Def Amount of true predicted attacks: [85 81 73 83 72]|
+05/07/2025 20:00:21 - INFO - End of Episode.
+|Episode 090/100| time: 41.07|
+|Def Loss 0.0283 | Def Reward in ep 397|
+|Att Loss Dos 0.0604 | Att Reward in ep 001|
+|Att Loss Probe 0.0928 | Att Reward in ep 000|
+|Att Loss R2L 0.0585 | Att Reward in ep 001|
+|Att Loss U2R 0.1323 | Att Reward in ep 001|
+|Def Estimated: [99 76 73 82 70]| Att Labels: [99 76 73 82 70]|
+|Def Amount of true predicted attacks: [98 76 73 81 69]|
+05/07/2025 20:01:06 - INFO - End of Episode.
+|Episode 091/100| time: 41.16|
+|Def Loss 0.0286 | Def Reward in ep 390|
+|Att Loss Dos 0.0476 | Att Reward in ep 003|
+|Att Loss Probe 0.0731 | Att Reward in ep 002|
+|Att Loss R2L 0.0432 | Att Reward in ep 004|
+|Att Loss U2R 0.1287 | Att Reward in ep 001|
+|Def Estimated: [101  86  71  73  69]| Att Labels: [102  88  69  75  66]|
+|Def Amount of true predicted attacks: [99 85 68 72 66]|
+05/07/2025 20:01:50 - INFO - End of Episode.
+|Episode 092/100| time: 40.67|
+|Def Loss 0.0334 | Def Reward in ep 395|
+|Att Loss Dos 0.0506 | Att Reward in ep 001|
+|Att Loss Probe 0.0657 | Att Reward in ep 001|
+|Att Loss R2L 0.0544 | Att Reward in ep 003|
+|Att Loss U2R 0.1219 | Att Reward in ep 000|
+|Def Estimated: [87 83 77 79 74]| Att Labels: [84 84 78 82 72]|
+|Def Amount of true predicted attacks: [84 83 77 79 72]|
+05/07/2025 20:02:35 - INFO - End of Episode.
+|Episode 093/100| time: 40.22|
+|Def Loss 0.0282 | Def Reward in ep 394|
+|Att Loss Dos 0.0430 | Att Reward in ep 000|
+|Att Loss Probe 0.0548 | Att Reward in ep 001|
+|Att Loss R2L 0.0545 | Att Reward in ep 005|
+|Att Loss U2R 0.0931 | Att Reward in ep 000|
+|Def Estimated: [78 86 74 84 78]| Att Labels: [78 85 74 88 75]|
+|Def Amount of true predicted attacks: [77 85 73 84 75]|
+05/07/2025 20:03:19 - INFO - End of Episode.
+|Episode 094/100| time: 40.85|
+|Def Loss 0.0346 | Def Reward in ep 384|
+|Att Loss Dos 0.0598 | Att Reward in ep 005|
+|Att Loss Probe 0.0482 | Att Reward in ep 002|
+|Att Loss R2L 0.0567 | Att Reward in ep 005|
+|Att Loss U2R 0.0859 | Att Reward in ep 004|
+|Def Estimated: [87 85 70 84 74]| Att Labels: [89 84 71 85 71]|
+|Def Amount of true predicted attacks: [85 81 69 80 69]|
+05/07/2025 20:04:04 - INFO - End of Episode.
+|Episode 095/100| time: 40.97|
+|Def Loss 0.0343 | Def Reward in ep 389|
+|Att Loss Dos 0.0735 | Att Reward in ep 002|
+|Att Loss Probe 0.0560 | Att Reward in ep 004|
+|Att Loss R2L 0.0500 | Att Reward in ep 003|
+|Att Loss U2R 0.1002 | Att Reward in ep 002|
+|Def Estimated: [93 79 70 85 73]| Att Labels: [91 80 72 84 73]|
+|Def Amount of true predicted attacks: [87 79 69 82 72]|
+05/07/2025 20:04:50 - INFO - End of Episode.
+|Episode 096/100| time: 41.88|
+|Def Loss 0.0382 | Def Reward in ep 389|
+|Att Loss Dos 0.0768 | Att Reward in ep 002|
+|Att Loss Probe 0.0431 | Att Reward in ep 002|
+|Att Loss R2L 0.0549 | Att Reward in ep 006|
+|Att Loss U2R 0.0801 | Att Reward in ep 001|
+|Def Estimated: [95 77 73 79 76]| Att Labels: [91 78 75 82 74]|
+|Def Amount of true predicted attacks: [90 76 73 77 73]|
+05/07/2025 20:05:35 - INFO - End of Episode.
+|Episode 097/100| time: 40.87|
+|Def Loss 0.0355 | Def Reward in ep 389|
+|Att Loss Dos 0.0893 | Att Reward in ep 003|
+|Att Loss Probe 0.0252 | Att Reward in ep 001|
+|Att Loss R2L 0.0532 | Att Reward in ep 007|
+|Att Loss U2R 0.0796 | Att Reward in ep 000|
+|Def Estimated: [76 84 77 82 81]| Att Labels: [75 85 77 88 75]|
+|Def Amount of true predicted attacks: [74 83 76 81 75]|
+05/07/2025 20:06:20 - INFO - End of Episode.
+|Episode 098/100| time: 40.94|
+|Def Loss 0.0399 | Def Reward in ep 391|
+|Att Loss Dos 0.1047 | Att Reward in ep 002|
+|Att Loss Probe 0.0270 | Att Reward in ep 003|
+|Att Loss R2L 0.0644 | Att Reward in ep 002|
+|Att Loss U2R 0.0777 | Att Reward in ep 002|
+|Def Estimated: [86 90 66 82 76]| Att Labels: [90 87 68 81 74]|
+|Def Amount of true predicted attacks: [86 87 66 79 73]|
+05/07/2025 20:07:05 - INFO - End of Episode.
+|Episode 099/100| time: 40.98|
+|Def Loss 0.0363 | Def Reward in ep 388|
+|Att Loss Dos 0.0984 | Att Reward in ep 002|
+|Att Loss Probe 0.0568 | Att Reward in ep 004|
+|Att Loss R2L 0.0623 | Att Reward in ep 005|
+|Att Loss U2R 0.0841 | Att Reward in ep 001|
+|Def Estimated: [92 82 73 82 71]| Att Labels: [92 80 73 86 69]|
+|Def Amount of true predicted attacks: [88 80 70 81 69]|
+05/07/2025 20:07:10 - INFO - Model 'attacker_model_dos' saved in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/attacker_model_dos.keras
+05/07/2025 20:07:10 - INFO - Model summary:
+Model: "attacker_model_dos"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense (Dense)               (None, 100)               12300     
+                                                                 
+ dense_1 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_2 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_3 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_4 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_5 (Dense)             (None, 7)                 707       
+                                                                 
+=================================================================
+Total params: 53407 (208.62 KB)
+Trainable params: 53407 (208.62 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+05/07/2025 20:07:10 - INFO - Model 'attacker_model_probe' saved in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/attacker_model_probe.keras
+05/07/2025 20:07:10 - INFO - Model summary:
+Model: "attacker_model_probe"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_12 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_13 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_14 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_15 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_16 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_17 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 53205 (207.83 KB)
+Trainable params: 53205 (207.83 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+05/07/2025 20:07:10 - INFO - Model 'attacker_model_probe_r2l' saved in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/attacker_model_r2l.keras
+05/07/2025 20:07:10 - INFO - Model summary:
+Model: "attacker_model_probe_r2l"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_24 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_25 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_26 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_27 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_28 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_29 (Dense)            (None, 9)                 909       
+                                                                 
+=================================================================
+Total params: 53609 (209.41 KB)
+Trainable params: 53609 (209.41 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+05/07/2025 20:07:10 - INFO - Model 'attacker_model_probe_u2r' saved in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/attacker_model_u2r.keras
+05/07/2025 20:07:10 - INFO - Model summary:
+Model: "attacker_model_probe_u2r"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_36 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_37 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_38 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_39 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_40 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_41 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 53205 (207.83 KB)
+Trainable params: 53205 (207.83 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+05/07/2025 20:07:10 - INFO - Model 'defender_model' saved in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/defender_model.keras
+05/07/2025 20:07:10 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_48 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_49 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_50 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_51 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 33005 (128.93 KB)
+Trainable params: 33005 (128.93 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+05/07/2025 20:07:10 - INFO - Saved trained models.
+05/07/2025 20:07:10 - INFO - Total runtime: 01:06:58
+05/07/2025 20:07:10 - INFO - End of the script at: 2025-05-07 20:07:10.148306
+05/07/2025 20:07:20 - INFO - Debug information saved to /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/logs/debug_info.json
+05/07/2025 20:07:20 - INFO - Trying to save summary plots under: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/plots/
+05/07/2025 20:07:21 - INFO - Plotted rewards and losses during training in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/plots/
+05/07/2025 20:07:22 - INFO - Plotted attack distributions during training in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/plots/
+05/07/2025 20:07:24 - INFO - Reading formated train data from: /workspace/data/datasets/formated/formated_training_data.csv
+05/07/2025 20:07:25 - INFO - Reading formated test data from: /workspace/data/datasets/formated/formated_test_data.csv
+05/07/2025 20:07:26 - INFO - Normalized confusion matrix
+05/07/2025 20:07:26 - INFO - 
+Confusion Matrix:
+[[0.93038822 0.00648749 0.02141901 0.00195654 0.03974874]
+ [0.1078037  0.85478681 0.00697238 0.0288281  0.00160901]
+ [0.14539447 0.07971912 0.68649318 0.07104502 0.0173482 ]
+ [0.79593319 0.         0.00762527 0.14233842 0.05410312]
+ [0.36       0.         0.355      0.075      0.21      ]]
+05/07/2025 20:07:27 - INFO - Plotted confusion matrix in: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/plots/intraset/
+05/07/2025 20:07:27 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_48 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_49 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_50 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_51 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 33005 (128.93 KB)
+Trainable params: 33005 (128.93 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+loaded from: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/defender_model.keras
+05/07/2025 20:07:27 - INFO - Overall overview
+Total reward: 17506 | Number of samples: 22544 | Accuracy = 77.65%
+Overall overview per attack type
+              Estimated Correct Total Mismatch   F1_score
+normal            12455    9035  9711     2744  81.521249
+DoS                6631    6375  7458      827  90.496132
+Probe              2014    1662  2421      407  74.949267
+R2L                 813     392  2754     1941  21.979254
+U2R                 631      42   200      431  10.108303
+Weigthed Avg.                                   75.877293
+05/07/2025 20:07:27 - INFO - 
+ Class  Support  Accuracy  Precision  Recall  F1-Score
+normal     9711    0.9304     0.7254  0.9304    0.8152
+   DoS     7458    0.8548     0.9614  0.8548    0.9050
+ Probe     2421    0.6865     0.8252  0.6865    0.7495
+   R2L     2754    0.1423     0.4822  0.1423    0.2198
+   U2R      200    0.2100     0.0666  0.2100    0.1011
+05/07/2025 20:07:27 - INFO - Overall weighted F1-score: 0.7588
+05/07/2025 20:07:27 - INFO - Classification report:
+              precision    recall  f1-score   support
+
+      normal       0.73      0.93      0.82      9711
+         DoS       0.96      0.85      0.90      7458
+       Probe       0.83      0.69      0.75      2421
+         R2L       0.48      0.14      0.22      2754
+         U2R       0.07      0.21      0.10       200
+
+    accuracy                           0.78     22544
+   macro avg       0.61      0.56      0.56     22544
+weighted avg       0.78      0.78      0.76     22544
+
+05/07/2025 20:07:27 - INFO - Model metrics: 
+loss=0.07790340483188629, mse=0.1611209213733673, mae=0.2609683871269226
+05/07/2025 20:07:27 - INFO - Optimizer config: {'name': 'Adam', 'weight_decay': None, 'clipnorm': None, 'global_clipnorm': None, 'clipvalue': None, 'use_ema': False, 'ema_momentum': 0.99, 'ema_overwrite_frequency': None, 'jit_compile': False, 'is_legacy_optimizer': False, 'learning_rate': 0.001, 'beta_1': 0.9, 'beta_2': 0.999, 'epsilon': 1e-07, 'amsgrad': False}
+05/07/2025 20:07:27 - INFO - Time needed for testing: 2.2244186401367188
+05/07/2025 20:07:27 - INFO - [Intra Set] Metrics exported to: /workspace/models/trained-models/2025-05-07-19-00-multi-attacker-nsl-def-mem-4000-minibatch-400-3rd/logs/evaluation_metrics_defender_model.json

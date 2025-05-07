@@ -1,0 +1,151 @@
+{
+    "f1_per_class": [
+        {
+            "Class": "normal",
+            "Support": 9711,
+            "Accuracy": 0.9304,
+            "Precision": 0.7254,
+            "Recall": 0.9304,
+            "F1-Score": 0.8152
+        },
+        {
+            "Class": "DoS",
+            "Support": 7458,
+            "Accuracy": 0.8548,
+            "Precision": 0.9614,
+            "Recall": 0.8548,
+            "F1-Score": 0.905
+        },
+        {
+            "Class": "Probe",
+            "Support": 2421,
+            "Accuracy": 0.6865,
+            "Precision": 0.8252,
+            "Recall": 0.6865,
+            "F1-Score": 0.7495
+        },
+        {
+            "Class": "R2L",
+            "Support": 2754,
+            "Accuracy": 0.1423,
+            "Precision": 0.4822,
+            "Recall": 0.1423,
+            "F1-Score": 0.2198
+        },
+        {
+            "Class": "U2R",
+            "Support": 200,
+            "Accuracy": 0.21,
+            "Precision": 0.0666,
+            "Recall": 0.21,
+            "F1-Score": 0.1011
+        }
+    ],
+    "weighted_f1": 0.7587729329186865,
+    "classification_report": {
+        "normal": {
+            "precision": 0.7254114813327981,
+            "recall": 0.9303882195448461,
+            "f1-score": 0.8152124875936119,
+            "support": 9711.0
+        },
+        "DoS": {
+            "precision": 0.9613934549841653,
+            "recall": 0.8547868061142397,
+            "f1-score": 0.9049613173397686,
+            "support": 7458.0
+        },
+        "Probe": {
+            "precision": 0.8252234359483615,
+            "recall": 0.6864931846344485,
+            "f1-score": 0.7494926719278466,
+            "support": 2421.0
+        },
+        "R2L": {
+            "precision": 0.4821648216482165,
+            "recall": 0.14233841684822077,
+            "f1-score": 0.21979254275301374,
+            "support": 2754.0
+        },
+        "U2R": {
+            "precision": 0.06656101426307448,
+            "recall": 0.21,
+            "f1-score": 0.10108303249097472,
+            "support": 200.0
+        },
+        "accuracy": 0.7765259048970902,
+        "macro avg": {
+            "precision": 0.6121508416353232,
+            "recall": 0.564801325428351,
+            "f1-score": 0.5581084104210431,
+            "support": 22544.0
+        },
+        "weighted avg": {
+            "precision": 0.7786374797106765,
+            "recall": 0.7765259048970902,
+            "f1-score": 0.7587729329186865,
+            "support": 22544.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.07790340483188629,
+        "mse": 0.1611209213733673,
+        "mae": 0.2609683871269226
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": false,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 9035,
+            "TN": 9413,
+            "FP": 3420,
+            "FN": 676
+        },
+        "1": {
+            "TP": 6375,
+            "TN": 14830,
+            "FP": 256,
+            "FN": 1083
+        },
+        "2": {
+            "TP": 1662,
+            "TN": 19771,
+            "FP": 352,
+            "FN": 759
+        },
+        "3": {
+            "TP": 392,
+            "TN": 19369,
+            "FP": 421,
+            "FN": 2362
+        },
+        "4": {
+            "TP": 42,
+            "TN": 21755,
+            "FP": 589,
+            "FN": 158
+        }
+    }
+}
