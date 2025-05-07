@@ -102,7 +102,13 @@ class RLenv():
                 - done (np.array): A flag indicating whether the task is complete (always `False` for continuous tasks).
         """
         # Map attack actions to attack types and corresponding indices
-        attack_names_mapped = [self.attack_names[att[0]] for att in attack_actions] if isinstance(self.data_manager, CICDataManager) else [list(self.attack_names)[att[0]] for att in attack_actions] # TODO: the current implementation works only for one attack per attacker actions
+        if isinstance(self.data_manager, CICDataManager):
+            attack_names_mapped = [self.attack_names[att[0]] for att in attack_actions]
+        elif isinstance(self.data_manager, NslKddDataManager) and self.multiple_attackers:
+            attack_names_mapped = [list(self.attack_map.keys())[att[0]] for att in attack_actions]
+        else:
+            attack_names_mapped = [self.attack_names[att[0]] for att in attack_actions]
+        # TODO: the current implementation works only for one attack per attacker actions
         attack_types_mapped = [self.attack_map[attack_name] for attack_name in attack_names_mapped]
         attack_type_indices = np.array([np.array(self.attack_types.index(attack_type)) for attack_type in attack_types_mapped])
         defender_actions_flat = np.array([action[0] for action in defender_actions])  # // TODO: the current implementation works only for one attack per attacker action

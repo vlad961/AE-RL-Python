@@ -186,7 +186,7 @@ def calculate_f1_scores_per_class_dynamically(predicted_actions, attack_types, t
 
     return f1_scores
 
-def print_aggregated_performance_measures(predicted_actions, true_labels):
+def print_averaged_performance_metrics(predicted_actions, true_labels):
     logging.info('Performance measures on Test data')
     logging.info('Accuracy =  {:.4f}'.format(accuracy_score(true_labels, predicted_actions)))
     logging.info('Weighted average F1 =  {:.4f}'.format(f1_score(true_labels, predicted_actions, average='weighted')))
