@@ -54,7 +54,7 @@ def main(attack_type=None, file_name_suffix=""):
             else:
                 # Retrieve training data for given attack types and existing attack instances.
                 data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
-                _, attack_names = data_mgr.get_samples_for_attack_type(attack_type, 0)
+                _, attack_names = data_mgr.update_samples_for_attack_type(attack_type, 0)
         else: # If no attack type is given, all attacks are used for training.
             data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
             attack_names = NslKddDataManager.get_attack_names(NSL_KDD_FORMATTED_TRAIN_PATH) # Names of attacks in the dataset where at least one sample is present

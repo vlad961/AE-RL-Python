@@ -384,7 +384,7 @@ class NslKddDataManager:
             return attack_df.head(num_samples)
         
 
-    def get_samples_for_attack_type(self, att_types: List[str], num_samples: int) -> Tuple[pd.DataFrame, list]:
+    def update_samples_for_attack_type(self, att_types: List[str], num_samples: int) -> Tuple[pd.DataFrame, list]:
         """
         Get a specified number of samples for a given attack types.
 
@@ -411,6 +411,8 @@ class NslKddDataManager:
         attack_df = self.df[self.df[attack_names].any(axis=1)]
         self.df = attack_df
         self.update_attack_names_for_given_attacks(attack_names)
+        self.shape = attack_df.shape
+        self.obs_size = self.shape[1] - len(self.all_attack_names)  # Number of columns/features - number of all possible attack names
         if num_samples == 0:
             return attack_df, self.attack_names
         else:

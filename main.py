@@ -16,7 +16,6 @@ import os
 from utils.log_config import log_training_parameters, logger_setup, move_log_files
 from utils.plotting import plot_attack_distributions, plot_rewards_and_losses_during_training
 
-# FIXME: The process must be verified! See multiple_agents and cic_training.py as reference...
 """
 This script is the main entry point for the project. It is responsible for downloading the data, training the agents and saving the trained models.
 Notes and credits:
@@ -51,7 +50,7 @@ def main(attack_type=None, file_name_suffix=""):
             else:
                 # Retrieve training data for given attack types and existing attack instances.
                 data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
-                _, attack_names = data_mgr.get_samples_for_attack_type(attack_type, 0)
+                _, attack_names = data_mgr.update_samples_for_attack_type(attack_type, 0)
         else: # If no attack type is given, all attacks are used for training.
             data_mgr = NslKddDataManager(ORIGINAL_KDD_TRAIN, ORIGINAL_KDD_TEST, NSL_KDD_FORMATTED_TRAIN_PATH, NSL_KDD_FORMATTED_TEST_PATH, dataset_type='train')
             attack_names = NslKddDataManager.get_attack_names(NSL_KDD_FORMATTED_TRAIN_PATH) # Names of attacks in the dataset where at least one sample is present
@@ -211,16 +210,9 @@ def main(attack_type=None, file_name_suffix=""):
 
 # Run the main function
 if __name__ == "__main__":
-    #main(file_name_suffix="-Lin-5L-def-3L-lr-0.001")
-    #main("U2R", file_name_suffix="-WIN-only-DoS")
-    #main("normal_and_attack_balanced", file_name_suffix="-balanced-data-1st")
-    #main("balanced_data", file_name_suffix="-balanced-data-1st")
-    main("balanced_data", file_name_suffix="-balanced-data-2nd")
-    #main("balanced_data", file_name_suffix="-balanced-data-3rd")
-    #main(["normal", "R2L"], file_name_suffix="-Mac-normal")
+    #main() # Run the AE-RL framework with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
+    #main(file_name_suffix="-att-5L-def-3L-lr") # Run the AE-RL framework with all attack types and save the results in a specific folder (att-5L-def-3L-lr)
+    #main(["U2R"], file_name_suffix="-WIN-only-U2R") # Run the AE-RL framework with a list of specific attack types (Possible Values: normal, DoS, Probe, R2L, U2R)
+    main(["normal", "R2L"], file_name_suffix="-normal-r2l-1st") # Run the AE-RL framework within a binary classification task (normal vs. R2L)
     #main(["normal", "R2L", "U2R"], file_name_suffix="-WIN-normal-r2l-u2r-attacks-att-5L-def-3L-lr-0.001") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
-    #main(["normal", "U2R"], file_name_suffix="-WIN-normal-U2R") # Run the main function with a list of specific attack types (normal, DoS, Probe, R2L, U2R)
-    #main() # Run the main function with all attack types (normal, DoS, Probe, R2L, U2R) and save the results in a default folder (timestamp).
-    #main(file_name_suffix="mac-all-attacks") # Run the main function with all attack types and save the results in a specific folder (mac-all-attacks)
-    #main("normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R)
-    #main("normal", file_name_suffix="mac-normal") # Run the main function with a specific attack type (normal, DoS, Probe, R2L, U2R) and save the results in a specific folder
+    #main("normal_and_attack_balanced", file_name_suffix="nsl_kdd_downsampled_normal") # Run the main function on the NSL-KDD data with all attack types but use a set that has the same amount of attack and normal instances.

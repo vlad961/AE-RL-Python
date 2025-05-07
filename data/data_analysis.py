@@ -53,16 +53,16 @@ def visualize_relationships_within_data(data: NslKddDataManager):
     Visualize relationships within data
     """
     test  = NslKddDataManager(dataset_type="test")
-    normal_data, normal_attacks = test.get_samples_for_attack_type(["normal"], 0)
+    normal_data, normal_attacks = test.update_samples_for_attack_type(["normal"], 0)
     normal_states, normal_labels = test.get_batch(batch_size=10)
     test  = NslKddDataManager(dataset_type="test")
-    dos_data, dos_attacks = test.get_samples_for_attack_type(["DoS"], 0)
+    dos_data, dos_attacks = test.update_samples_for_attack_type(["DoS"], 0)
     test  = NslKddDataManager(dataset_type="test")
-    probe_data, probe_attacks = test.get_samples_for_attack_type(["Probe"], 0)
+    probe_data, probe_attacks = test.update_samples_for_attack_type(["Probe"], 0)
     test  = NslKddDataManager(dataset_type="test")
-    r2l_data, r2l_attacks = test.get_samples_for_attack_type(["R2L"], 0)
+    r2l_data, r2l_attacks = test.update_samples_for_attack_type(["R2L"], 0)
     test  = NslKddDataManager(dataset_type="test")
-    u2r_data, u2r_attacks = test.get_samples_for_attack_type(["U2R"], 0)
+    u2r_data, u2r_attacks = test.update_samples_for_attack_type(["U2R"], 0)
 
     normal_data = normal_data[normal_data[normal_attacks]].sample(n=1, random_state=42)
     
