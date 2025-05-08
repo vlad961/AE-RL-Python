@@ -1,0 +1,188 @@
+{
+    "one_vs_all_detailed": [
+        {
+            "name": "normal",
+            "accuracy": 0.8838481261857699,
+            "f1": 0.8894563476473966,
+            "precision": 0.905338275326433,
+            "recall": 0.8741220319855071
+        },
+        {
+            "name": "DoS",
+            "accuracy": 0.9264524937883515,
+            "f1": 0.8947147126671894,
+            "precision": 0.9357054573112759,
+            "recall": 0.8571646308271823
+        },
+        {
+            "name": "R2L",
+            "accuracy": 0.9824168671064435,
+            "f1": 0.27826653633105247,
+            "precision": 0.20588235294117646,
+            "recall": 0.4291457286432161
+        },
+        {
+            "name": "Probe",
+            "accuracy": 0.9699856318417439,
+            "f1": 0.8569374550682962,
+            "precision": 0.7665335409192445,
+            "recall": 0.9715168153740563
+        },
+        {
+            "name": "U2R",
+            "accuracy": 0.9842744080080652,
+            "f1": 0.04988009592326139,
+            "precision": 0.02557796360059026,
+            "recall": 1.0
+        }
+    ],
+    "f1_per_class": [
+        {
+            "Class": "normal",
+            "Support": 67343,
+            "Accuracy": 0.8741,
+            "Precision": 0.9053,
+            "Recall": 0.8741,
+            "F1-Score": 0.8895
+        },
+        {
+            "Class": "DoS",
+            "Support": 45927,
+            "Accuracy": 0.8572,
+            "Precision": 0.9357,
+            "Recall": 0.8572,
+            "F1-Score": 0.8947
+        },
+        {
+            "Class": "Probe",
+            "Support": 11656,
+            "Accuracy": 0.9715,
+            "Precision": 0.7665,
+            "Recall": 0.9715,
+            "F1-Score": 0.8569
+        },
+        {
+            "Class": "R2L",
+            "Support": 995,
+            "Accuracy": 0.4291,
+            "Precision": 0.2059,
+            "Recall": 0.4291,
+            "F1-Score": 0.2783
+        },
+        {
+            "Class": "U2R",
+            "Support": 52,
+            "Accuracy": 1.0,
+            "Precision": 0.0256,
+            "Recall": 1.0,
+            "F1-Score": 0.0499
+        }
+    ],
+    "weighted_f1": 0.8831904723488215,
+    "classification_report": {
+        "normal": {
+            "precision": 0.905338275326433,
+            "recall": 0.8741220319855071,
+            "f1-score": 0.8894563476473966,
+            "support": 67343.0
+        },
+        "DoS": {
+            "precision": 0.9357054573112759,
+            "recall": 0.8571646308271823,
+            "f1-score": 0.8947147126671894,
+            "support": 45927.0
+        },
+        "Probe": {
+            "precision": 0.7665335409192445,
+            "recall": 0.9715168153740563,
+            "f1-score": 0.8569374550682962,
+            "support": 11656.0
+        },
+        "R2L": {
+            "precision": 0.20588235294117646,
+            "recall": 0.4291457286432161,
+            "f1-score": 0.27826653633105247,
+            "support": 995.0
+        },
+        "U2R": {
+            "precision": 0.02557796360059026,
+            "recall": 1.0,
+            "f1-score": 0.04988009592326139,
+            "support": 52.0
+        },
+        "accuracy": 0.873488763465187,
+        "macro avg": {
+            "precision": 0.5678075180197439,
+            "recall": 0.8263898413659924,
+            "f1-score": 0.5938510295274392,
+            "support": 125973.0
+        },
+        "weighted avg": {
+            "precision": 0.8976783752191451,
+            "recall": 0.873488763465187,
+            "f1-score": 0.8831904723488215,
+            "support": 125973.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.029042841866612434,
+        "mse": 0.05824073404073715,
+        "mae": 0.148371621966362
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 58866,
+            "TN": 52475,
+            "FP": 6155,
+            "FN": 8477
+        },
+        "1": {
+            "TP": 39367,
+            "TN": 77341,
+            "FP": 2705,
+            "FN": 6560
+        },
+        "2": {
+            "TP": 11324,
+            "TN": 110868,
+            "FP": 3449,
+            "FN": 332
+        },
+        "3": {
+            "TP": 427,
+            "TN": 123331,
+            "FP": 1647,
+            "FN": 568
+        },
+        "4": {
+            "TP": 52,
+            "TN": 123940,
+            "FP": 1981,
+            "FN": 0
+        }
+    }
+}

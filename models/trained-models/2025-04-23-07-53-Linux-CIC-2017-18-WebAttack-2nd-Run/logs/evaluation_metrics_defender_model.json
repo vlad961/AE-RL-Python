@@ -1,0 +1,116 @@
+{
+    "one_vs_all": {
+        "tp": 1389,
+        "tn": 136894,
+        "fp": 3106,
+        "fn": 77,
+        "accuracy": 0.9774998939674551,
+        "recall": 0.9474761255115962,
+        "specificity": 0.9778142857142857,
+        "precision": 0.30901001112347054,
+        "f1_score": 0.46602918973326624,
+        "false_positive_rate": 0.022185714285714284
+    },
+    "one_vs_all_detailed": [
+        {
+            "name": "Benign",
+            "accuracy": 0.9774998939674551,
+            "f1": 0.9885078221185611,
+            "precision": 0.999437837206416,
+            "recall": 0.9778142857142857
+        },
+        {
+            "name": "Web Attack",
+            "accuracy": 0.9774998939674551,
+            "f1": 0.46602918973326624,
+            "precision": 0.30901001112347054,
+            "recall": 0.9474761255115962
+        }
+    ],
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 140000,
+            "Accuracy": 0.9778,
+            "Precision": 0.9994,
+            "Recall": 0.9778,
+            "F1-Score": 0.9885
+        },
+        {
+            "Class": "Web Attack",
+            "Support": 1466,
+            "Accuracy": 0.9475,
+            "Precision": 0.309,
+            "Recall": 0.9475,
+            "F1-Score": 0.466
+        }
+    ],
+    "weighted_f1": 0.9830934209544874,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.999437837206416,
+            "recall": 0.9778142857142857,
+            "f1-score": 0.9885078221185611,
+            "support": 140000.0
+        },
+        "Web Attack": {
+            "precision": 0.30901001112347054,
+            "recall": 0.9474761255115962,
+            "f1-score": 0.46602918973326624,
+            "support": 1466.0
+        },
+        "accuracy": 0.9774998939674551,
+        "macro avg": {
+            "precision": 0.6542239241649432,
+            "recall": 0.962645205612941,
+            "f1-score": 0.7272685059259136,
+            "support": 141466.0
+        },
+        "weighted avg": {
+            "precision": 0.9922829929820964,
+            "recall": 0.9774998939674551,
+            "f1-score": 0.9830934209544874,
+            "support": 141466.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.062499068677425385,
+        "mse": 0.3454720973968506,
+        "mae": 0.15282568335533142
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": false,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "Web Attack"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 136894,
+            "TN": 1389,
+            "FP": 77,
+            "FN": 3106
+        },
+        "1": {
+            "TP": 1389,
+            "TN": 136894,
+            "FP": 3106,
+            "FN": 77
+        }
+    }
+}

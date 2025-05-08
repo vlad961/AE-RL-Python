@@ -1,0 +1,100 @@
+{
+    "one_vs_all": {
+        "tp": 6028,
+        "tn": 138375,
+        "fp": 1625,
+        "fn": 164,
+        "accuracy": 0.9877626682718617,
+        "recall": 0.9735142118863049,
+        "specificity": 0.9883928571428572,
+        "precision": 0.7876649679864105,
+        "f1_score": 0.8707836764174792,
+        "false_positive_rate": 0.011607142857142858
+    },
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 140000,
+            "Accuracy": 0.9884,
+            "Precision": 0.9988,
+            "Recall": 0.9884,
+            "F1-Score": 0.9936
+        },
+        {
+            "Class": "Brute Force",
+            "Support": 6192,
+            "Accuracy": 0.9735,
+            "Precision": 0.7877,
+            "Recall": 0.9735,
+            "F1-Score": 0.8708
+        }
+    ],
+    "weighted_f1": 0.9883762495193683,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.9988162178159219,
+            "recall": 0.9883928571428572,
+            "f1-score": 0.9935772010382747,
+            "support": 140000.0
+        },
+        "Brute Force": {
+            "precision": 0.7876649679864105,
+            "recall": 0.9735142118863049,
+            "f1-score": 0.8707836764174792,
+            "support": 6192.0
+        },
+        "accuracy": 0.9877626682718617,
+        "macro avg": {
+            "precision": 0.8932405929011662,
+            "recall": 0.980953534514581,
+            "f1-score": 0.9321804387278769,
+            "support": 146192.0
+        },
+        "weighted avg": {
+            "precision": 0.9898728519754906,
+            "recall": 0.9877626682718617,
+            "f1-score": 0.9883762495193683,
+            "support": 146192.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.030727706849575043,
+        "mse": 0.2576475143432617,
+        "mae": 0.12161210179328918
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "Brute Force"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 138375,
+            "TN": 6028,
+            "FP": 164,
+            "FN": 1625
+        },
+        "1": {
+            "TP": 6028,
+            "TN": 138375,
+            "FP": 1625,
+            "FN": 164
+        }
+    }
+}

@@ -1,0 +1,261 @@
+04/22/2025 06:34:57 - INFO - Started script at: 2025-04-22-06-34
+Current working dir: /workspace
+Used data files: 
+/workspace/data/datasets/origin-kaggle-com/nsl-kdd/KDDTrain+.txt,
+/workspace/data/datasets/origin-kaggle-com/nsl-kdd/KDDTest+.txt
+04/22/2025 06:34:57 - INFO - Setting up Attacker and Defender Agents...
+04/22/2025 06:34:57 - INFO - Reading formated train data from: /workspace/data/datasets/formated/formated_training_data.csv
+04/22/2025 06:34:57 - INFO - Reading formated test data from: /workspace/data/datasets/formated/formated_test_data.csv
+04/22/2025 06:34:58 - INFO - Initializing Attacker:DoS's ReplayMemory with observation_size=122 and max_size=1000
+04/22/2025 06:34:58 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+04/22/2025 06:34:58 - INFO - Initializing Attacker:Probe's ReplayMemory with observation_size=122 and max_size=1000
+04/22/2025 06:34:58 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+04/22/2025 06:34:58 - INFO - Initializing Attacker:R2L's ReplayMemory with observation_size=122 and max_size=1000
+04/22/2025 06:34:58 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+04/22/2025 06:34:58 - INFO - Initializing Attacker:U2R's ReplayMemory with observation_size=122 and max_size=1000
+04/22/2025 06:34:58 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+04/22/2025 06:34:58 - INFO - Initializing Defender's ReplayMemory with observation_size=122 and max_size=4000
+04/22/2025 06:34:58 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 17 variables whereas the saved optimizer has 1 variables. 
+04/22/2025 06:34:58 - INFO - Creating environment...
+04/22/2025 06:34:58 - INFO - Start Training with the following parameters:
+-----------------------------------------------------------------------------------------------------------------------
+Total episodes: 3 | Iterations in episode: 100 | Minibatch from mem size: 100 | Total Samples: 300 | Data shape: (125973, 162)
+-----------------------------------------------------------------------------------------------------------------------
+Attacker<Attack-Type>: Num_actions=23 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=5 | Learning rate=0.001
+-----------------------------------------------------------------------------------------------------------------------
+Defender: Num_actions=5 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=3 | Learning rate=0.001
+-----------------------------------------------------------------------------------------------------------------------
+Used Attack types: 'all: Normal, DoS, Probe, R2L, U2R' | Attack name(s): ['normal', 'back', 'land', 'neptune', 'pod', 'smurf', 'teardrop', 'ipsweep', 'nmap', 'portsweep', 'satan', 'ftp_write', 'guess_passwd', 'imap', 'multihop', 'phf', 'spy', 'warezclient', 'warezmaster', 'buffer_overflow', 'loadmodule', 'perl', 'rootkit']
+-----------------------------------------------------------------------------------------------------------------------
+
+04/22/2025 06:35:04 - INFO - End of Episode.
+|Episode 000/003| time: 5.62|
+|Def Loss 0.0000 | Def Reward in ep 060|
+|Att Loss Dos 0.0000 | Att Reward in ep 081|
+|Att Loss Probe 0.0000 | Att Reward in ep 085|
+|Att Loss R2L 0.0000 | Att Reward in ep 087|
+|Att Loss U2R 0.0000 | Att Reward in ep 087|
+|Def Estimated: [165  49  57  49  80]| Att Labels: [70 87 79 85 79]|
+|Def Amount of true predicted attacks: [19 12 10  9 10]|
+04/22/2025 06:35:05 - WARNING - 5 out of the last 163 calls to <function QNetwork.predict at 0x74944ca3e7a0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+04/22/2025 06:35:05 - WARNING - 6 out of the last 164 calls to <function QNetwork.predict at 0x7496e630dee0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+04/22/2025 06:35:12 - WARNING - 5 out of the last 5 calls to <function Model.make_train_function.<locals>.train_function at 0x749437f9a700> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+04/22/2025 06:35:45 - INFO - End of Episode.
+|Episode 001/003| time: 40.44|
+|Def Loss 0.4811 | Def Reward in ep 309|
+|Att Loss Dos 1.6021 | Att Reward in ep 016|
+|Att Loss Probe 2.4148 | Att Reward in ep 019|
+|Att Loss R2L 1.2381 | Att Reward in ep 034|
+|Att Loss U2R 2.2095 | Att Reward in ep 022|
+|Def Estimated: [49 93 84 82 92]| Att Labels: [56 91 89 86 78]|
+|Def Amount of true predicted attacks: [37 76 74 58 64]|
+04/22/2025 06:36:18 - INFO - End of Episode.
+|Episode 002/003| time: 33.00|
+|Def Loss 0.1776 | Def Reward in ep 364|
+|Att Loss Dos 1.2500 | Att Reward in ep 008|
+|Att Loss Probe 1.8293 | Att Reward in ep 009|
+|Att Loss R2L 1.1384 | Att Reward in ep 014|
+|Att Loss U2R 2.0226 | Att Reward in ep 005|
+|Def Estimated: [76 85 76 76 87]| Att Labels: [68 91 78 84 79]|
+|Def Amount of true predicted attacks: [62 83 73 72 74]|
+04/22/2025 06:36:18 - INFO - Model 'attacker_model_dos' saved in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/attacker_model_dos.keras
+04/22/2025 06:36:18 - INFO - Model summary:
+Model: "attacker_model_dos"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense (Dense)               (None, 100)               12300     
+                                                                 
+ dense_1 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_2 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_3 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_4 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_5 (Dense)             (None, 7)                 707       
+                                                                 
+=================================================================
+Total params: 53407 (208.62 KB)
+Trainable params: 53407 (208.62 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+04/22/2025 06:36:18 - INFO - Model 'attacker_model_probe' saved in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/attacker_model_probe.keras
+04/22/2025 06:36:18 - INFO - Model summary:
+Model: "attacker_model_probe"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_12 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_13 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_14 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_15 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_16 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_17 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 53205 (207.83 KB)
+Trainable params: 53205 (207.83 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+04/22/2025 06:36:18 - INFO - Model 'attacker_model_probe_r2l' saved in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/attacker_model_r2l.keras
+04/22/2025 06:36:18 - INFO - Model summary:
+Model: "attacker_model_probe_r2l"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_24 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_25 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_26 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_27 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_28 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_29 (Dense)            (None, 9)                 909       
+                                                                 
+=================================================================
+Total params: 53609 (209.41 KB)
+Trainable params: 53609 (209.41 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+04/22/2025 06:36:18 - INFO - Model 'attacker_model_probe_u2r' saved in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/attacker_model_u2r.keras
+04/22/2025 06:36:18 - INFO - Model summary:
+Model: "attacker_model_probe_u2r"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_36 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_37 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_38 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_39 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_40 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_41 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 53205 (207.83 KB)
+Trainable params: 53205 (207.83 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+04/22/2025 06:36:18 - INFO - Model 'defender_model' saved in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/defender_model.keras
+04/22/2025 06:36:18 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_48 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_49 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_50 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_51 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 33005 (128.93 KB)
+Trainable params: 33005 (128.93 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+04/22/2025 06:36:18 - INFO - Saved trained models.
+04/22/2025 06:36:18 - INFO - Total runtime: 00:01:21
+04/22/2025 06:36:18 - INFO - End of the script at: 2025-04-22 06:36:18.997239
+04/22/2025 06:36:19 - INFO - Debug information saved to /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/logs/debug_info.json
+04/22/2025 06:36:19 - INFO - Trying to save summary plots under: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/plots/
+04/22/2025 06:36:19 - INFO - Plotted rewards and losses during training in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/plots/
+04/22/2025 06:36:19 - INFO - Plotted attack distributions during training in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/plots/
+04/22/2025 06:36:28 - INFO - Normalized confusion matrix
+04/22/2025 06:36:28 - INFO - 
+Confusion Matrix:
+[[8.74122032e-01 3.78510016e-02 4.33155636e-02 2.32986353e-02
+  2.14127675e-02]
+ [1.30446143e-01 8.57164631e-01 1.15836001e-02 7.40305267e-04
+  6.53210530e-05]
+ [9.95195607e-03 1.32120796e-02 9.71516815e-01 3.77487989e-03
+  1.54426905e-03]
+ [4.82412060e-02 2.01005025e-03 0.00000000e+00 4.29145729e-01
+  5.20603015e-01]
+ [0.00000000e+00 0.00000000e+00 0.00000000e+00 0.00000000e+00
+  1.00000000e+00]]
+04/22/2025 06:36:28 - INFO - Plotted confusion matrix in: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/plots/intraset/
+04/22/2025 06:36:28 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_48 (Dense)            (None, 100)               12300     
+                                                                 
+ dense_49 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_50 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_51 (Dense)            (None, 5)                 505       
+                                                                 
+=================================================================
+Total params: 33005 (128.93 KB)
+Trainable params: 33005 (128.93 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+loaded from: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/defender_model.keras
+04/22/2025 06:36:28 - INFO - Overall overview
+Total reward: 110036 | Number of samples: 125973 | Accuracy = 87.35%
+Overall overview per attack type
+              Estimated Correct  Total Mismatch   F1_score
+normal            65021   58866  67343     2322  88.945635
+DoS               42072   39367  45927     3855  89.471471
+Probe             14773   11324  11656     3117  85.693746
+R2L                2074     427    995     1079  27.826654
+U2R                2033      52     52     1981    4.98801
+Weigthed Avg.                                    88.319047
+04/22/2025 06:36:29 - INFO - 
+ Class  Support  Accuracy  Precision  Recall  F1-Score
+normal    67343    0.8741     0.9053  0.8741    0.8895
+   DoS    45927    0.8572     0.9357  0.8572    0.8947
+ Probe    11656    0.9715     0.7665  0.9715    0.8569
+   R2L      995    0.4291     0.2059  0.4291    0.2783
+   U2R       52    1.0000     0.0256  1.0000    0.0499
+04/22/2025 06:36:29 - INFO - Overall weighted F1-score: 0.8832
+04/22/2025 06:36:37 - INFO - 
+One vs All metrics: 
+     name  accuracy        f1  precision    recall
+0  normal  0.883848  0.889456   0.905338  0.874122
+1     DoS  0.926452  0.894715   0.935705  0.857165
+2     R2L  0.982417  0.278267   0.205882  0.429146
+3   Probe  0.969986  0.856937   0.766534  0.971517
+4     U2R  0.984274  0.049880   0.025578  1.000000
+04/22/2025 06:36:37 - INFO - Classification report:
+              precision    recall  f1-score   support
+
+      normal       0.91      0.87      0.89     67343
+         DoS       0.94      0.86      0.89     45927
+       Probe       0.77      0.97      0.86     11656
+         R2L       0.21      0.43      0.28       995
+         U2R       0.03      1.00      0.05        52
+
+    accuracy                           0.87    125973
+   macro avg       0.57      0.83      0.59    125973
+weighted avg       0.90      0.87      0.88    125973
+
+04/22/2025 06:36:41 - INFO - Model metrics: 
+loss=0.029042841866612434, mse=0.05824073404073715, mae=0.148371621966362
+04/22/2025 06:36:41 - INFO - Optimizer config: {'name': 'Adam', 'weight_decay': None, 'clipnorm': None, 'global_clipnorm': None, 'clipvalue': None, 'use_ema': False, 'ema_momentum': 0.99, 'ema_overwrite_frequency': None, 'jit_compile': True, 'is_legacy_optimizer': False, 'learning_rate': 0.001, 'beta_1': 0.9, 'beta_2': 0.999, 'epsilon': 1e-07, 'amsgrad': False}
+04/22/2025 06:36:41 - INFO - Time needed for testing: 20.405275106430054
+04/22/2025 06:36:42 - INFO - Metrics exported to: /workspace/models/trained-models/2025-04-22-06-34-WIN-multiple-attackers-formated-data-att-5L-def-3L-lr-0.001/logs/evaluation_metrics_defender_model.json

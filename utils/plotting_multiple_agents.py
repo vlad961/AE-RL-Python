@@ -288,18 +288,20 @@ def plot_attack_distributions_multiple_agents(attacks_by_epoch, attack_map, atta
             mapped_epoch = [value for value in mapped_epoch if value != -1]
         
         if use_direct_name_mapping:
-            plt.subplot(3, 3, indx + 1)  # falls du mehrere Epoch-Plots darstellen willst
+            plt.subplot(3, 3, indx + 1)
             attack_counts = pd.Series(mapped_epoch).value_counts()
+            # Reindex to ensure all attack names are present and in the same order.
+            attack_counts = attack_counts.reindex(attack_names, fill_value=0)
             bars = plt.bar(attack_counts.index, attack_counts.values, color='skyblue', edgecolor='black')
-            plt.xlabel(f"{e} epoch")  # optional
+            plt.xlabel(f"{e} epoch")
             plt.xticks(rotation=90)
-            plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))  # <- wichtig!
+            plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
             for bar, count in zip(bars, attack_counts.values):
                 plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.5,
                         f'{int(count)}', ha='center', va='bottom', fontsize=8, color='black')
             plt.ylim(0, attack_counts.max() + attack_counts.max() * 0.1)
         else:
-            plt.subplot(3, 3, indx + 1)  # falls du mehrere Epoch-Plots darstellen willst
+            plt.subplot(3, 3, indx + 1)
             counts, _, bars = plt.hist(mapped_epoch, bins=bins, width=0.9, align='left', color='skyblue', edgecolor='black')
             plt.xlabel(f"{e} epoch")
             plt.xticks(bins[:-1], attack_names, rotation=90)

@@ -1,0 +1,81 @@
+{
+    "one_vs_all": {
+        "tp": 194,
+        "tn": 405847,
+        "fp": 19153,
+        "fn": 79234,
+        "accuracy": 0.8049533332804681,
+        "recall": 0.00244246361484615,
+        "specificity": 0.9549341176470588,
+        "precision": 0.010027394428076705,
+        "f1_score": 0.003928119463426981,
+        "false_positive_rate": 0.04506588235294118
+    },
+    "classification_report": {
+        "Benign": {
+            "precision": 0.8366582075983187,
+            "recall": 0.9549341176470588,
+            "f1-score": 0.8918920403788234,
+            "support": 425000.0
+        },
+        "Brute Force": {
+            "precision": 0.010027394428076705,
+            "recall": 0.00244246361484615,
+            "f1-score": 0.003928119463426981,
+            "support": 79428.0
+        },
+        "accuracy": 0.8049533332804681,
+        "macro avg": {
+            "precision": 0.42334280101319766,
+            "recall": 0.4786882906309525,
+            "f1-score": 0.4479100799211252,
+            "support": 504428.0
+        },
+        "weighted avg": {
+            "precision": 0.7064956626395019,
+            "recall": 0.8049533332804681,
+            "f1-score": 0.7520718910007792,
+            "support": 504428.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.21362526714801788,
+        "mse": 4712.92041015625,
+        "mae": 0.4187157452106476
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "Brute Force"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 405847,
+            "TN": 194,
+            "FP": 79234,
+            "FN": 19153
+        },
+        "1": {
+            "TP": 194,
+            "TN": 405847,
+            "FP": 19153,
+            "FN": 79234
+        }
+    }
+}

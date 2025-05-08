@@ -1,0 +1,116 @@
+{
+    "one_vs_all": {
+        "tp": 16,
+        "tn": 139930,
+        "fp": 70,
+        "fn": 5,
+        "accuracy": 0.9994643660593768,
+        "recall": 0.7619047619047619,
+        "specificity": 0.9995,
+        "precision": 0.18604651162790697,
+        "f1_score": 0.29906542056074764,
+        "false_positive_rate": 0.0005
+    },
+    "one_vs_all_detailed": [
+        {
+            "name": "Benign",
+            "accuracy": 0.9994643660593768,
+            "f1": 0.9997320806615821,
+            "precision": 0.9999642691249508,
+            "recall": 0.9995
+        },
+        {
+            "name": "Infiltration",
+            "accuracy": 0.9994643660593768,
+            "f1": 0.29906542056074764,
+            "precision": 0.18604651162790697,
+            "recall": 0.7619047619047619
+        }
+    ],
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 140000,
+            "Accuracy": 0.9995,
+            "Precision": 1.0,
+            "Recall": 0.9995,
+            "F1-Score": 0.9997
+        },
+        {
+            "Class": "Infiltration",
+            "Support": 21,
+            "Accuracy": 0.7619,
+            "Precision": 0.186,
+            "Recall": 0.7619,
+            "F1-Score": 0.2991
+        }
+    ],
+    "weighted_f1": 0.9996269964252025,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.9999642691249508,
+            "recall": 0.9995,
+            "f1-score": 0.9997320806615821,
+            "support": 140000.0
+        },
+        "Infiltration": {
+            "precision": 0.18604651162790697,
+            "recall": 0.7619047619047619,
+            "f1-score": 0.29906542056074764,
+            "support": 21.0
+        },
+        "accuracy": 0.9994643660593768,
+        "macro avg": {
+            "precision": 0.593005390376429,
+            "recall": 0.880702380952381,
+            "f1-score": 0.6493987506111649,
+            "support": 140021.0
+        },
+        "weighted avg": {
+            "precision": 0.9998421997717292,
+            "recall": 0.9994643660593768,
+            "f1-score": 0.9996269964252025,
+            "support": 140021.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.0023359034676104784,
+        "mse": 0.005253712181001902,
+        "mae": 0.028643013909459114
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": false,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "Infiltration"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 139930,
+            "TN": 16,
+            "FP": 5,
+            "FN": 70
+        },
+        "1": {
+            "TP": 16,
+            "TN": 139930,
+            "FP": 70,
+            "FN": 5
+        }
+    }
+}

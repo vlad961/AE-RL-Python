@@ -1,0 +1,81 @@
+{
+    "one_vs_all": {
+        "tp": 535273,
+        "tn": 336360,
+        "fp": 88640,
+        "fn": 285760,
+        "accuracy": 0.6995264170371089,
+        "recall": 0.6519506524098301,
+        "specificity": 0.791435294117647,
+        "precision": 0.8579289099602028,
+        "f1_score": 0.7408899709746939,
+        "false_positive_rate": 0.20856470588235293
+    },
+    "classification_report": {
+        "Benign": {
+            "precision": 0.5406673953578088,
+            "recall": 0.791435294117647,
+            "f1-score": 0.6424478569791428,
+            "support": 425000.0
+        },
+        "(D)DOS": {
+            "precision": 0.8579289099602028,
+            "recall": 0.6519506524098301,
+            "f1-score": 0.7408899709746939,
+            "support": 821033.0
+        },
+        "accuracy": 0.6995264170371089,
+        "macro avg": {
+            "precision": 0.6992981526590059,
+            "recall": 0.7216929732637385,
+            "f1-score": 0.6916689139769183,
+            "support": 1246033.0
+        },
+        "weighted avg": {
+            "precision": 0.7497165723206559,
+            "recall": 0.6995264170371089,
+            "f1-score": 0.707313092635108,
+            "support": 1246033.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.2675742506980896,
+        "mse": 1280.314453125,
+        "mae": 0.5134276151657104
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "(D)DOS"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 336360,
+            "TN": 535273,
+            "FP": 285760,
+            "FN": 88640
+        },
+        "1": {
+            "TP": 535273,
+            "TN": 336360,
+            "FP": 88640,
+            "FN": 285760
+        }
+    }
+}
