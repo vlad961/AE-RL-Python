@@ -1,0 +1,100 @@
+{
+    "one_vs_all": {
+        "tp": 209451,
+        "tn": 136628,
+        "fp": 3372,
+        "fn": 9917,
+        "accuracy": 0.9630211927606243,
+        "recall": 0.9547928594872543,
+        "specificity": 0.9759142857142857,
+        "precision": 0.9841558478172002,
+        "f1_score": 0.969252020518706,
+        "false_positive_rate": 0.024085714285714287
+    },
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 140000,
+            "Accuracy": 0.9759,
+            "Precision": 0.9323,
+            "Recall": 0.9759,
+            "F1-Score": 0.9536
+        },
+        {
+            "Class": "(D)DOS",
+            "Support": 219368,
+            "Accuracy": 0.9548,
+            "Precision": 0.9842,
+            "Recall": 0.9548,
+            "F1-Score": 0.9693
+        }
+    ],
+    "weighted_f1": 0.9631635116553062,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.9323279538708247,
+            "recall": 0.9759142857142857,
+            "f1-score": 0.9536233401385472,
+            "support": 140000.0
+        },
+        "(D)DOS": {
+            "precision": 0.9841558478172002,
+            "recall": 0.9547928594872543,
+            "f1-score": 0.9692520205187058,
+            "support": 219368.0
+        },
+        "accuracy": 0.9630211927606243,
+        "macro avg": {
+            "precision": 0.9582419008440124,
+            "recall": 0.96535357260077,
+            "f1-score": 0.9614376803286265,
+            "support": 359368.0
+        },
+        "weighted avg": {
+            "precision": 0.963965109764584,
+            "recall": 0.9630211927606243,
+            "f1-score": 0.9631635116553062,
+            "support": 359368.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.10821396857500076,
+        "mse": 43.25605392456055,
+        "mae": 0.23428156971931458
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "(D)DOS"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 136628,
+            "TN": 209451,
+            "FP": 9917,
+            "FN": 3372
+        },
+        "1": {
+            "TP": 209451,
+            "TN": 136628,
+            "FP": 3372,
+            "FN": 9917
+        }
+    }
+}

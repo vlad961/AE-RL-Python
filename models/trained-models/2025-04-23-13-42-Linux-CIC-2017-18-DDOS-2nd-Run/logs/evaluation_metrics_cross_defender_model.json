@@ -1,0 +1,67 @@
+{
+    "one_vs_all": {
+        "tp": 42572,
+        "tn": 400425,
+        "fp": 24575,
+        "fn": 225297,
+        "accuracy": 0.6393661716717013,
+        "recall": 0.15892843143476848,
+        "specificity": 0.9421764705882353,
+        "precision": 0.6340119439438843,
+        "f1_score": 0.25414905556749523,
+        "false_positive_rate": 0.057823529411764704
+    },
+    "classification_report": {
+        "Benign": {
+            "precision": 0.6399407404566245,
+            "recall": 0.9421764705882353,
+            "f1-score": 0.7621901892222681,
+            "support": 425000.0
+        },
+        "(D)DOS": {
+            "precision": 0.6340119439438843,
+            "recall": 0.15892843143476848,
+            "f1-score": 0.2541490555674953,
+            "support": 267869.0
+        },
+        "accuracy": 0.6393661716717013,
+        "macro avg": {
+            "precision": 0.6369763422002543,
+            "recall": 0.5505524510115019,
+            "f1-score": 0.5081696223948817,
+            "support": 692869.0
+        },
+        "weighted avg": {
+            "precision": 0.6376486177132614,
+            "recall": 0.6393661716717013,
+            "f1-score": 0.5657772014410709,
+            "support": 692869.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.13366331160068512,
+        "mse": 0.27315032482147217,
+        "mae": 0.33505409955978394
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": false,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "(D)DOS"
+    ]
+}

@@ -1,0 +1,803 @@
+04/24/2025 07:54:58 - INFO - Started script at: 2025-04-24-07-54
+Current working dir: /workspace
+Used training data files: 
+/workspace/data/datasets/cic_ids/cic-ids-2017/clean/all_benign.feather,
+/workspace/data/datasets/cic_ids/cic-ids-2017/clean/all_malicious.feather
+Used inter set for validation:
+/workspace/data/datasets/cic_ids/cse-cic-ids-2018/clean/all_benign.feather,
+/workspace/data/datasets/cic_ids/cse-cic-ids-2018/clean/all_malicious.feather
+04/24/2025 07:54:58 - INFO - Setting up Attacker and Defender Agents...
+04/24/2025 07:54:58 - INFO - Loading benign data from:
+/workspace/data/datasets/cic_ids/cic-ids-2017/clean/all_benign.feather
+Loading malicious data from:
+/workspace/data/datasets/cic_ids/cic-ids-2017/clean/all_malicious.feather
+04/24/2025 07:55:00 - INFO - Multi-Class Split ready.
+04/24/2025 07:55:00 - INFO - Train: (62267, 67), Validation: (184037, 67), Test: (429420, 67)
+04/24/2025 07:55:00 - INFO - [Init full dataset] Loaded 62267 train, 429420 test samples.
+04/24/2025 07:55:00 - INFO - Loading benign data from:
+/workspace/data/datasets/cic_ids/cse-cic-ids-2018/clean/all_benign.feather
+Loading malicious data from:
+/workspace/data/datasets/cic_ids/cse-cic-ids-2018/clean/all_malicious.feather
+04/24/2025 07:55:36 - WARNING - No samples found for attack type 'Probe'.
+04/24/2025 07:55:37 - WARNING - No samples found for attack type 'Heartbleed'.
+04/24/2025 07:55:40 - INFO - Multi-Class Split ready.
+04/24/2025 07:55:40 - INFO - Train: (59160, 67), Validation: (274662, 67), Test: (1556424, 67)
+04/24/2025 07:55:41 - INFO - Initializing Attacker:CIC-2017-all's ReplayMemory with observation_size=67 and max_size=1000
+04/24/2025 07:55:42 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 25 variables whereas the saved optimizer has 1 variables. 
+04/24/2025 07:55:42 - INFO - Initializing Defender's ReplayMemory with observation_size=67 and max_size=1000
+04/24/2025 07:55:42 - WARNING - Skipping variable loading for optimizer 'Adam', because it has 17 variables whereas the saved optimizer has 1 variables. 
+04/24/2025 07:55:42 - INFO - Creating environment...
+04/24/2025 07:55:42 - INFO - Start Training with the following parameters:
+-----------------------------------------------------------------------------------------------------------------------
+Total episodes: 100 | Iterations in episode: 100 | <Attacker> Minibatch from mem size: 100 | Total Samples: 10000 | <Defender> Minibatch from mem size: 100 | Data shape: (62267, 67)
+-----------------------------------------------------------------------------------------------------------------------
+Attacker<Attack-Type>: Num_actions=15 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=5 | Learning rate=0.001
+-----------------------------------------------------------------------------------------------------------------------
+Defender: Num_actions=8 | gamma=0.001 | epsilon=1 | ANN hidden size=100 | ANN hidden layers=3 | Learning rate=0.001
+-----------------------------------------------------------------------------------------------------------------------
+Used Attack types: '['Benign', '(D)DOS', 'Brute Force', 'Web Attack', 'Botnet', 'Probe', 'Infiltration', 'Heartbleed']' | Attack name(s): ['Benign', 'Bot', 'DDoS', 'DoS GoldenEye', 'DoS Hulk', 'DoS Slowhttptest', 'DoS slowloris', 'FTP Patator', 'Heartbleed', 'Infiltration', 'PortScan', 'SSH Patator', 'Web Attack Brute Force', 'Web Attack Sql Injection', 'Web Attack XSS']
+-----------------------------------------------------------------------------------------------------------------------
+
+04/24/2025 07:55:43 - INFO - End of Episode.
+|Episode 000/100| time: 0.49|
+|Def Loss 0.0000 | Def Reward in ep 015|
+|Att Loss 0.0000 | Att Reward in ep 085|
+|Def Estimated: [13 17  9 13 12 15 12  9]| Att Labels: [ 2 36 14 19  7  6  9  7]|
+|Def Amount of true predicted attacks: [0 8 2 1 1 2 0 1]|
+04/24/2025 07:55:47 - WARNING - 5 out of the last 5 calls to <function QNetwork.predict at 0x74582520fa60> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+04/24/2025 07:55:48 - WARNING - 6 out of the last 11 calls to <function QNetwork.predict at 0x74582520fa60> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+04/24/2025 07:55:51 - INFO - End of Episode.
+|Episode 001/100| time: 6.89|
+|Def Loss 0.3922 | Def Reward in ep 034|
+|Att Loss 0.6348 | Att Reward in ep 066|
+|Def Estimated: [ 4 28 33  4  6  7  3 15]| Att Labels: [ 9 26 16 23  7  6  8  5]|
+|Def Amount of true predicted attacks: [ 1 16 11  1  0  0  0  5]|
+04/24/2025 07:55:53 - INFO - End of Episode.
+|Episode 002/100| time: 2.50|
+|Def Loss 0.2834 | Def Reward in ep 061|
+|Att Loss 0.4407 | Att Reward in ep 039|
+|Def Estimated: [ 9 29 30 12 12  0  0  8]| Att Labels: [ 7 30 12 26  4  7  6  8]|
+|Def Amount of true predicted attacks: [ 3 25 11 12  3  0  0  7]|
+04/24/2025 07:55:56 - INFO - End of Episode.
+|Episode 003/100| time: 2.46|
+|Def Loss 0.2071 | Def Reward in ep 068|
+|Att Loss 0.4395 | Att Reward in ep 032|
+|Def Estimated: [ 7 46 12 11 11  7  1  5]| Att Labels: [ 8 41  9 20  7  6  4  5]|
+|Def Amount of true predicted attacks: [ 3 36  8 10  4  2  0  5]|
+04/24/2025 07:55:59 - INFO - End of Episode.
+|Episode 004/100| time: 2.72|
+|Def Loss 0.2304 | Def Reward in ep 069|
+|Att Loss 0.4092 | Att Reward in ep 031|
+|Def Estimated: [ 8 42 14  9  8 12  0  7]| Att Labels: [12 34 12 17  8  4  4  9]|
+|Def Amount of true predicted attacks: [ 4 31 12  8  4  3  0  7]|
+04/24/2025 07:56:02 - INFO - End of Episode.
+|Episode 005/100| time: 2.62|
+|Def Loss 0.2023 | Def Reward in ep 069|
+|Att Loss 0.3783 | Att Reward in ep 031|
+|Def Estimated: [20 33 15  8  6 11  0  7]| Att Labels: [15 33 13 12  7  3 10  7]|
+|Def Amount of true predicted attacks: [11 26 13  8  2  2  0  7]|
+04/24/2025 07:56:05 - INFO - End of Episode.
+|Episode 006/100| time: 2.53|
+|Def Loss 0.1402 | Def Reward in ep 067|
+|Att Loss 0.3542 | Att Reward in ep 033|
+|Def Estimated: [13 29 16 11 15  6  1  9]| Att Labels: [ 4 27 14 22 14  5  6  8]|
+|Def Amount of true predicted attacks: [ 4 22 13 11  6  3  0  8]|
+04/24/2025 07:56:07 - INFO - End of Episode.
+|Episode 007/100| time: 2.56|
+|Def Loss 0.1154 | Def Reward in ep 068|
+|Att Loss 0.3294 | Att Reward in ep 032|
+|Def Estimated: [20 36 14  7  9  6  0  8]| Att Labels: [10 32 12 21  6  4  9  6]|
+|Def Amount of true predicted attacks: [ 7 29 12  7  3  4  0  6]|
+04/24/2025 07:56:10 - INFO - End of Episode.
+|Episode 008/100| time: 2.58|
+|Def Loss 0.0997 | Def Reward in ep 074|
+|Att Loss 0.3180 | Att Reward in ep 026|
+|Def Estimated: [18 30 18 13  7  4  4  6]| Att Labels: [11 30 13 21  4  2 13  6]|
+|Def Amount of true predicted attacks: [ 9 27 13 13  3  2  1  6]|
+04/24/2025 07:56:13 - INFO - End of Episode.
+|Episode 009/100| time: 2.55|
+|Def Loss 0.0810 | Def Reward in ep 078|
+|Att Loss 0.3120 | Att Reward in ep 022|
+|Def Estimated: [11 39 12 12  8 13  2  3]| Att Labels: [ 9 33 11 24  7  7  6  3]|
+|Def Amount of true predicted attacks: [ 7 33 11 12  5  7  0  3]|
+04/24/2025 07:56:16 - INFO - End of Episode.
+|Episode 010/100| time: 2.59|
+|Def Loss 0.0835 | Def Reward in ep 070|
+|Att Loss 0.2534 | Att Reward in ep 030|
+|Def Estimated: [20 33 10 12  5 13  3  4]| Att Labels: [16 24  8 21  5  8 14  4]|
+|Def Amount of true predicted attacks: [11 23  8 12  2  8  2  4]|
+04/24/2025 07:56:19 - INFO - End of Episode.
+|Episode 011/100| time: 2.60|
+|Def Loss 0.0916 | Def Reward in ep 081|
+|Att Loss 0.1810 | Att Reward in ep 019|
+|Def Estimated: [18 36 20 11  5  5  0  5]| Att Labels: [12 36 16 14  5  5  6  6]|
+|Def Amount of true predicted attacks: [ 9 32 16 11  3  5  0  5]|
+04/24/2025 07:56:22 - INFO - End of Episode.
+|Episode 012/100| time: 2.56|
+|Def Loss 0.0993 | Def Reward in ep 074|
+|Att Loss 0.1123 | Att Reward in ep 026|
+|Def Estimated: [11 32 15 14  9 10  3  6]| Att Labels: [10 26 10 24  7  7 10  6]|
+|Def Amount of true predicted attacks: [ 6 25 10 13  4  7  3  6]|
+04/24/2025 07:56:24 - INFO - End of Episode.
+|Episode 013/100| time: 2.62|
+|Def Loss 0.1102 | Def Reward in ep 068|
+|Att Loss 0.1153 | Att Reward in ep 032|
+|Def Estimated: [17 28 16 16  7  9  1  6]| Att Labels: [10 26 10 29  4  8  8  5]|
+|Def Amount of true predicted attacks: [ 7 21 10 15  1  8  1  5]|
+04/24/2025 07:56:27 - INFO - End of Episode.
+|Episode 014/100| time: 2.59|
+|Def Loss 0.1012 | Def Reward in ep 083|
+|Att Loss 0.0978 | Att Reward in ep 017|
+|Def Estimated: [18 30  9 16  9  5 12  1]| Att Labels: [17 30  9 22 10  5  7  0]|
+|Def Amount of true predicted attacks: [14 30  9 16  5  5  4  0]|
+04/24/2025 07:56:30 - INFO - End of Episode.
+|Episode 015/100| time: 2.68|
+|Def Loss 0.1166 | Def Reward in ep 078|
+|Att Loss 0.1111 | Att Reward in ep 022|
+|Def Estimated: [ 8 28 14 17  6  7 16  4]| Att Labels: [10 28 15 26  5  5  8  3]|
+|Def Amount of true predicted attacks: [ 4 25 14 17  2  5  8  3]|
+04/24/2025 07:56:33 - INFO - End of Episode.
+|Episode 016/100| time: 2.58|
+|Def Loss 0.1344 | Def Reward in ep 080|
+|Att Loss 0.1173 | Att Reward in ep 020|
+|Def Estimated: [15 26 15 14  6  5 15  4]| Att Labels: [16 26 16 20  7  3  8  4]|
+|Def Amount of true predicted attacks: [10 24 15 13  4  3  7  4]|
+04/24/2025 07:56:36 - INFO - End of Episode.
+|Episode 017/100| time: 2.57|
+|Def Loss 0.1137 | Def Reward in ep 080|
+|Att Loss 0.1145 | Att Reward in ep 020|
+|Def Estimated: [20 11 13 18 11 12 10  5]| Att Labels: [14 13 13 32  6 10  7  5]|
+|Def Amount of true predicted attacks: [11 11 12 18  6 10  7  5]|
+04/24/2025 07:56:39 - INFO - End of Episode.
+|Episode 018/100| time: 2.68|
+|Def Loss 0.1164 | Def Reward in ep 075|
+|Att Loss 0.1069 | Att Reward in ep 025|
+|Def Estimated: [16 28 15 10  9  6 13  3]| Att Labels: [10 28 15 26  8  6  5  2]|
+|Def Amount of true predicted attacks: [10 24 15 10  4  5  5  2]|
+04/24/2025 07:56:42 - INFO - End of Episode.
+|Episode 019/100| time: 2.63|
+|Def Loss 0.1122 | Def Reward in ep 083|
+|Att Loss 0.1253 | Att Reward in ep 017|
+|Def Estimated: [11 28 23 12  7  4  8  7]| Att Labels: [ 8 26 23 21  9  3  4  6]|
+|Def Amount of true predicted attacks: [ 6 24 23 11  6  3  4  6]|
+04/24/2025 07:56:45 - INFO - End of Episode.
+|Episode 020/100| time: 2.57|
+|Def Loss 0.1098 | Def Reward in ep 081|
+|Att Loss 0.1156 | Att Reward in ep 019|
+|Def Estimated: [ 9 32 23  9  4  8  5 10]| Att Labels: [ 7 31 18 19  7  8  0 10]|
+|Def Amount of true predicted attacks: [ 4 30 18  8  3  8  0 10]|
+04/24/2025 07:56:48 - INFO - End of Episode.
+|Episode 021/100| time: 2.59|
+|Def Loss 0.1032 | Def Reward in ep 083|
+|Att Loss 0.0978 | Att Reward in ep 017|
+|Def Estimated: [15 28 14 19  6  7  5  6]| Att Labels: [13 25 11 30  8  3  4  6]|
+|Def Amount of true predicted attacks: [10 25 11 19  5  3  4  6]|
+04/24/2025 07:56:51 - INFO - End of Episode.
+|Episode 022/100| time: 2.64|
+|Def Loss 0.0821 | Def Reward in ep 081|
+|Att Loss 0.0882 | Att Reward in ep 019|
+|Def Estimated: [21 21 16 15  4  8  7  8]| Att Labels: [21 20 13 23  6  7  4  6]|
+|Def Amount of true predicted attacks: [17 20 11 14  3  6  4  6]|
+04/24/2025 07:56:54 - INFO - End of Episode.
+|Episode 023/100| time: 2.60|
+|Def Loss 0.0761 | Def Reward in ep 082|
+|Att Loss 0.0752 | Att Reward in ep 018|
+|Def Estimated: [18 35 13 13  3 10  2  6]| Att Labels: [12 33 12 27  2  6  2  6]|
+|Def Amount of true predicted attacks: [10 33 12 13  0  6  2  6]|
+04/24/2025 07:56:57 - INFO - End of Episode.
+|Episode 024/100| time: 2.57|
+|Def Loss 0.0799 | Def Reward in ep 082|
+|Att Loss 0.0615 | Att Reward in ep 018|
+|Def Estimated: [12 28 21 18  2  4  8  7]| Att Labels: [ 8 25 17 31  4  2  6  7]|
+|Def Amount of true predicted attacks: [ 7 24 16 18  2  2  6  7]|
+04/24/2025 07:57:00 - INFO - End of Episode.
+|Episode 025/100| time: 2.68|
+|Def Loss 0.0723 | Def Reward in ep 090|
+|Att Loss 0.0637 | Att Reward in ep 010|
+|Def Estimated: [17 31 17  8  3 11  9  4]| Att Labels: [16 29 17 11  5  9  9  4]|
+|Def Amount of true predicted attacks: [13 29 16  7  3  9  9  4]|
+04/24/2025 07:57:02 - INFO - End of Episode.
+|Episode 026/100| time: 2.55|
+|Def Loss 0.0816 | Def Reward in ep 077|
+|Att Loss 0.0563 | Att Reward in ep 023|
+|Def Estimated: [11 32 11 12 11  3  7 13]| Att Labels: [ 8 27  8 27 12  3  3 12]|
+|Def Amount of true predicted attacks: [ 5 27  8 11  8  3  3 12]|
+04/24/2025 07:57:05 - INFO - End of Episode.
+|Episode 027/100| time: 2.63|
+|Def Loss 0.0830 | Def Reward in ep 088|
+|Att Loss 0.0625 | Att Reward in ep 012|
+|Def Estimated: [10 32 14 16  3  9  6 10]| Att Labels: [ 7 32 12 23  3  8  5 10]|
+|Def Amount of true predicted attacks: [ 6 30 12 16  2  7  5 10]|
+04/24/2025 07:57:08 - INFO - End of Episode.
+|Episode 028/100| time: 2.60|
+|Def Loss 0.0757 | Def Reward in ep 093|
+|Att Loss 0.0998 | Att Reward in ep 007|
+|Def Estimated: [15 27  5 34  1  4 11  3]| Att Labels: [13 27  5 35  3  4 10  3]|
+|Def Amount of true predicted attacks: [13 25  5 32  1  4 10  3]|
+04/24/2025 07:57:11 - INFO - End of Episode.
+|Episode 029/100| time: 2.54|
+|Def Loss 0.0684 | Def Reward in ep 092|
+|Att Loss 0.1120 | Att Reward in ep 008|
+|Def Estimated: [10 29 13 19  2  4  9 14]| Att Labels: [ 6 31 12 21  4  4  8 14]|
+|Def Amount of true predicted attacks: [ 6 27 12 19  2  4  8 14]|
+04/24/2025 07:57:14 - INFO - End of Episode.
+|Episode 030/100| time: 2.60|
+|Def Loss 0.0752 | Def Reward in ep 089|
+|Att Loss 0.1190 | Att Reward in ep 011|
+|Def Estimated: [11 30 16 20  1 10  8  4]| Att Labels: [ 7 33 17 22  2  9  7  3]|
+|Def Amount of true predicted attacks: [ 5 30 15 19  1  9  7  3]|
+04/24/2025 07:57:17 - INFO - End of Episode.
+|Episode 031/100| time: 2.56|
+|Def Loss 0.0862 | Def Reward in ep 094|
+|Att Loss 0.1367 | Att Reward in ep 006|
+|Def Estimated: [ 9 30 14 22  2 10  8  5]| Att Labels: [11 28 14 24  2  9  7  5]|
+|Def Amount of true predicted attacks: [ 7 28 14 22  2  9  7  5]|
+04/24/2025 07:57:20 - INFO - End of Episode.
+|Episode 032/100| time: 2.60|
+|Def Loss 0.0802 | Def Reward in ep 093|
+|Att Loss 0.1381 | Att Reward in ep 007|
+|Def Estimated: [14 28 12 24  1  5  8  8]| Att Labels: [13 27 12 25  3  6  6  8]|
+|Def Amount of true predicted attacks: [11 26 12 24  1  5  6  8]|
+04/24/2025 07:57:23 - INFO - End of Episode.
+|Episode 033/100| time: 2.62|
+|Def Loss 0.0747 | Def Reward in ep 092|
+|Att Loss 0.1227 | Att Reward in ep 008|
+|Def Estimated: [19 25 17 22  3  3  6  5]| Att Labels: [18 25 17 23  4  3  5  5]|
+|Def Amount of true predicted attacks: [16 24 16 21  2  3  5  5]|
+04/24/2025 07:57:26 - INFO - End of Episode.
+|Episode 034/100| time: 2.65|
+|Def Loss 0.0691 | Def Reward in ep 096|
+|Att Loss 0.1128 | Att Reward in ep 004|
+|Def Estimated: [14 33 14 22  5  7  2  3]| Att Labels: [16 33 13 22  5  7  1  3]|
+|Def Amount of true predicted attacks: [14 31 13 22  5  7  1  3]|
+04/24/2025 07:57:29 - INFO - End of Episode.
+|Episode 035/100| time: 2.59|
+|Def Loss 0.0706 | Def Reward in ep 093|
+|Att Loss 0.1073 | Att Reward in ep 007|
+|Def Estimated: [17 29 17 12  5  7  6  7]| Att Labels: [16 28 17 12  7  7  6  7]|
+|Def Amount of true predicted attacks: [13 28 17 11  4  7  6  7]|
+04/24/2025 07:57:32 - INFO - End of Episode.
+|Episode 036/100| time: 2.57|
+|Def Loss 0.0680 | Def Reward in ep 085|
+|Att Loss 0.0909 | Att Reward in ep 015|
+|Def Estimated: [22 28 14 21  6  3  4  2]| Att Labels: [12 33 16 21  9  3  3  3]|
+|Def Amount of true predicted attacks: [11 27 14 20  5  3  3  2]|
+04/24/2025 07:57:35 - INFO - End of Episode.
+|Episode 037/100| time: 2.63|
+|Def Loss 0.0696 | Def Reward in ep 096|
+|Att Loss 0.0667 | Att Reward in ep 004|
+|Def Estimated: [13 36 16 17  4  5  1  8]| Att Labels: [13 36 15 17  4  5  2  8]|
+|Def Amount of true predicted attacks: [12 35 15 17  3  5  1  8]|
+04/24/2025 07:57:38 - INFO - End of Episode.
+|Episode 038/100| time: 2.63|
+|Def Loss 0.0780 | Def Reward in ep 095|
+|Att Loss 0.0528 | Att Reward in ep 005|
+|Def Estimated: [16 32 19 11  3  9  4  6]| Att Labels: [15 31 19 12  5  9  3  6]|
+|Def Amount of true predicted attacks: [13 31 19 11  3  9  3  6]|
+04/24/2025 07:57:41 - INFO - End of Episode.
+|Episode 039/100| time: 2.60|
+|Def Loss 0.0878 | Def Reward in ep 091|
+|Att Loss 0.0547 | Att Reward in ep 009|
+|Def Estimated: [14 36 14 14  6  5  8  3]| Att Labels: [14 36 14 14  7  5  7  3]|
+|Def Amount of true predicted attacks: [11 33 14 14  5  4  7  3]|
+04/24/2025 07:57:44 - INFO - End of Episode.
+|Episode 040/100| time: 2.62|
+|Def Loss 0.0845 | Def Reward in ep 091|
+|Att Loss 0.0528 | Att Reward in ep 009|
+|Def Estimated: [16 30 15 18  4  7  7  3]| Att Labels: [11 33 15 18  8  6  6  3]|
+|Def Amount of true predicted attacks: [10 30 15 18  4  5  6  3]|
+04/24/2025 07:57:47 - INFO - End of Episode.
+|Episode 041/100| time: 2.57|
+|Def Loss 0.0828 | Def Reward in ep 092|
+|Att Loss 0.0454 | Att Reward in ep 008|
+|Def Estimated: [13 37 14 14  4  5  8  5]| Att Labels: [12 38 15 14  6  3  7  5]|
+|Def Amount of true predicted attacks: [10 36 14 13  4  3  7  5]|
+04/24/2025 07:57:50 - INFO - End of Episode.
+|Episode 042/100| time: 2.61|
+|Def Loss 0.0901 | Def Reward in ep 090|
+|Att Loss 0.0444 | Att Reward in ep 010|
+|Def Estimated: [15 33 12 20  4  5  5  6]| Att Labels: [15 36 13 19  4  5  3  5]|
+|Def Amount of true predicted attacks: [12 32 12 18  3  5  3  5]|
+04/24/2025 07:57:53 - INFO - End of Episode.
+|Episode 043/100| time: 2.57|
+|Def Loss 0.0823 | Def Reward in ep 090|
+|Att Loss 0.0533 | Att Reward in ep 010|
+|Def Estimated: [11 28 24 17  4  3  7  6]| Att Labels: [ 8 29 24 18  7  1  7  6]|
+|Def Amount of true predicted attacks: [ 6 27 23 16  4  1  7  6]|
+04/24/2025 07:57:56 - INFO - End of Episode.
+|Episode 044/100| time: 2.64|
+|Def Loss 0.0956 | Def Reward in ep 092|
+|Att Loss 0.0562 | Att Reward in ep 008|
+|Def Estimated: [17 29 13 19  4  6  5  7]| Att Labels: [19 27 12 19  4  7  5  7]|
+|Def Amount of true predicted attacks: [15 25 11 19  4  6  5  7]|
+04/24/2025 07:57:59 - INFO - End of Episode.
+|Episode 045/100| time: 2.62|
+|Def Loss 0.0934 | Def Reward in ep 089|
+|Att Loss 0.0612 | Att Reward in ep 011|
+|Def Estimated: [11 41 16 13  2  7  5  5]| Att Labels: [13 39 15 15  4  5  4  5]|
+|Def Amount of true predicted attacks: [ 8 38 14 13  2  5  4  5]|
+04/24/2025 07:58:02 - INFO - End of Episode.
+|Episode 046/100| time: 2.62|
+|Def Loss 0.0946 | Def Reward in ep 093|
+|Att Loss 0.0599 | Att Reward in ep 007|
+|Def Estimated: [12 36 12 18  2 11  4  5]| Att Labels: [17 33 12 19  2  8  4  5]|
+|Def Amount of true predicted attacks: [11 33 12 18  2  8  4  5]|
+04/24/2025 07:58:05 - INFO - End of Episode.
+|Episode 047/100| time: 2.65|
+|Def Loss 0.0997 | Def Reward in ep 089|
+|Att Loss 0.0690 | Att Reward in ep 011|
+|Def Estimated: [19 29 13 19  4  3  6  7]| Att Labels: [19 30 14 16  7  2  4  8]|
+|Def Amount of true predicted attacks: [16 28 12 16  4  2  4  7]|
+04/24/2025 07:58:08 - INFO - End of Episode.
+|Episode 048/100| time: 2.59|
+|Def Loss 0.1062 | Def Reward in ep 092|
+|Att Loss 0.0671 | Att Reward in ep 008|
+|Def Estimated: [11 27 15 20  0 10 10  7]| Att Labels: [12 25 14 19  4 10  9  7]|
+|Def Amount of true predicted attacks: [ 8 25 14 19  0 10  9  7]|
+04/24/2025 07:58:11 - INFO - End of Episode.
+|Episode 049/100| time: 2.61|
+|Def Loss 0.0857 | Def Reward in ep 095|
+|Att Loss 0.0728 | Att Reward in ep 005|
+|Def Estimated: [14 30 16 18  6  7  6  3]| Att Labels: [13 31 16 17  9  7  4  3]|
+|Def Amount of true predicted attacks: [12 30 16 17  6  7  4  3]|
+04/24/2025 07:58:14 - INFO - End of Episode.
+|Episode 050/100| time: 2.61|
+|Def Loss 0.0950 | Def Reward in ep 088|
+|Att Loss 0.0766 | Att Reward in ep 012|
+|Def Estimated: [14 34 18 16  5  5  7  1]| Att Labels: [13 35 18 16  9  3  5  1]|
+|Def Amount of true predicted attacks: [ 9 33 17 15  5  3  5  1]|
+04/24/2025 07:58:17 - INFO - End of Episode.
+|Episode 051/100| time: 2.63|
+|Def Loss 0.0921 | Def Reward in ep 093|
+|Att Loss 0.0660 | Att Reward in ep 007|
+|Def Estimated: [14 32 16 15  3  7  5  8]| Att Labels: [16 31 16 15  4  6  4  8]|
+|Def Amount of true predicted attacks: [12 30 15 15  3  6  4  8]|
+04/24/2025 07:58:20 - INFO - End of Episode.
+|Episode 052/100| time: 2.64|
+|Def Loss 0.1042 | Def Reward in ep 098|
+|Att Loss 0.0569 | Att Reward in ep 002|
+|Def Estimated: [21 32 11 18  2  3  7  6]| Att Labels: [21 31 12 18  2  3  7  6]|
+|Def Amount of true predicted attacks: [20 31 11 18  2  3  7  6]|
+04/24/2025 07:58:24 - INFO - End of Episode.
+|Episode 053/100| time: 2.63|
+|Def Loss 0.1049 | Def Reward in ep 092|
+|Att Loss 0.0510 | Att Reward in ep 008|
+|Def Estimated: [15 40 12 13  5  5  6  4]| Att Labels: [15 38 12 12  8  5  6  4]|
+|Def Amount of true predicted attacks: [11 37 12 12  5  5  6  4]|
+04/24/2025 07:58:27 - INFO - End of Episode.
+|Episode 054/100| time: 2.62|
+|Def Loss 0.0931 | Def Reward in ep 090|
+|Att Loss 0.0515 | Att Reward in ep 010|
+|Def Estimated: [16 28 16 16  4  6  7  7]| Att Labels: [13 30 15 16  6  7  6  7]|
+|Def Amount of true predicted attacks: [11 26 15 16  3  6  6  7]|
+04/24/2025 07:58:30 - INFO - End of Episode.
+|Episode 055/100| time: 2.60|
+|Def Loss 0.0764 | Def Reward in ep 093|
+|Att Loss 0.0543 | Att Reward in ep 007|
+|Def Estimated: [17 32 14 21  2  2  6  6]| Att Labels: [14 32 15 22  5  2  4  6]|
+|Def Amount of true predicted attacks: [12 32 14 21  2  2  4  6]|
+04/24/2025 07:58:33 - INFO - End of Episode.
+|Episode 056/100| time: 2.58|
+|Def Loss 0.0851 | Def Reward in ep 091|
+|Att Loss 0.0518 | Att Reward in ep 009|
+|Def Estimated: [13 43 18 12  7  2  2  3]| Att Labels: [ 8 47 17 13  9  1  2  3]|
+|Def Amount of true predicted attacks: [ 8 43 15 12  7  1  2  3]|
+04/24/2025 07:58:36 - INFO - End of Episode.
+|Episode 057/100| time: 2.67|
+|Def Loss 0.0866 | Def Reward in ep 088|
+|Att Loss 0.0429 | Att Reward in ep 012|
+|Def Estimated: [22 32 11 19  4  2  6  4]| Att Labels: [16 31 12 20 10  2  5  4]|
+|Def Amount of true predicted attacks: [14 29 11 19  4  2  5  4]|
+04/24/2025 07:58:39 - INFO - End of Episode.
+|Episode 058/100| time: 2.61|
+|Def Loss 0.0801 | Def Reward in ep 093|
+|Att Loss 0.0443 | Att Reward in ep 007|
+|Def Estimated: [14 29 15 19  2  8  6  7]| Att Labels: [13 28 16 19  5  8  4  7]|
+|Def Amount of true predicted attacks: [11 27 15 19  2  8  4  7]|
+04/24/2025 07:58:42 - INFO - End of Episode.
+|Episode 059/100| time: 2.63|
+|Def Loss 0.0882 | Def Reward in ep 092|
+|Att Loss 0.0431 | Att Reward in ep 008|
+|Def Estimated: [16 33 19 14  0  8  5  5]| Att Labels: [ 9 36 20 16  2  8  4  5]|
+|Def Amount of true predicted attacks: [ 9 33 19 14  0  8  4  5]|
+04/24/2025 07:58:45 - INFO - End of Episode.
+|Episode 060/100| time: 2.59|
+|Def Loss 0.0797 | Def Reward in ep 093|
+|Att Loss 0.0467 | Att Reward in ep 007|
+|Def Estimated: [ 8 35 14 17  9  6  4  7]| Att Labels: [ 7 37 13 17 10  6  3  7]|
+|Def Amount of true predicted attacks: [ 5 34 13 17  9  5  3  7]|
+04/24/2025 07:58:48 - INFO - End of Episode.
+|Episode 061/100| time: 2.56|
+|Def Loss 0.0640 | Def Reward in ep 092|
+|Att Loss 0.0436 | Att Reward in ep 008|
+|Def Estimated: [12 33 16 14  7  3  8  7]| Att Labels: [11 34 16 15  8  2  7  7]|
+|Def Amount of true predicted attacks: [ 9 32 15 14  6  2  7  7]|
+04/24/2025 07:58:51 - INFO - End of Episode.
+|Episode 062/100| time: 2.64|
+|Def Loss 0.0804 | Def Reward in ep 090|
+|Att Loss 0.0436 | Att Reward in ep 010|
+|Def Estimated: [13 38 19 10  2  8  6  4]| Att Labels: [10 37 21 12  5  8  4  3]|
+|Def Amount of true predicted attacks: [ 8 36 19 10  2  8  4  3]|
+04/24/2025 07:58:54 - INFO - End of Episode.
+|Episode 063/100| time: 2.59|
+|Def Loss 0.0720 | Def Reward in ep 088|
+|Att Loss 0.0462 | Att Reward in ep 012|
+|Def Estimated: [14 38 14 16  1  4  5  8]| Att Labels: [ 7 41 16 16  7  3  3  7]|
+|Def Amount of true predicted attacks: [ 7 38 14 15  1  3  3  7]|
+04/24/2025 07:58:57 - INFO - End of Episode.
+|Episode 064/100| time: 2.56|
+|Def Loss 0.0810 | Def Reward in ep 095|
+|Att Loss 0.0493 | Att Reward in ep 005|
+|Def Estimated: [ 4 41 24  9  5  5  6  6]| Att Labels: [ 4 40 24 10  6  4  6  6]|
+|Def Amount of true predicted attacks: [ 2 39 24  9  5  4  6  6]|
+04/24/2025 07:59:01 - INFO - End of Episode.
+|Episode 065/100| time: 2.57|
+|Def Loss 0.0743 | Def Reward in ep 092|
+|Att Loss 0.0459 | Att Reward in ep 008|
+|Def Estimated: [11 28 24 13  7  1  9  7]| Att Labels: [ 6 30 25 13 12  1  6  7]|
+|Def Amount of true predicted attacks: [ 6 28 24 13  7  1  6  7]|
+04/24/2025 07:59:04 - INFO - End of Episode.
+|Episode 066/100| time: 2.57|
+|Def Loss 0.0647 | Def Reward in ep 095|
+|Att Loss 0.0434 | Att Reward in ep 005|
+|Def Estimated: [11 38 17 17  2  3  7  5]| Att Labels: [ 8 39 17 18  5  3  5  5]|
+|Def Amount of true predicted attacks: [ 8 38 17 17  2  3  5  5]|
+04/24/2025 07:59:07 - INFO - End of Episode.
+|Episode 067/100| time: 2.60|
+|Def Loss 0.0512 | Def Reward in ep 093|
+|Att Loss 0.0415 | Att Reward in ep 007|
+|Def Estimated: [ 7 40 18 12  6  5  7  5]| Att Labels: [ 5 41 17 11 11  5  6  4]|
+|Def Amount of true predicted attacks: [ 4 40 17 11  6  5  6  4]|
+04/24/2025 07:59:10 - INFO - End of Episode.
+|Episode 068/100| time: 2.56|
+|Def Loss 0.0514 | Def Reward in ep 091|
+|Att Loss 0.0362 | Att Reward in ep 009|
+|Def Estimated: [16 29 16 11  5  6  7 10]| Att Labels: [12 29 15 12 11  6  5 10]|
+|Def Amount of true predicted attacks: [11 28 15 11  5  6  5 10]|
+04/24/2025 07:59:13 - INFO - End of Episode.
+|Episode 069/100| time: 2.55|
+|Def Loss 0.0393 | Def Reward in ep 095|
+|Att Loss 0.0324 | Att Reward in ep 005|
+|Def Estimated: [ 7 38 21 15  4  5  7  3]| Att Labels: [ 4 39 21 14  7  5  7  3]|
+|Def Amount of true predicted attacks: [ 4 38 21 14  4  5  6  3]|
+04/24/2025 07:59:16 - INFO - End of Episode.
+|Episode 070/100| time: 2.62|
+|Def Loss 0.0414 | Def Reward in ep 095|
+|Att Loss 0.0450 | Att Reward in ep 005|
+|Def Estimated: [15 37 18 16  4  4  4  2]| Att Labels: [12 40 16 17  4  5  4  2]|
+|Def Amount of true predicted attacks: [12 37 16 16  4  4  4  2]|
+04/24/2025 07:59:19 - INFO - End of Episode.
+|Episode 071/100| time: 2.57|
+|Def Loss 0.0577 | Def Reward in ep 089|
+|Att Loss 0.0377 | Att Reward in ep 011|
+|Def Estimated: [10 33 17 16  6  5  6  7]| Att Labels: [ 7 34 18 15 11  5  4  6]|
+|Def Amount of true predicted attacks: [ 6 32 17 14  5  5  4  6]|
+04/24/2025 07:59:22 - INFO - End of Episode.
+|Episode 072/100| time: 2.62|
+|Def Loss 0.0406 | Def Reward in ep 090|
+|Att Loss 0.0343 | Att Reward in ep 010|
+|Def Estimated: [11 32 15 14  5  7  8  8]| Att Labels: [ 8 31 16 15 11  6  6  7]|
+|Def Amount of true predicted attacks: [ 7 30 15 14  5  6  6  7]|
+04/24/2025 07:59:25 - INFO - End of Episode.
+|Episode 073/100| time: 2.63|
+|Def Loss 0.0342 | Def Reward in ep 094|
+|Att Loss 0.0413 | Att Reward in ep 006|
+|Def Estimated: [11 33 18 16  3  6  6  7]| Att Labels: [10 33 19 16  5  6  4  7]|
+|Def Amount of true predicted attacks: [ 8 33 18 16  2  6  4  7]|
+04/24/2025 07:59:29 - INFO - End of Episode.
+|Episode 074/100| time: 2.60|
+|Def Loss 0.0339 | Def Reward in ep 087|
+|Att Loss 0.0431 | Att Reward in ep 013|
+|Def Estimated: [10 42 15 10  8  4  3  8]| Att Labels: [10 40 17 11 11  2  2  7]|
+|Def Amount of true predicted attacks: [ 6 39 15 10  7  1  2  7]|
+04/24/2025 07:59:32 - INFO - End of Episode.
+|Episode 075/100| time: 2.59|
+|Def Loss 0.0397 | Def Reward in ep 091|
+|Att Loss 0.0442 | Att Reward in ep 009|
+|Def Estimated: [13 34 16 17  4  5  5  6]| Att Labels: [ 8 36 15 18  8  4  5  6]|
+|Def Amount of true predicted attacks: [ 7 33 15 17  4  4  5  6]|
+04/24/2025 07:59:35 - INFO - End of Episode.
+|Episode 076/100| time: 2.61|
+|Def Loss 0.0304 | Def Reward in ep 095|
+|Att Loss 0.0400 | Att Reward in ep 005|
+|Def Estimated: [15 29 14 18  5  8  6  5]| Att Labels: [14 29 14 19  8  7  5  4]|
+|Def Amount of true predicted attacks: [13 29 14 18  5  7  5  4]|
+04/24/2025 07:59:38 - INFO - End of Episode.
+|Episode 077/100| time: 2.72|
+|Def Loss 0.0387 | Def Reward in ep 091|
+|Att Loss 0.0468 | Att Reward in ep 009|
+|Def Estimated: [18 34 11 12  5  3  8  9]| Att Labels: [13 36 11 16  6  3  7  8]|
+|Def Amount of true predicted attacks: [13 34 10 12  4  3  7  8]|
+04/24/2025 07:59:41 - INFO - End of Episode.
+|Episode 078/100| time: 2.66|
+|Def Loss 0.0495 | Def Reward in ep 090|
+|Att Loss 0.0535 | Att Reward in ep 010|
+|Def Estimated: [16 32 16 12  5  2 11  6]| Att Labels: [16 32 14 12 10  2  8  6]|
+|Def Amount of true predicted attacks: [13 31 14 11  5  2  8  6]|
+04/24/2025 07:59:45 - INFO - End of Episode.
+|Episode 079/100| time: 2.61|
+|Def Loss 0.0641 | Def Reward in ep 097|
+|Att Loss 0.0454 | Att Reward in ep 003|
+|Def Estimated: [13 28 21 16  5  7  6  4]| Att Labels: [12 28 21 17  6  7  5  4]|
+|Def Amount of true predicted attacks: [12 27 21 16  5  7  5  4]|
+04/24/2025 07:59:48 - INFO - End of Episode.
+|Episode 080/100| time: 2.64|
+|Def Loss 0.0734 | Def Reward in ep 095|
+|Att Loss 0.0406 | Att Reward in ep 005|
+|Def Estimated: [19 24 19 13  3  7  8  7]| Att Labels: [17 26 19 13  5  7  6  7]|
+|Def Amount of true predicted attacks: [17 24 19 12  3  7  6  7]|
+04/24/2025 07:59:51 - INFO - End of Episode.
+|Episode 081/100| time: 2.59|
+|Def Loss 0.0666 | Def Reward in ep 087|
+|Att Loss 0.0476 | Att Reward in ep 013|
+|Def Estimated: [16 33  6 23  8  3  6  5]| Att Labels: [ 9 34  7 24 15  2  5  4]|
+|Def Amount of true predicted attacks: [ 8 33  6 22  8  2  4  4]|
+04/24/2025 07:59:54 - INFO - End of Episode.
+|Episode 082/100| time: 2.63|
+|Def Loss 0.0643 | Def Reward in ep 091|
+|Att Loss 0.0462 | Att Reward in ep 009|
+|Def Estimated: [11 27 20 18  4  4  9  7]| Att Labels: [ 5 30 21 20  6  4  8  6]|
+|Def Amount of true predicted attacks: [ 4 27 20 18  4  4  8  6]|
+04/24/2025 07:59:57 - INFO - End of Episode.
+|Episode 083/100| time: 2.60|
+|Def Loss 0.0707 | Def Reward in ep 091|
+|Att Loss 0.0459 | Att Reward in ep 009|
+|Def Estimated: [11 39 16 19  3  6  2  4]| Att Labels: [ 6 37 16 20 10  6  2  3]|
+|Def Amount of true predicted attacks: [ 5 37 16 19  3  6  2  3]|
+04/24/2025 08:00:01 - INFO - End of Episode.
+|Episode 084/100| time: 2.66|
+|Def Loss 0.0629 | Def Reward in ep 093|
+|Att Loss 0.0320 | Att Reward in ep 007|
+|Def Estimated: [22 28  6 18  8  4 10  4]| Att Labels: [23 29  6 18 10  2  8  4]|
+|Def Amount of true predicted attacks: [20 28  6 18  7  2  8  4]|
+04/24/2025 08:00:04 - INFO - End of Episode.
+|Episode 085/100| time: 2.58|
+|Def Loss 0.0678 | Def Reward in ep 090|
+|Att Loss 0.0299 | Att Reward in ep 010|
+|Def Estimated: [14 37  8 17  8  5  6  5]| Att Labels: [ 9 37 10 16 12  5  6  5]|
+|Def Amount of true predicted attacks: [ 7 36  8 15  8  5  6  5]|
+04/24/2025 08:00:07 - INFO - End of Episode.
+|Episode 086/100| time: 2.60|
+|Def Loss 0.0661 | Def Reward in ep 091|
+|Att Loss 0.0228 | Att Reward in ep 009|
+|Def Estimated: [14 33 14 15  8  6  3  7]| Att Labels: [ 9 33 13 15 16  5  2  7]|
+|Def Amount of true predicted attacks: [ 8 33 13 15  8  5  2  7]|
+04/24/2025 08:00:10 - INFO - End of Episode.
+|Episode 087/100| time: 2.60|
+|Def Loss 0.0610 | Def Reward in ep 094|
+|Att Loss 0.0252 | Att Reward in ep 006|
+|Def Estimated: [15 33 10 16  4  9  5  8]| Att Labels: [16 32 10 16  8  6  5  7]|
+|Def Amount of true predicted attacks: [14 32 10 16  4  6  5  7]|
+04/24/2025 08:00:13 - INFO - End of Episode.
+|Episode 088/100| time: 2.59|
+|Def Loss 0.0621 | Def Reward in ep 088|
+|Att Loss 0.0318 | Att Reward in ep 012|
+|Def Estimated: [11 30 22  7  7  5 11  7]| Att Labels: [12 30 21  8 11  5  8  5]|
+|Def Amount of true predicted attacks: [ 9 28 20  7  6  5  8  5]|
+04/24/2025 08:00:17 - INFO - End of Episode.
+|Episode 089/100| time: 2.59|
+|Def Loss 0.0509 | Def Reward in ep 090|
+|Att Loss 0.0431 | Att Reward in ep 010|
+|Def Estimated: [11 34 16 17  4  6  9  3]| Att Labels: [11 33 15 16  8  7  8  2]|
+|Def Amount of true predicted attacks: [ 8 32 14 16  4  6  8  2]|
+04/24/2025 08:00:20 - INFO - End of Episode.
+|Episode 090/100| time: 2.59|
+|Def Loss 0.0623 | Def Reward in ep 087|
+|Att Loss 0.0512 | Att Reward in ep 013|
+|Def Estimated: [14 27  7 17  8  9  9  9]| Att Labels: [13 28  8 18 13  8  5  7]|
+|Def Amount of true predicted attacks: [ 9 26  7 17  8  8  5  7]|
+04/24/2025 08:00:23 - INFO - End of Episode.
+|Episode 091/100| time: 2.69|
+|Def Loss 0.0554 | Def Reward in ep 093|
+|Att Loss 0.0504 | Att Reward in ep 007|
+|Def Estimated: [13 34 13 16  6 11  2  5]| Att Labels: [15 34 12 17  7  8  2  5]|
+|Def Amount of true predicted attacks: [12 33 12 15  6  8  2  5]|
+04/24/2025 08:00:26 - INFO - End of Episode.
+|Episode 092/100| time: 2.62|
+|Def Loss 0.0476 | Def Reward in ep 095|
+|Att Loss 0.0424 | Att Reward in ep 005|
+|Def Estimated: [15 33 13 15  6  4  8  6]| Att Labels: [13 34 12 15  7  4  9  6]|
+|Def Amount of true predicted attacks: [12 33 12 15  5  4  8  6]|
+04/24/2025 08:00:29 - INFO - End of Episode.
+|Episode 093/100| time: 2.58|
+|Def Loss 0.0490 | Def Reward in ep 091|
+|Att Loss 0.0512 | Att Reward in ep 009|
+|Def Estimated: [13 30 19 17  4  4  4  9]| Att Labels: [10 32 19 17  8  4  3  7]|
+|Def Amount of true predicted attacks: [ 9 30 18 16  4  4  3  7]|
+04/24/2025 08:00:33 - INFO - End of Episode.
+|Episode 094/100| time: 2.59|
+|Def Loss 0.0410 | Def Reward in ep 093|
+|Att Loss 0.0492 | Att Reward in ep 007|
+|Def Estimated: [12 37 11 17  8  3  5  7]| Att Labels: [10 37 11 17 12  3  5  5]|
+|Def Amount of true predicted attacks: [ 9 35 11 17  8  3  5  5]|
+04/24/2025 08:00:36 - INFO - End of Episode.
+|Episode 095/100| time: 2.65|
+|Def Loss 0.0393 | Def Reward in ep 094|
+|Att Loss 0.0499 | Att Reward in ep 006|
+|Def Estimated: [18 31 11 19  6  8  4  3]| Att Labels: [22 32 11 19  6  4  3  3]|
+|Def Amount of true predicted attacks: [17 31 11 19  6  4  3  3]|
+04/24/2025 08:00:39 - INFO - End of Episode.
+|Episode 096/100| time: 2.62|
+|Def Loss 0.0528 | Def Reward in ep 092|
+|Att Loss 0.0521 | Att Reward in ep 008|
+|Def Estimated: [17 33 10 12  6  6  6 10]| Att Labels: [16 33 10 13 10  4  4 10]|
+|Def Amount of true predicted attacks: [14 33 10 12  5  4  4 10]|
+04/24/2025 08:00:43 - INFO - End of Episode.
+|Episode 097/100| time: 2.63|
+|Def Loss 0.0553 | Def Reward in ep 093|
+|Att Loss 0.0490 | Att Reward in ep 007|
+|Def Estimated: [13 28 11 20  8  8  7  5]| Att Labels: [11 29 10 21  9  8  7  5]|
+|Def Amount of true predicted attacks: [10 27 10 20  7  7  7  5]|
+04/24/2025 08:00:46 - INFO - End of Episode.
+|Episode 098/100| time: 2.63|
+|Def Loss 0.0633 | Def Reward in ep 091|
+|Att Loss 0.0410 | Att Reward in ep 009|
+|Def Estimated: [18 24 17 14  3  4  9 11]| Att Labels: [19 23 17 14  7  3  7 10]|
+|Def Amount of true predicted attacks: [16 22 17 13  3  3  7 10]|
+04/24/2025 08:00:49 - INFO - End of Episode.
+|Episode 099/100| time: 2.60|
+|Def Loss 0.0515 | Def Reward in ep 094|
+|Att Loss 0.0341 | Att Reward in ep 006|
+|Def Estimated: [15 27 15 19  5  9  4  6]| Att Labels: [13 28 15 19  9  7  4  5]|
+|Def Amount of true predicted attacks: [12 27 15 19  5  7  4  5]|
+04/24/2025 08:00:50 - INFO - Model 'attacker_model_cic_2017' saved in: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/attacker_model_cic.keras
+04/24/2025 08:00:50 - INFO - Model summary:
+Model: "attacker_model_cic_2017"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense (Dense)               (None, 100)               6800      
+                                                                 
+ dense_1 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_2 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_3 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_4 (Dense)             (None, 100)               10100     
+                                                                 
+ dense_5 (Dense)             (None, 15)                1515      
+                                                                 
+=================================================================
+Total params: 48715 (190.29 KB)
+Trainable params: 48715 (190.29 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+04/24/2025 08:00:50 - INFO - Model 'defender_model' saved in: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/defender_model.keras
+04/24/2025 08:00:50 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_12 (Dense)            (None, 100)               6800      
+                                                                 
+ dense_13 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_14 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_15 (Dense)            (None, 8)                 808       
+                                                                 
+=================================================================
+Total params: 27808 (108.62 KB)
+Trainable params: 27808 (108.62 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+04/24/2025 08:00:50 - INFO - Saved trained models.
+04/24/2025 08:00:50 - INFO - Total runtime: 00:05:51
+04/24/2025 08:00:50 - INFO - End of the script at: 2025-04-24 08:00:50.216216
+04/24/2025 08:00:52 - INFO - Debug information saved to /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/logs/debug_info.json
+04/24/2025 08:00:52 - INFO - Trying to save summary plots under: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/plots/
+04/24/2025 08:00:54 - INFO - Plotted attack distributions during training in: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/plots/
+04/24/2025 08:01:11 - INFO - Normalized confusion matrix
+04/24/2025 08:01:11 - INFO - 
+Confusion Matrix:
+[[8.69171429e-01 4.09285714e-02 3.07142857e-03 3.76214286e-02
+  4.21428571e-03 3.88857143e-02 3.83571429e-03 2.27142857e-03]
+ [5.29479368e-03 9.94002882e-01 3.64843664e-05 6.84081871e-05
+  5.47265497e-05 3.10117115e-04 0.00000000e+00 2.32587836e-04]
+ [1.91143676e-02 1.43357757e-03 9.64956993e-01 1.01943294e-02
+  0.00000000e+00 3.82287353e-03 4.77859191e-04 0.00000000e+00]
+ [1.19214586e-02 1.47265077e-02 1.40252454e-03 9.55119215e-01
+  0.00000000e+00 1.68302945e-02 0.00000000e+00 0.00000000e+00]
+ [8.19165379e-02 1.77743431e-02 0.00000000e+00 8.34621329e-02
+  6.05100464e-01 1.75425039e-01 0.00000000e+00 3.63214838e-02]
+ [2.12675457e-04 2.14311422e-03 7.36184275e-04 2.91201780e-03
+  0.00000000e+00 9.93996008e-01 0.00000000e+00 0.00000000e+00]
+ [1.57894737e-01 1.57894737e-01 0.00000000e+00 0.00000000e+00
+  0.00000000e+00 2.63157895e-01 4.21052632e-01 0.00000000e+00]
+ [0.00000000e+00 0.00000000e+00 0.00000000e+00 0.00000000e+00
+  0.00000000e+00 0.00000000e+00 0.00000000e+00 1.00000000e+00]]
+04/24/2025 08:01:12 - INFO - Plotted confusion matrix in: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/plots/intraset/
+04/24/2025 08:01:12 - INFO - Model summary:
+Model: "defender_model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense_12 (Dense)            (None, 100)               6800      
+                                                                 
+ dense_13 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_14 (Dense)            (None, 100)               10100     
+                                                                 
+ dense_15 (Dense)            (None, 8)                 808       
+                                                                 
+=================================================================
+Total params: 27808 (108.62 KB)
+Trainable params: 27808 (108.62 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+loaded from: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/defender_model.keras
+04/24/2025 08:01:13 - INFO - Overall overview
+Total reward: 408616 | Number of samples: 429420 | Accuracy = 95.16%
+Overall overview per attack type
+              Estimated Correct   Total Mismatch   F1_score
+Benign           123104  121684  140000    16896  92.498784
+(D)DOS           223874  217957  219272     4602  98.368032
+Brute Force        6543    6058    6278      265  94.501209
+Web Attack         6994    1362    1426     5568  32.351544
+Botnet             1385     783    1294       91  58.454647
+Probe             66551   60759   61126     5425  95.176108
+Infiltration        548       8      19      529   2.821869
+Heartbleed          421       5       5      416   2.347418
+Weigthed Avg.                                     95.598801
+04/24/2025 08:01:14 - INFO - 
+       Class  Support  Accuracy  Precision  Recall  F1-Score
+      Benign   140000    0.8692     0.9885  0.8692    0.9250
+      (D)DOS   219272    0.9940     0.9736  0.9940    0.9837
+ Brute Force     6278    0.9650     0.9259  0.9650    0.9450
+  Web Attack     1426    0.9551     0.1947  0.9551    0.3235
+      Botnet     1294    0.6051     0.5653  0.6051    0.5845
+       Probe    61126    0.9940     0.9130  0.9940    0.9518
+Infiltration       19    0.4211     0.0146  0.4211    0.0282
+  Heartbleed        5    1.0000     0.0119  1.0000    0.0235
+04/24/2025 08:01:14 - INFO - Overall weighted F1-score: 0.9560
+04/24/2025 08:01:14 - INFO - Classification report:
+              precision    recall  f1-score   support
+
+      Benign       0.99      0.87      0.92    140000
+      (D)DOS       0.97      0.99      0.98    219272
+ Brute Force       0.93      0.96      0.95      6278
+  Web Attack       0.19      0.96      0.32      1426
+      Botnet       0.57      0.61      0.58      1294
+       Probe       0.91      0.99      0.95     61126
+Infiltration       0.01      0.42      0.03        19
+  Heartbleed       0.01      1.00      0.02         5
+
+    accuracy                           0.95    429420
+   macro avg       0.57      0.85      0.60    429420
+weighted avg       0.97      0.95      0.96    429420
+
+04/24/2025 08:01:29 - INFO - Model metrics: 
+loss=0.08860886842012405, mse=0.29566216468811035, mae=0.2597505748271942
+04/24/2025 08:01:29 - INFO - Optimizer config: {'name': 'Adam', 'weight_decay': None, 'clipnorm': None, 'global_clipnorm': None, 'clipvalue': None, 'use_ema': False, 'ema_momentum': 0.99, 'ema_overwrite_frequency': None, 'jit_compile': True, 'is_legacy_optimizer': False, 'learning_rate': 0.001, 'beta_1': 0.9, 'beta_2': 0.999, 'epsilon': 1e-07, 'amsgrad': False}
+04/24/2025 08:01:29 - INFO - Time needed for testing: 29.24181032180786
+04/24/2025 08:01:29 - INFO - [Intra Set] Metrics exported to: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/logs/evaluation_metrics_defender_model.json
+04/24/2025 08:02:13 - INFO - Normalized confusion matrix
+04/24/2025 08:02:13 - INFO - 
+Confusion Matrix:
+[[5.71454118e-01 3.88825882e-01 2.77200000e-02 3.90588235e-04
+  2.11764706e-05 1.95764706e-03 3.37647059e-03 6.25411765e-03]
+ [2.64506762e-01 2.71167240e-01 4.64222461e-01 3.16701626e-05
+  1.33989149e-05 5.60318261e-05 0.00000000e+00 2.43616635e-06]
+ [2.28255798e-03 1.26108176e-04 9.97452615e-01 0.00000000e+00
+  0.00000000e+00 1.38718993e-04 0.00000000e+00 0.00000000e+00]
+ [5.79819277e-01 2.71084337e-02 8.43373494e-02 0.00000000e+00
+  0.00000000e+00 3.01204819e-03 1.59638554e-01 1.46084337e-01]
+ [6.98613420e-03 3.77562470e-03 9.87698507e-01 1.55611430e-04
+  0.00000000e+00 1.38412272e-03 0.00000000e+00 0.00000000e+00]
+ [           nan            nan            nan            nan
+             nan            nan            nan            nan]
+ [5.56659471e-01 3.64024649e-01 4.49069205e-02 3.17337318e-03
+  9.22492205e-06 1.91693880e-02 3.72686851e-03 8.33010461e-03]
+ [           nan            nan            nan            nan
+             nan            nan            nan            nan]]
+04/24/2025 08:02:13 - INFO - Plotted confusion matrix in: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/plots/interset/
+04/24/2025 08:02:13 - INFO - [Inter-Set] Confusion matrix saved to /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/plots/
+04/24/2025 08:03:05 - INFO - [Cross-Set] Model metrics: loss=0.14495274424552917, mse=51.51564407348633, mae=0.39400771260261536
+04/24/2025 08:03:07 - INFO - [Inter-Set] Evaluation completed. Metrics exported to: /workspace/models/trained-models/2025-04-24-07-54-mac-cic-2017-18-multi-class-1st-run/logs/evaluation_metrics_cross_defender_model.json
+04/24/2025 08:03:07 - INFO - [Inter-Set] Time needed: 97.79 seconds
+04/24/2025 08:03:07 - INFO - Finished script at: 2025-04-24-08-03
+Total runtime: 0:08:08.742212

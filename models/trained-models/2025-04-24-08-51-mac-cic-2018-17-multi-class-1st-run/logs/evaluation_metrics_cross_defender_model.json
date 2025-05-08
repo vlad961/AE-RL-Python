@@ -1,0 +1,121 @@
+{
+    "classification_report": {
+        "Benign": {
+            "precision": 0.28356293003535643,
+            "recall": 0.2761214285714286,
+            "f1-score": 0.2797927086122913,
+            "support": 140000.0
+        },
+        "(D)DOS": {
+            "precision": 0.9200656658253872,
+            "recall": 0.5469781823488635,
+            "f1-score": 0.6860815321383523,
+            "support": 219272.0
+        },
+        "Brute Force": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 6278.0
+        },
+        "Web Attack": {
+            "precision": 0.019217926838317134,
+            "recall": 0.5448807854137447,
+            "f1-score": 0.037126406574766464,
+            "support": 1426.0
+        },
+        "Botnet": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 1294.0
+        },
+        "Infiltration": {
+            "precision": 4.923117317885685e-05,
+            "recall": 0.15789473684210525,
+            "f1-score": 9.843165562044753e-05,
+            "support": 19.0
+        },
+        "accuracy": 0.4327416784101616,
+        "macro avg": {
+            "precision": 0.20381595897870655,
+            "recall": 0.2543125221960237,
+            "f1-score": 0.16718317983017175,
+            "support": 368289.0
+        },
+        "weighted avg": {
+            "precision": 0.655655896811683,
+            "recall": 0.4327416784101616,
+            "f1-score": 0.5149825084288118,
+            "support": 368289.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.10188626497983932,
+        "mse": 0.21206793189048767,
+        "mae": 0.32774096727371216
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "(D)DOS",
+        "Brute Force",
+        "Web Attack",
+        "Botnet",
+        "Infiltration"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 38657,
+            "TN": 130620,
+            "FP": 97669,
+            "FN": 101343
+        },
+        "1": {
+            "TP": 119937,
+            "TN": 138597,
+            "FP": 10420,
+            "FN": 99335
+        },
+        "2": {
+            "TP": 0,
+            "TN": 361840,
+            "FP": 171,
+            "FN": 6278
+        },
+        "3": {
+            "TP": 777,
+            "TN": 327209,
+            "FP": 39654,
+            "FN": 649
+        },
+        "4": {
+            "TP": 0,
+            "TN": 366928,
+            "FP": 67,
+            "FN": 1294
+        },
+        "5": {
+            "TP": 3,
+            "TN": 307336,
+            "FP": 60934,
+            "FN": 16
+        }
+    }
+}

@@ -1,0 +1,214 @@
+{
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 140000,
+            "Accuracy": 0.901,
+            "Precision": 0.9779,
+            "Recall": 0.901,
+            "F1-Score": 0.9379
+        },
+        {
+            "Class": "(D)DOS",
+            "Support": 219272,
+            "Accuracy": 0.9919,
+            "Precision": 0.9771,
+            "Recall": 0.9919,
+            "F1-Score": 0.9844
+        },
+        {
+            "Class": "Brute Force",
+            "Support": 6278,
+            "Accuracy": 0.967,
+            "Precision": 0.9627,
+            "Recall": 0.967,
+            "F1-Score": 0.9649
+        },
+        {
+            "Class": "Web Attack",
+            "Support": 1426,
+            "Accuracy": 0.9088,
+            "Precision": 0.5848,
+            "Recall": 0.9088,
+            "F1-Score": 0.7117
+        },
+        {
+            "Class": "Botnet",
+            "Support": 1294,
+            "Accuracy": 0.9413,
+            "Precision": 0.2091,
+            "Recall": 0.9413,
+            "F1-Score": 0.3422
+        },
+        {
+            "Class": "Probe",
+            "Support": 61126,
+            "Accuracy": 0.9796,
+            "Precision": 0.9603,
+            "Recall": 0.9796,
+            "F1-Score": 0.9698
+        },
+        {
+            "Class": "Infiltration",
+            "Support": 19,
+            "Accuracy": 0.5263,
+            "Precision": 0.0131,
+            "Recall": 0.5263,
+            "F1-Score": 0.0256
+        },
+        {
+            "Class": "Heartbleed",
+            "Support": 5,
+            "Accuracy": 1.0,
+            "Precision": 0.0136,
+            "Recall": 1.0,
+            "F1-Score": 0.0268
+        }
+    ],
+    "weighted_f1": 0.9639897718160602,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.9779195707961514,
+            "recall": 0.9009642857142857,
+            "f1-score": 0.9378659617894067,
+            "support": 140000.0
+        },
+        "(D)DOS": {
+            "precision": 0.9770582236856882,
+            "recall": 0.9919187128315516,
+            "f1-score": 0.9844323898623831,
+            "support": 219272.0
+        },
+        "Brute Force": {
+            "precision": 0.9627339042182049,
+            "recall": 0.9670277158330679,
+            "f1-score": 0.9648760330578512,
+            "support": 6278.0
+        },
+        "Web Attack": {
+            "precision": 0.5848375451263538,
+            "recall": 0.908835904628331,
+            "f1-score": 0.7116968698517299,
+            "support": 1426.0
+        },
+        "Botnet": {
+            "precision": 0.20909871244635192,
+            "recall": 0.9412673879443586,
+            "f1-score": 0.3421828908554572,
+            "support": 1294.0
+        },
+        "Probe": {
+            "precision": 0.9602745657787115,
+            "recall": 0.9795504368026698,
+            "f1-score": 0.9698167299702783,
+            "support": 61126.0
+        },
+        "Infiltration": {
+            "precision": 0.013123359580052493,
+            "recall": 0.5263157894736842,
+            "f1-score": 0.02560819462227913,
+            "support": 19.0
+        },
+        "Heartbleed": {
+            "precision": 0.01358695652173913,
+            "recall": 1.0,
+            "f1-score": 0.02680965147453083,
+            "support": 5.0
+        },
+        "accuracy": 0.9596921428904103,
+        "macro avg": {
+            "precision": 0.5873291047691567,
+            "recall": 0.9019850291534937,
+            "f1-score": 0.6204110901854896,
+            "support": 429420.0
+        },
+        "weighted avg": {
+            "precision": 0.9710700634479325,
+            "recall": 0.9596921428904103,
+            "f1-score": 0.9639897718160602,
+            "support": 429420.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.044195204973220825,
+        "mse": 0.189731165766716,
+        "mae": 0.20276153087615967
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "(D)DOS",
+        "Brute Force",
+        "Web Attack",
+        "Botnet",
+        "Probe",
+        "Infiltration",
+        "Heartbleed"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 126135,
+            "TN": 286572,
+            "FP": 2848,
+            "FN": 13865
+        },
+        "1": {
+            "TP": 217500,
+            "TN": 205041,
+            "FP": 5107,
+            "FN": 1772
+        },
+        "2": {
+            "TP": 6071,
+            "TN": 422907,
+            "FP": 235,
+            "FN": 207
+        },
+        "3": {
+            "TP": 1296,
+            "TN": 427074,
+            "FP": 920,
+            "FN": 130
+        },
+        "4": {
+            "TP": 1218,
+            "TN": 423519,
+            "FP": 4607,
+            "FN": 76
+        },
+        "5": {
+            "TP": 59876,
+            "TN": 365817,
+            "FP": 2477,
+            "FN": 1250
+        },
+        "6": {
+            "TP": 10,
+            "TN": 428649,
+            "FP": 752,
+            "FN": 9
+        },
+        "7": {
+            "TP": 5,
+            "TN": 429052,
+            "FP": 363,
+            "FN": 0
+        }
+    }
+}

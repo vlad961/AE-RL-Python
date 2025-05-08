@@ -1,0 +1,116 @@
+{
+    "one_vs_all": {
+        "tp": 818864,
+        "tn": 168687,
+        "fp": 1313,
+        "fn": 1871,
+        "accuracy": 0.9967862243687767,
+        "recall": 0.9977203360402566,
+        "specificity": 0.9922764705882353,
+        "precision": 0.9983991260423055,
+        "f1_score": 0.9980596156283822,
+        "false_positive_rate": 0.0077235294117647055
+    },
+    "one_vs_all_detailed": [
+        {
+            "name": "(D)DOS",
+            "accuracy": 0.9967862243687767,
+            "f1": 0.9980596156283823,
+            "precision": 0.9983991260423055,
+            "recall": 0.9977203360402566
+        },
+        {
+            "name": "Benign",
+            "accuracy": 0.9967862243687767,
+            "f1": 0.9906506380704608,
+            "precision": 0.9890301246496793,
+            "recall": 0.9922764705882353
+        }
+    ],
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 170000,
+            "Accuracy": 0.9923,
+            "Precision": 0.989,
+            "Recall": 0.9923,
+            "F1-Score": 0.9907
+        },
+        {
+            "Class": "(D)DOS",
+            "Support": 820735,
+            "Accuracy": 0.9977,
+            "Precision": 0.9984,
+            "Recall": 0.9977,
+            "F1-Score": 0.9981
+        }
+    ],
+    "weighted_f1": 0.9967883108043409,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.9890301246496793,
+            "recall": 0.9922764705882353,
+            "f1-score": 0.9906506380704608,
+            "support": 170000.0
+        },
+        "(D)DOS": {
+            "precision": 0.9983991260423055,
+            "recall": 0.9977203360402566,
+            "f1-score": 0.9980596156283823,
+            "support": 820735.0
+        },
+        "accuracy": 0.9967862243687767,
+        "macro avg": {
+            "precision": 0.9937146253459924,
+            "recall": 0.9949984033142459,
+            "f1-score": 0.9943551268494215,
+            "support": 990735.0
+        },
+        "weighted avg": {
+            "precision": 0.9967915011610341,
+            "recall": 0.9967862243687767,
+            "f1-score": 0.9967883108043409,
+            "support": 990735.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.01152949221432209,
+        "mse": 0.023396015167236328,
+        "mae": 0.07906192541122437
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": false,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "(D)DOS"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 168687,
+            "TN": 818864,
+            "FP": 1871,
+            "FN": 1313
+        },
+        "1": {
+            "TP": 818864,
+            "TN": 168687,
+            "FP": 1313,
+            "FN": 1871
+        }
+    }
+}

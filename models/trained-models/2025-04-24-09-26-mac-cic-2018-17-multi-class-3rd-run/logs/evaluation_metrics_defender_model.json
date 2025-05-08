@@ -1,0 +1,172 @@
+{
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 425000,
+            "Accuracy": 0.6456,
+            "Precision": 0.8641,
+            "Recall": 0.6456,
+            "F1-Score": 0.7391
+        },
+        {
+            "Class": "(D)DOS",
+            "Support": 820962,
+            "Accuracy": 0.9957,
+            "Precision": 0.9781,
+            "Recall": 0.9957,
+            "F1-Score": 0.9868
+        },
+        {
+            "Class": "Brute Force",
+            "Support": 79297,
+            "Accuracy": 0.9973,
+            "Precision": 0.8663,
+            "Recall": 0.9973,
+            "F1-Score": 0.9272
+        },
+        {
+            "Class": "Web Attack",
+            "Support": 664,
+            "Accuracy": 0.9744,
+            "Precision": 0.0172,
+            "Recall": 0.9744,
+            "F1-Score": 0.0338
+        },
+        {
+            "Class": "Botnet",
+            "Support": 122099,
+            "Accuracy": 0.988,
+            "Precision": 0.8634,
+            "Recall": 0.988,
+            "F1-Score": 0.9215
+        },
+        {
+            "Class": "Infiltration",
+            "Support": 108402,
+            "Accuracy": 0.452,
+            "Precision": 0.3642,
+            "Recall": 0.452,
+            "F1-Score": 0.4034
+        }
+    ],
+    "weighted_f1": 0.8699505916637764,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.864133806564987,
+            "recall": 0.6456258823529412,
+            "f1-score": 0.7390674892563698,
+            "support": 425000.0
+        },
+        "(D)DOS": {
+            "precision": 0.978100888361318,
+            "recall": 0.9956550973126649,
+            "f1-score": 0.9867999309453128,
+            "support": 820962.0
+        },
+        "Brute Force": {
+            "precision": 0.8662504107788367,
+            "recall": 0.9972634525896313,
+            "f1-score": 0.9271515414421967,
+            "support": 79297.0
+        },
+        "Web Attack": {
+            "precision": 0.0171932715048763,
+            "recall": 0.9743975903614458,
+            "f1-score": 0.03379031205118162,
+            "support": 664.0
+        },
+        "Botnet": {
+            "precision": 0.8634242359172571,
+            "recall": 0.9879605893578162,
+            "f1-score": 0.9215038444056545,
+            "support": 122099.0
+        },
+        "Infiltration": {
+            "precision": 0.3641538598733688,
+            "recall": 0.4520396302651243,
+            "f1-score": 0.4033650798877209,
+            "support": 108402.0
+        },
+        "accuracy": 0.861682934727298,
+        "macro avg": {
+            "precision": 0.6588760788334406,
+            "recall": 0.8421570403732707,
+            "f1-score": 0.6686130329980728,
+            "support": 1556424.0
+        },
+        "weighted avg": {
+            "precision": 0.8891158495089171,
+            "recall": 0.861682934727298,
+            "f1-score": 0.8699505916637764,
+            "support": 1556424.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.09872566908597946,
+        "mse": 216.69789123535156,
+        "mae": 0.2915092408657074
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": true,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "(D)DOS",
+        "Brute Force",
+        "Web Attack",
+        "Botnet",
+        "Infiltration"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 274391,
+            "TN": 1088282,
+            "FP": 43142,
+            "FN": 150609
+        },
+        "1": {
+            "TP": 817395,
+            "TN": 717161,
+            "FP": 18301,
+            "FN": 3567
+        },
+        "2": {
+            "TP": 79080,
+            "TN": 1464917,
+            "FP": 12210,
+            "FN": 217
+        },
+        "3": {
+            "TP": 647,
+            "TN": 1518776,
+            "FP": 36984,
+            "FN": 17
+        },
+        "4": {
+            "TP": 120629,
+            "TN": 1415244,
+            "FP": 19081,
+            "FN": 1470
+        },
+        "5": {
+            "TP": 49002,
+            "TN": 1362460,
+            "FP": 85562,
+            "FN": 59400
+        }
+    }
+}
