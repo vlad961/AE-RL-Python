@@ -1,0 +1,116 @@
+{
+    "one_vs_all": {
+        "tp": 72036,
+        "tn": 117710,
+        "fp": 52290,
+        "fn": 36188,
+        "accuracy": 0.6819900511817816,
+        "recall": 0.6656194559432289,
+        "specificity": 0.6924117647058824,
+        "precision": 0.579412190531345,
+        "f1_score": 0.6195312835949258,
+        "false_positive_rate": 0.30758823529411766
+    },
+    "one_vs_all_detailed": [
+        {
+            "name": "Benign",
+            "accuracy": 0.6819900511817816,
+            "f1": 0.7268337563059976,
+            "precision": 0.7648572431090722,
+            "recall": 0.6924117647058824
+        },
+        {
+            "name": "Infiltration",
+            "accuracy": 0.6819900511817816,
+            "f1": 0.6195312835949258,
+            "precision": 0.579412190531345,
+            "recall": 0.6656194559432289
+        }
+    ],
+    "f1_per_class": [
+        {
+            "Class": "Benign",
+            "Support": 170000,
+            "Accuracy": 0.6924,
+            "Precision": 0.7649,
+            "Recall": 0.6924,
+            "F1-Score": 0.7268
+        },
+        {
+            "Class": "Infiltration",
+            "Support": 108224,
+            "Accuracy": 0.6656,
+            "Precision": 0.5794,
+            "Recall": 0.6656,
+            "F1-Score": 0.6195
+        }
+    ],
+    "weighted_f1": 0.6850950752192365,
+    "classification_report": {
+        "Benign": {
+            "precision": 0.7648572431090722,
+            "recall": 0.6924117647058824,
+            "f1-score": 0.7268337563059976,
+            "support": 170000.0
+        },
+        "Infiltration": {
+            "precision": 0.579412190531345,
+            "recall": 0.6656194559432289,
+            "f1-score": 0.6195312835949258,
+            "support": 108224.0
+        },
+        "accuracy": 0.6819900511817816,
+        "macro avg": {
+            "precision": 0.6721347168202085,
+            "recall": 0.6790156103245557,
+            "f1-score": 0.6731825199504617,
+            "support": 278224.0
+        },
+        "weighted avg": {
+            "precision": 0.6927225409619822,
+            "recall": 0.6819900511817816,
+            "f1-score": 0.6850950752192365,
+            "support": 278224.0
+        }
+    },
+    "model_eval": {
+        "loss": 0.16787460446357727,
+        "mse": 7.875547885894775,
+        "mae": 0.4401870667934418
+    },
+    "optimizer": {
+        "name": "Adam",
+        "weight_decay": null,
+        "clipnorm": null,
+        "global_clipnorm": null,
+        "clipvalue": null,
+        "use_ema": false,
+        "ema_momentum": 0.99,
+        "ema_overwrite_frequency": null,
+        "jit_compile": false,
+        "is_legacy_optimizer": false,
+        "learning_rate": 0.0010000000474974513,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": 1e-07,
+        "amsgrad": false
+    },
+    "attack_types": [
+        "Benign",
+        "Infiltration"
+    ],
+    "metrics": {
+        "0": {
+            "TP": 117710,
+            "TN": 72036,
+            "FP": 36188,
+            "FN": 52290
+        },
+        "1": {
+            "TP": 72036,
+            "TN": 117710,
+            "FP": 52290,
+            "FN": 36188
+        }
+    }
+}
