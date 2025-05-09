@@ -1,5 +1,5 @@
 # AE-RL-Python
-
+The submitted thesis to this codespace as well as the referenced code can be found on branch 3: "https://github.com/vlad961/AE-RL-Python/tree/3-introduce-more-modern-datasets-and-make-an-inter-set-comparison".
 # Setup Environment
 ## Windows 11 utilizing GPU
 ### TensorFlow 
