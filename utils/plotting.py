@@ -2,9 +2,11 @@ from matplotlib import pyplot as plt
 import logging
 from matplotlib.ticker import MaxNLocator
 import numpy as np
-import os
+import os, sys
 import pandas as pd
 import seaborn as sns
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils.plotting_multiple_agents import select_epochs_to_plot
 
@@ -389,8 +391,7 @@ def plot_all_only_attacks_one_vs_all_metrics2():
     plt.close()
 
 def plot_one_vs_all_metrics_comparison_between_all_only_attacks_and_normal_and_class():
-    # Neuimport nach Reset
-    # Definieren der Tabellen
+    # Tables
     only_attacks = pd.DataFrame({
         "name": ["normal", "DoS", "R2L", "Probe", "U2R"],
         "accuracy": [0.0, 0.615907, 0.890924, 0.897534, 0.976801],
@@ -415,7 +416,6 @@ def plot_one_vs_all_metrics_comparison_between_all_only_attacks_and_normal_and_c
         "recall": [0.0, 0.842317, 0.30719, 0.814539, 0.225]
     })
 
-    # Kombinieren der drei Modelle für alle Metriken
     metrics = ["accuracy", "f1", "precision", "recall"]
     comparison_dfs = {}
 
@@ -438,9 +438,8 @@ def plot_one_vs_all_metrics_comparison_between_all_only_attacks_and_normal_and_c
 
         bars1 = ax.bar(x, df_metric[f"{metric}_model_1"], width=bar_width, label=f"{metric} - Model Only Attacks")
         bars2 = ax.bar([p + bar_width for p in x], df_metric[f"{metric}_model_2"], width=bar_width, label=f"{metric} - Model All Types")
-        bars3 = ax.bar([p + 2 * bar_width for p in x], df_metric[f"{metric}_model_3"], width=bar_width, label=f"{metric} - Model Normal & Klasse-X")
+        bars3 = ax.bar([p + 2 * bar_width for p in x], df_metric[f"{metric}_model_3"], width=bar_width, label=f"{metric} - Model Normal & Class-X")
 
-            # Werte über die Balken schreiben
         for bars in [bars1, bars2, bars3]:
             for bar in bars:
                 height = bar.get_height()
@@ -449,7 +448,7 @@ def plot_one_vs_all_metrics_comparison_between_all_only_attacks_and_normal_and_c
         ax.set_xticks([p + bar_width for p in x])
         ax.set_xticklabels(x_labels)
         ax.set_ylabel(metric.capitalize())
-        ax.set_title(f"Vergleich der One-vs-All {metric.capitalize()}-Werte zwischen den drei Modellen")
+        ax.set_title(f"Comparison of the One-vs-All \"{metric.capitalize()}\" values")
         ax.legend()
 
     plt.tight_layout()
@@ -592,3 +591,5 @@ def plot_roc_curve(fpr, tpr, roc_auc, path):
         os.makedirs(path)
     plt.savefig(os.path.join(path, 'roc_curve.pdf'), format='pdf', dpi=1000)
     plt.close()
+
+plot_one_vs_all_metrics_comparison_between_all_only_attacks_and_normal_and_class()
